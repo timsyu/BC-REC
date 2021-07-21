@@ -1,5 +1,5 @@
 #ignore node module
-node_modules
+node_modules/
 
 #ignore build
-build
+build/
