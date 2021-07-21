@@ -8,16 +8,10 @@ $ node --version
 v12.16.3
 ```
 
-Install Truffle in our project directory.
+Install Truffle, Ganache and other packages in our project directory.
 
 ```bash
-$ npm install --save-dev truffle
-```
-
-Install ganache in our project
-
-```bash
-$ npm install --save-dev ganache-cli
+$ npm install
 ```
 
 Start Ganache in deterministic mode
