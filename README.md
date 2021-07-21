@@ -96,7 +96,7 @@ Summary
 > Final cost:          0.08027284 ETH
 ```
 
-## 2 ways to interacting the contract
+## 2 ways to interact the contract
 
 ### Interacting from the console
 
