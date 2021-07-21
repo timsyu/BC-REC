@@ -8,11 +8,7 @@ $ node --version
 v12.16.3
 ```
 
-<<<<<<< HEAD
 Install Truffle, Ganache and other packages in our project directory.
-=======
-Install Truffle & Ganache in our project directory.
->>>>>>> e3b0423d (update package.json)
 
 ```bash
 $ npm install
