@@ -2,10 +2,14 @@
 
 
 First Install Node by [here](https://nodejs.org/en/download/)
+Then install node v12.16.3
 
 ```bash
 $ node --version  
 v12.16.3
+
+#ifneeded
+$ nvm use v12.16.3
 ```
 
 Install Truffle, Ganache and other packages in our project directory.
