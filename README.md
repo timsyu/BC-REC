@@ -16,7 +16,7 @@ $ nvm use v12.16.3
 Install Truffle, Ganache and other packages in our project directory.
 
 ```bash
-$ npm install
+$ npm ci
 ```
 
 Start Ganache in deterministic mode
