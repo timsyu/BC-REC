@@ -5,62 +5,53 @@ import "./Org.sol";
 
 contract OrgManager {
     
-    uint orgNum;
-    // org id => Org
-    mapping(uint => Org) orgs;
+    uint _orgNum;
+    // org id => Org contract address
+    mapping(uint => address) _orgs; 
     
     constructor() {
-        orgNum = 0;
+        _orgNum = 0;
     }
     
     modifier onlyOwner(uint orgId) {
-        Org org = orgs[orgId];
-        require( org.getOwner() == msg.sender, "only org owner can call this");
+        require( Org(_orgs[orgId]).getOwner() == msg.sender, "only org owner can call this");
         _;
     }
     
     // new a contract to owner
-    function createOrg (uint date, string memory description) public {
-        Org org = new Org(orgNum, msg.sender, date, description);
-        orgs[orgNum] = org;
-        orgNum ++;
+    function createOrg (uint date, string memory description) external returns (uint, Org) {
+        Org org = new Org(_orgNum, msg.sender, date, description);
+        _orgs[_orgNum] = address(org);
+        uint orgId = _orgNum;
+        _orgNum ++;
+        return (orgId, org);
     }
     
-    function getOrg (uint orgId) public view returns (Org) {
-        return orgs[orgId];
+    function getOrg (uint orgId) external view returns (address) {
+        return _orgs[orgId];
     }
     
-    function getOrgInfo (uint orgId) public view returns (Org.OrgInfo memory) {
-        return orgs[orgId].getOrgInfo();
+    function getOrgInfo (uint orgId) private view returns (Org.OrgInfo memory) {
+        return Org(_orgs[orgId]).getOrgInfo();
     }
     
-    function getAllOrgInfo () public view returns (uint[] memory, address[] memory, uint[] memory, string[] memory) {
-        uint[] memory ids = new uint[](orgNum);
-        address[] memory owners = new address[](orgNum);
-        uint[] memory dates = new uint[](orgNum);
-        string[] memory descriptions = new string[](orgNum);
-
+    function getAllOrgInfo () external view returns (Org.OrgInfo[] memory) {
+        Org.OrgInfo[] memory result = new Org.OrgInfo[](_orgNum);
         
-        for(uint i = 0; i < orgNum; i++) {
-            Org org = orgs[i];
-            Org.OrgInfo memory orgInfo = org.getOrgInfo();
-            ids[i] = orgInfo.id;
-            owners[i] = orgInfo.owner;
-            dates[i] = orgInfo.date;
-            descriptions[i] = orgInfo.description;
+        for(uint i = 0; i < _orgNum; i++) {
+            Org.OrgInfo memory orgInfo = getOrgInfo(i);
+            result[i] = orgInfo;
         }
         
-        return (ids, owners, dates, descriptions);
+        return result;
     }
     
-    function deleteOrg (uint orgId) public onlyOwner(orgId) {
-        Org org = orgs[orgId];
-        org.setDisable(msg.sender);
-        orgNum --;
+    function deleteOrg (uint orgId) external onlyOwner(orgId) {
+        Org(_orgs[orgId]).setDisable(msg.sender);
+        _orgNum --;
     }
     
-    function transferOwner (uint orgId, address newOwner) public onlyOwner(orgId) {
-        Org org = orgs[orgId];
-        org.setOwner(newOwner);
+    function transferOwner (uint orgId, address newOwner) external onlyOwner(orgId) {
+        Org(_orgs[orgId]).setOwner(newOwner);
     }
 }
