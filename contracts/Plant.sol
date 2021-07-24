@@ -70,27 +70,12 @@ contract Plant {
         uint deviceId,
         uint date,
         uint value
-        ) external {
+        ) external onlyDevice {
         _powers.push(Power(deviceId, date, value, value, ""));
     }
     
-    // get target time section power generation
-    function showTimeSection(
-        uint sdate,
-        uint edate
-        ) external view returns (Power[] memory) {
-        Power[] memory result = new Power[](_powers.length);
-        uint num = 0;
-       
-        for (uint i = 0; i < _powers.length ; i++) {
-            uint d = _powers[i].date;
-            if (sdate <= d && d <= edate) {
-                result[num] = _powers[i];
-                num ++;
-            }
-        }
-        
-        return result;
+    function getAllPower() external view returns (Power[] memory) {
+        return _powers;
     }
     
     function getDeviceNum() external view returns (uint) {
