@@ -4,9 +4,8 @@ pragma solidity ^0.8.4;
 contract User {
     
     struct UserInfo {
-        uint id; // user id
-        address account;
-        uint date; // timestamp
+        uint id;
+        uint[] orgIds;
         string email;
         uint phone;
         string firstName;
@@ -22,18 +21,38 @@ contract User {
         _userInfoNum = 0;
     }
     
-    function addUser(
+    function register(
         address account,
-        uint date,
         string memory email,
         uint phone,
         string memory firstName,
         string memory lastName
         ) external {
-        // UserInfo memory userInfo = UserInfo(userInfoNum ,account, date, email, phone, firstName, lastName);
-        _userInfos[account] = UserInfo(_userInfoNum, account, date, email, phone, firstName, lastName);
-        _userAddress[_userInfoNum] = account;
-        _userInfoNum ++;
+        _userInfos[account] = UserInfo(_userInfoNum, new uint[](0), email, phone, firstName, lastName);
+        _userAddress[_userInfoNum++] = account;
+    }
+    
+    function addOrgIdToUser(address account, uint orgId) external {
+        (bool result,) = has(account, orgId);
+        require(!result, "The user can not belong to Org");
+        _userInfos[account].orgIds.push(orgId);
+    }
+    
+    function removeOrgIdToUser(address account, uint orgId) external {
+        (bool result, uint id) = has(account, orgId);
+        require(result, "The user must belong to Org");
+        delete _userInfos[account].orgIds[id];
+    }
+    
+    function has(address account, uint orgId) private view returns (bool result, uint id) {
+        uint[] memory ids = _userInfos[account].orgIds;
+        for(uint i = 0; i < ids.length; i++) {
+            if(ids[i] == orgId) {
+                result = true;
+                id = i;
+                break;
+            }
+        }
     }
     
     function removeUser(address account) external {
@@ -46,14 +65,10 @@ contract User {
         return _userInfos[account];
     }
     
-    function getAllUserInfo() external view returns (UserInfo[] memory) {
-        
-        UserInfo[] memory result = new UserInfo[](_userInfoNum);
-        
+    function getAllUserInfo() external view returns (UserInfo[] memory result) {
+        result = new UserInfo[](_userInfoNum);
         for(uint i = 0; i < _userInfoNum; i++) {
             result[i] = _userInfos[_userAddress[i]];
         }
-        
-        return result;
     }
 }

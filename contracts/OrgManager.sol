@@ -8,8 +8,10 @@ contract OrgManager {
     uint _orgNum;
     // org id => Org contract address
     mapping(uint => address) _orgs; 
+    address _user;
     
-    constructor() {
+    constructor(address user) {
+        _user = user;
         _orgNum = 0;
     }
     
@@ -20,11 +22,9 @@ contract OrgManager {
     
     // new a contract to owner
     function createOrg (uint date, string memory description) external returns (uint, Org) {
-        Org org = new Org(_orgNum, msg.sender, date, description);
-        _orgs[_orgNum] = address(org);
-        uint orgId = _orgNum;
-        _orgNum ++;
-        return (orgId, org);
+        Org org = new Org(_user, _orgNum, msg.sender, date, description);
+        _orgs[_orgNum++] = address(org);
+        return (_orgNum, org);
     }
     
     function getOrg (uint orgId) external view returns (address) {
@@ -35,15 +35,12 @@ contract OrgManager {
         return Org(_orgs[orgId]).getOrgInfo();
     }
     
-    function getAllOrgInfo () external view returns (Org.OrgInfo[] memory) {
-        Org.OrgInfo[] memory result = new Org.OrgInfo[](_orgNum);
-        
+    function getAllOrgInfo () external view returns (Org.OrgInfo[] memory result) {
+        result = new Org.OrgInfo[](_orgNum);
         for(uint i = 0; i < _orgNum; i++) {
             Org.OrgInfo memory orgInfo = getOrgInfo(i);
             result[i] = orgInfo;
         }
-        
-        return result;
     }
     
     function deleteOrg (uint orgId) external onlyOwner(orgId) {

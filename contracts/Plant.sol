@@ -5,6 +5,7 @@ import "./Org.sol";
 import "./Issuer.sol";
 
 contract Plant {
+    enum State { Pending, Approve, DisApprove}
     
     struct Power {
         uint deviceId;
@@ -17,15 +18,11 @@ contract Plant {
     struct DeviceInfo {
         uint date; // timestamp
     	uint capacity; // float? theoretical power generation
-    	string state;
+    	State state;
     	string location;
     	string image;
     }
-    
-    struct CertificateRequest {
-        Org.State state;
-    }
-    
+
     uint _orgId;
     address _org;
     string _plantName;
@@ -56,14 +53,21 @@ contract Plant {
     function addDevice(
         uint date,
         uint capacity,
-        string memory state,
+        uint state,
         string memory location,
         string memory image
         ) external onlyOrg returns (uint) {
-        _deviceInfos[_deviceInfoNum] = DeviceInfo(date, capacity, state, location, image);
-        uint id = _deviceInfoNum;
-        _deviceInfoNum ++;
-        return id;
+        require(uint(State.DisApprove) >= state);
+        _deviceInfos[_deviceInfoNum++] = DeviceInfo(date, capacity, State(state), location, image);
+        return _deviceInfoNum;
+    }
+    
+    function changeDeviceState(
+        uint deviceId,
+        uint state
+        ) external onlyOrg {
+        require(uint(State.DisApprove) >= state);
+        _deviceInfos[deviceId].state = State(state);
     }
     
     function record(
@@ -71,7 +75,18 @@ contract Plant {
         uint date,
         uint value
         ) external onlyDevice {
+        require(_deviceInfos[deviceId].state == State.Approve);
         _powers.push(Power(deviceId, date, value, value, ""));
+    }
+    
+    function getAllDeviceByState(State state) external view returns (DeviceInfo[] memory result) {
+        result = new DeviceInfo[](_deviceInfoNum);
+        uint num = 0;
+        for(uint i = 0; i< _deviceInfoNum; i++) {
+            if(_deviceInfos[i].state == state) {
+                result[num++] = _deviceInfos[i];
+            }
+        }
     }
     
     function getAllPower() external view returns (Power[] memory) {
