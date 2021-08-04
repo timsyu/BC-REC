@@ -4,11 +4,13 @@ pragma solidity ^0.8.4;
 import "./Org.sol";
 import "./OrgManager.sol";
 import "./Plant.sol";
+import "./NFT721Demo.sol";
 
 contract Issuer {
     
     address _issuerAccount;
     address _orgManager;
+    NFT721Demo _nft;
     
     enum State { Pending, Approve, DisApprove}
     struct DeviceRequest {
@@ -25,20 +27,15 @@ contract Issuer {
     
     DeviceRequest[] _deviceRequests;
     
-    constructor(address orgManager) {
+    constructor(address orgManager, address nft) {
         _orgManager = orgManager;
-        
+        _nft = NFT721Demo(nft);
         // test
         _issuerAccount = 0x17F6AD8Ef982297579C203069C1DbfFE4348c372;
     }
     
     modifier onlyOrg(uint orgId) {
         require( msg.sender == OrgManager(_orgManager).getOrg(orgId), "only org contract can call this");
-        _;
-    }
-    
-    modifier onlyPlant(uint orgId, uint plantId) {
-        require( msg.sender == Org(OrgManager(_orgManager).getOrg(orgId)).getPlant(plantId), "only plant contract can call this");
         _;
     }
     
@@ -66,8 +63,34 @@ contract Issuer {
         return _deviceRequests;
     }
     
-    function requestCertificate(uint orgId,uint plantId, uint number) external onlyPlant(orgId, plantId) {
+    event ReqCertEvent(uint indexed tokenId, uint orgId ,uint plantId, uint[] powerIds, uint sdate, uint edate);
+    
+    // After calculating, will call this
+    function requestCertificate(uint orgId,uint plantId, uint number) external {
+        Org org = Org(OrgManager(_orgManager).getOrg(orgId));
+        address plantAddress = org.getPlant(plantId);
+        require( msg.sender == plantAddress, "only plant contract can call this");
+        Plant plant = Plant(plantAddress);
         
+        // 1. calculate in plant contract
+        (uint[] memory numbers, uint[] memory powerIds, Plant.DateRange[] memory dateRanges) = plant.calculate(number);
+        
+        address receiver = org.getPlantAccount();
+        uint start = 0;
+        for (uint i = 0;i < number;i++) {
+            uint[] memory oneTokenPowerIds = new uint[](numbers[i]);
+            for (uint j = start;j < start + numbers[i];j++) {
+                oneTokenPowerIds[j - start] = powerIds[j];
+                start = numbers[i];
+            }
+            
+            // 2. mint
+            uint tokenId = _nft.mintNft(receiver, "");
+            tokenId++;
+            // 3. emit one token
+            emit ReqCertEvent(tokenId, orgId , plantId, oneTokenPowerIds, dateRanges[i].sdate, dateRanges[i].edate);
+        }
+        // emit this requestCertificate which tokenIds?
     }
     
 }

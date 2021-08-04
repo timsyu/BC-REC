@@ -26,6 +26,7 @@ contract Org {
     mapping(address => Role) _userRole;
     mapping(uint => address) _userAddress;
     
+    address _plantAccount;
     uint _plantNum;
     // plant id => Plant contract address
     mapping(uint => address) _plants;
@@ -128,6 +129,15 @@ contract Org {
         // remove org id from the target user storing in the user contract
         User(_user).removeOrgIdToUser(account, _orgInfo.id);
         _userNum --;
+    }
+    
+    // only admins can call this
+    function setPlantAccount(address account) external onlyAdmin onlyAble {
+       _plantAccount = account;
+    }
+    
+    function getPlantAccount() external view onlyAble returns (address){
+       return _plantAccount;
     }
     
     // only admins can call this
