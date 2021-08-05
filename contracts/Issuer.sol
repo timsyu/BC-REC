@@ -68,9 +68,8 @@ contract Issuer {
     // After calculating, will call this
     function requestCertificate(uint orgId,uint plantId, uint number) external {
         Org org = Org(OrgManager(_orgManager).getOrg(orgId));
-        address plantAddress = org.getPlant(plantId);
-        require( msg.sender == plantAddress, "only plant contract can call this");
-        Plant plant = Plant(plantAddress);
+        require(org.getUserRole(msg.sender) == Org.Role.Admin, "only Org.Role Device can call this");
+        Plant plant = Plant(org.getPlant(plantId));
         
         // 1. calculate in plant contract
         (uint[] memory numbers, uint[] memory powerIds, Plant.DateRange[] memory dateRanges) = plant.calculate(number);

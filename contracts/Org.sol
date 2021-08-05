@@ -131,6 +131,25 @@ contract Org {
         _userNum --;
     }
     
+    // device is not an user
+    // only admins can call this
+    function addDeviceRole(address account) external onlyAdmin onlyAble returns (uint){
+        _userRole[account] = Role.Device;
+        _userAddress[_userNum++] = account;
+        // add org id to the target user storing in the user contract
+        User(_user).addOrgIdToUser(account, _orgInfo.id);
+        return _userNum;
+    }
+    
+    // only admins can call this
+    function removeDeviceRole(uint userId, address account) external onlyAdmin onlyAble {
+        delete _userRole[account];
+        delete _userAddress[userId];
+        // remove org id from the target user storing in the user contract
+        User(_user).removeOrgIdToUser(account, _orgInfo.id);
+        _userNum --;
+    }
+    
     // only admins can call this
     function setPlantAccount(address account) external onlyAdmin onlyAble {
        _plantAccount = account;

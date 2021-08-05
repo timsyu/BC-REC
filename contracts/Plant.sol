@@ -5,7 +5,7 @@ import "./Org.sol";
 import "./Issuer.sol";
 
 contract Plant {
-    enum State { Pending, Approve, DisApprove}
+    enum State { Pending, Approve, DisApprove} // add not send request yet state?
     event RecordEvent(uint indexed powerId, uint indexed deviceId, uint date, uint value);
     
     struct Power {
@@ -58,7 +58,7 @@ contract Plant {
         uint state,
         string memory location,
         string memory image
-        ) external onlyOrg returns (uint) {
+        ) external onlyOrg returns (uint) { // permission??
         require(uint(State.DisApprove) >= state);
         _deviceInfos[_deviceInfoNum++] = DeviceInfo(date, capacity, State(state), location, image);
         return _deviceInfoNum;
@@ -81,7 +81,7 @@ contract Plant {
         // store record value to the storage
         _powers.push(Power(totalPowerNum, deviceId, date, value, value));
         // emit record event to the chain
-        emit RecordEvent(totalPowerNum, deviceId, date, value);
+        emit RecordEvent(totalPowerNum, deviceId, date, value); // transaction hash?
         totalPowerNum++;
     }
     
@@ -103,12 +103,12 @@ contract Plant {
         return _deviceInfoNum;
     }
     
-    function requestCertificate(
-        address issuerContract, 
-        uint number
-        ) external onlyDevice {
-        Issuer(issuerContract).requestCertificate(_orgId, _plantId, number);
-    }
+    // function requestCertificate( // <- call requestCertificate() in the Issuer contract directly
+    //     address issuerContract, 
+    //     uint number
+    //     ) external onlyDevice { // should add some balance to this contract?
+    //     Issuer(issuerContract).requestCertificate(_orgId, _plantId, number);
+    // }
     
     // check whether it is able to request certificate
     // return result and number of power
@@ -124,7 +124,7 @@ contract Plant {
                 Power memory p = ps[j];
                 if (p.remainValue != 0) {
                     num++;
-                    if (target - p.remainValue > 0) {
+                    if (target > p.remainValue) {
                         target -= p.remainValue;
                         p.remainValue = 0;
                     } else { // generate a cert.
@@ -145,11 +145,13 @@ contract Plant {
         uint sdate;
         uint edate;
     }
+    
     event CalculateEvent(uint indexed powerId, uint value);
     // safe math? overflow?
     function calculate(uint number) external returns (uint[] memory, uint[] memory, DateRange[] memory){
+        
         (bool result, uint num) = checkReqCertAble(number);
-        require(result); // check result
+        require(result, "checkReqCertAble is failed!"); // check result
         
         uint[] memory numbers = new uint[](number); // number of powerIds[i] and values[i]
         DateRange[] memory dateRanges = new DateRange[](number); // start dates
@@ -175,7 +177,7 @@ contract Plant {
                     }
                     count++;
                     powerIds[powerNum] = p.powerId;
-                    if (target - p.remainValue > 0) {
+                    if (target > p.remainValue) {
                         target -= p.remainValue;
                         values[powerNum++] = p.remainValue;
                         p.remainValue = 0;
@@ -197,6 +199,12 @@ contract Plant {
         // emit record event to the chain
         for (uint i = 0;i < num;i++) {
             emit CalculateEvent(powerIds[i], values[i]);
+        }
+        // delete the power which remainValue == 0
+        for (uint i = 0;i < _powers.length;i++) {
+            if (_powers[i].remainValue == 0) {
+                delete _powers[i];
+            }
         }
         
         return (numbers, powerIds, dateRanges);
