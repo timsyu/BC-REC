@@ -5,6 +5,7 @@ import "./Org.sol";
 
 contract OrgManager {
     
+    event CreateOrgEvent(uint indexed orgId, address orgAddress, string description);
     uint _orgNum;
     // org id => Org contract address
     mapping(uint => address) _orgs; 
@@ -21,10 +22,10 @@ contract OrgManager {
     }
     
     // new a contract to owner
-    function createOrg (uint date, string memory description) external returns (uint, Org) {
+    function createOrg (uint date, string memory description) external {
         Org org = new Org(_user, _orgNum, msg.sender, date, description);
-        _orgs[_orgNum++] = address(org);
-        return (_orgNum, org);
+        _orgs[_orgNum] = address(org);
+        emit CreateOrgEvent(_orgNum++, address(org), description);
     }
     
     function getOrg (uint orgId) external view returns (address) {
@@ -43,10 +44,10 @@ contract OrgManager {
         }
     }
     
-    function deleteOrg (uint orgId) external onlyOwner(orgId) {
-        Org(_orgs[orgId]).setDisable(msg.sender);
-        _orgNum --;
-    }
+    // function deleteOrg (uint orgId) external onlyOwner(orgId) {
+    //     Org(_orgs[orgId]).setDisable(msg.sender);
+    //     _orgNum --;
+    // }
     
     function transferOwner (uint orgId, address newOwner) external onlyOwner(orgId) {
         Org(_orgs[orgId]).setOwner(newOwner);

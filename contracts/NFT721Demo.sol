@@ -1,9 +1,9 @@
 pragma solidity ^0.8.4;
 // SPDX-License-Identifier: MIT
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC721/ERC721.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Counters.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 // https://forum.openzeppelin.com/t/function-settokenuri-in-erc721-is-gone-with-pragma-0-8-0/5978/3
 
@@ -61,12 +61,5 @@ contract NFT721Demo is ERC721, Ownable {
 
         return newNftTokenId;
     }
-    
-    // function mintNft(address receiver, uint256 newNftTokenId ,string memory _tokenURI) external onlyOwner returns (uint256) {
-        
-    //     _mint(receiver, newNftTokenId);
-    //     _setTokenURI(newNftTokenId, _tokenURI);
 
-    //     return newNftTokenId;
-    // }
 }
