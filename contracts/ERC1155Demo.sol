@@ -2,7 +2,9 @@ pragma solidity ^0.8.4;
 // SPDX-License-Identifier: MIT
 
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Counters.sol";
+
+// https://forum.openzeppelin.com/t/function-settokenuri-in-erc721-is-gone-with-pragma-0-8-0/5978/3
 
 contract NFT1155Demo is ERC1155Supply {
     using Counters for Counters.Counter;
@@ -13,6 +15,8 @@ contract NFT1155Demo is ERC1155Supply {
     
     // Optional mapping for token URIs
     mapping (uint256 => string) private _tokenURIs;
+    // token id => power ids
+    
     
     // Base URI
     // string private _baseURIextended;
@@ -63,7 +67,7 @@ contract NFT1155Demo is ERC1155Supply {
         uint256 newNftTokenId = _tokenIds.current();
         _mint(receiver, newNftTokenId, 1, new bytes(0));
         _setTokenURI(newNftTokenId, _tokenURI);
-
+        require(false);
         return newNftTokenId;
     }
     
@@ -93,5 +97,18 @@ contract NFT1155Demo is ERC1155Supply {
         _mintBatch(receiver, ids, amounts, new bytes(0));
 
         return ids;
+    }
+    
+    uint256[] _data;
+    function testArray(uint256[] memory data) external {
+       _data = data;
+    }
+    
+    function getData() external view returns (uint256[] memory) {
+       return _data;
+    }
+    
+    function getSender() external view returns (address) {
+       return tx.origin;
     }
 }

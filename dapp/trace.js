@@ -3,7 +3,7 @@ const { abi } = require("./resource/orgManager");
 
 async function main () {
 	try {
-		web3 = new Web3()
+		web3 = new Web3();
 		const eventProvider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
 		web3.setProvider(eventProvider);
 		// const web3 = new Web3(new Web3.providers.HttpProvider('http://127.0.0.1:8545'));
@@ -13,7 +13,16 @@ async function main () {
 		// init account, contract address
 		const account = accounts[0];
 		const orgManagerAddress = '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B';
-
+		
+		let taccount = web3.eth.accounts.create(web3.utils.randomHex(32));
+		let twallet = web3.eth.accounts.wallet.add(taccount);
+		let tkeystore = twallet.encrypt(web3.utils.randomHex(32));
+		console.log({
+			account: taccount,
+			wallet: twallet,
+			keystore: tkeystore
+		});
+		
 		// Set up a Truffle contract, representing our deployed Box instance
 		// const OrgManager = artifacts.require('OrgManager');
 		// const orgManager = await OrgManager.deployed();
@@ -32,7 +41,7 @@ async function main () {
 		// console.log(allEventsA);
 
 		orgManager.events.CreateOrgEvent({
-			// filter: {orgId: orgId},
+			filter: {orgId: orgId},
 			fromBlock: 0,
 		})
 		.on("connected", function(subscriptionId){
@@ -47,6 +56,7 @@ async function main () {
 			console.log("org description: ",event.returnValues['description']);
 		})
 		.on('changed', function(event){
+			// The "removed events" I mean is the smart contract events that has been removed due to blockchain reorganization. <- from stack overflow
 			// remove event from local database
 			console.log("changed");
 		})

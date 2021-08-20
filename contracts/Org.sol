@@ -3,73 +3,80 @@ pragma solidity ^0.8.4;
 
 import "./Plant.sol";
 import "./Issuer.sol";
-import "./User.sol";
+// import "./User.sol";
 
 contract Org {
     
-    enum Role { Admin, Device}
-    enum State { Pending, Approve, DisApprove}
+    enum Role { Admin, Device} // Role.Device not used...
+    enum State { Idle, Pending, Approve, DisApprove}
     struct OrgInfo {
-        uint id; // org id
         address owner; // who creates this Org
+        string name;
         uint date; // timestamp
         string description;
     }
     
-    address _user;
-    address _issuer;
-    address _orgManager;
+    struct UserInfo {
+        Role role;
+        uint userIndex;
+    }
+    
+    struct DeviceRegisterRequest {
+        address plantId;
+        address deviceId;
+    }
+    
+    address _userContract;
+    address _issuerContract;
+    address _orgManagerContract;
+    
     OrgInfo _orgInfo;
     bool _disable;
-    uint _userNum;
-    // account address => role
-    mapping(address => Role) _userRole;
-    mapping(uint => address) _userAddress;
     
-    address _plantAccount;
-    uint _plantNum;
-    // plant id => Plant contract address
-    mapping(uint => address) _plants;
-
+    // user account address => userInfo
+    mapping(address => UserInfo) _userInfoMap;
+    address[] _users;
+    // plant contract address => _plants index
+    mapping(address => uint) _plantIndexes;
+    address[] _plants;
+    // device register requests
+    DeviceRegisterRequest[] _deviceRegisterRequests;
+    
     modifier onlyAdmin() {
-        require(_userRole[msg.sender] == Role.Admin, "only admin can call this");
+        require(_userInfoMap[msg.sender].role == Role.Admin, "only admin can call this");
         _;
     }
     
     modifier onlyOrgManager() {
-        require(_orgManager == msg.sender, "only orgManager contract can call this");
+        require(_orgManagerContract == msg.sender, "only orgManager contract can call this");
         _;
     }
     
     modifier onlyOwner(address caller) {
-        require(_orgInfo.owner == caller, "only owner can call this");
+        require(_orgInfo.owner == caller, "only org owner can call this");
         _;
     }
     
     modifier onlyAble() {
-        require(_disable == false, "only contract able can call this");
-        _;
-    }
-    
-    modifier onlyIssuer() {
-        require( _issuer == msg.sender, "only issuer contract can call this");
+        require(_disable == false, "only contract useable can call this");
         _;
     }
     
     // only admins can call this
-    function setDisable(address caller) external onlyOrgManager onlyOwner(caller) onlyAble{
-        _disable = true;
+    function setDisable(address caller, bool disable) external onlyOrgManager onlyOwner(caller) {
+        _disable = disable;
     }
     
-    constructor(address user, uint id, address owner, uint date, string memory description) {
-        _user = user;
-        _orgManager = msg.sender; // orgManager contract will call this
-        _orgInfo = OrgInfo(id, owner, date, description);
-        _userNum = 0;
-        _plantNum = 0;
+    constructor(address userContract, address owner, string memory name, uint date, string memory description) {
+        // init contract address
+        _userContract = userContract;
+        _orgManagerContract = msg.sender; // orgManager contract will call this
+        // set org info
+        _orgInfo = OrgInfo(owner, name, date, description);
+        // set org contract is useable
         _disable = false;
-        _userRole[owner] = Role.Admin;
-        _userAddress[_userNum++] = owner;
+        // set org owner to org admin
+        addUser(owner, Role.Admin);
     }
     
     // only admins can call this
@@ -77,93 +84,58 @@ contract Org {
         _orgInfo.description = description;
     }
     
-    function setOwner(address newOwner) external onlyOrgManager onlyAble{
-        _orgInfo.owner = newOwner;
+    // only admins can call this
+    function setIssuerContract(address issuerContract) external onlyAdmin onlyAble {
+        _issuerContract = issuerContract;
     }
     
-    function getOwner() external view onlyAble returns (address) {
-        return _orgInfo.owner;
+    // function setOwner(address newOwner) external onlyOrgManager onlyAble{
+    //     _orgInfo.owner = newOwner;
+    // }
+    
+    // function getOwner() external view returns (address) {
+    //     return _orgInfo.owner;
+    // }
+    
+    function getUserInfo(address account) external view returns (UserInfo memory) {
+        return _userInfoMap[account];
     }
     
-    function getUserRole(address account) external view onlyAble returns (Role) {
-        return _userRole[account];
+    function getAllUser() external view returns (address[] memory) {
+        return _users;
     }
     
-    function getAllUser() external view onlyAble returns (address[] memory) {
-        address[] memory result = new address[](_userNum);
-        for(uint i = 0; i < _userNum; i++) {
-            result[i] = _userAddress[i];
-        }
-        return result;
-    }
-    
-    function getOrgInfo() external view onlyAble returns (OrgInfo memory) {
+    function getOrgInfo() external view returns (OrgInfo memory) {
         return _orgInfo;
     }
     
-    function getPlant(uint plantId) external view onlyAble returns (address) {
-        return _plants[plantId];
-    }
-    
-    function getAllPlant() external view onlyAble returns (address[] memory) {
-        address[] memory result = new address[](_plantNum);
-        for(uint i = 0; i < _plantNum; i++) {
-            result[i] = _plants[i];
-        }
-        return result;
+    function addUser(address account, Role role) private {
+        _users.push(account);
+        _userInfoMap[account] = UserInfo(role, _users.length - 1);
     }
     
     // only admins can call this
-    function addAdmin(address account) external onlyAdmin onlyAble returns (uint){
-        _userRole[account] = Role.Admin;
-        _userAddress[_userNum++] = account;
-        // add org id to the target user storing in the user contract
-        User(_user).addOrgIdToUser(account, _orgInfo.id);
-        return _userNum;
+    function addAdmin(address account) external onlyAdmin onlyAble {
+        addUser(account, Role.Admin);
     }
     
     // only admins can call this
-    function removeAdmin(uint userId, address account) external onlyAdmin onlyAble {
-        delete _userRole[account];
-        delete _userAddress[userId];
+    function removeAdmin(address account) external onlyAdmin onlyAble {
+        uint index = _userInfoMap[account].userIndex;
+        delete _users[index];
+        delete _userInfoMap[account];
         // remove org id from the target user storing in the user contract
-        User(_user).removeOrgIdToUser(account, _orgInfo.id);
-        _userNum --;
-    }
-    
-    // device is not an user
-    // only admins can call this
-    function addDeviceRole(address account) external onlyAdmin onlyAble returns (uint){
-        _userRole[account] = Role.Device;
-        _userAddress[_userNum++] = account;
-        // add org id to the target user storing in the user contract
-        User(_user).addOrgIdToUser(account, _orgInfo.id);
-        return _userNum;
+        // User(_user).removeOrgIdToUser(account, _orgInfo.id);
     }
     
     // only admins can call this
-    function removeDeviceRole(uint userId, address account) external onlyAdmin onlyAble {
-        delete _userRole[account];
-        delete _userAddress[userId];
-        // remove org id from the target user storing in the user contract
-        User(_user).removeOrgIdToUser(account, _orgInfo.id);
-        _userNum --;
-    }
-    
-    // only admins can call this
-    function setPlantAccount(address account) external onlyAdmin onlyAble {
-       _plantAccount = account;
-    }
-    
-    function getPlantAccount() external view onlyAble returns (address){
-       return _plantAccount;
-    }
-    
-    // only admins can call this
-    function createPlant(string memory plantName, string memory plantLocation) external onlyAdmin onlyAble returns (uint, Plant) {
-       Plant plant = new Plant(_orgInfo.id, plantName, plantLocation);
-       _plants[_plantNum++] = address(plant);
-       return (_plantNum, plant);
+    function createPlant(string memory plantName, string memory plantLocation) external onlyAdmin onlyAble returns (address) {
+        // create plant contract
+        Plant plant = new Plant(_issuerContract, plantName, plantLocation);
+        address plantAddress = address(plant);
+        _plants.push(plantAddress);
+        _plantIndexes[plantAddress] = _plants.length - 1;
+        return plantAddress;
     }
     
     // // only admins can call this
@@ -174,30 +146,61 @@ contract Org {
     //     }
     // }
     
+    function getAllPlant() external view returns (address[] memory) {
+        return _plants;
+    }
+    
+    // each smart meter has its wallet
+    // smart meter dapp will call this
+    function registerDevice(address plantId) external onlyAble {
+        address deviceAccount = msg.sender;
+        _deviceRegisterRequests.push(DeviceRegisterRequest(deviceAccount, plantId));
+    }
+    
+    function getAllDeviceRegisterRequest() external view returns (DeviceRegisterRequest[] memory) {
+        return _deviceRegisterRequests;
+    }
+    
     // only admins can call this
-    function addDevice(
-        uint plantId,
+    // admin will fill some infoes and press approve button
+    function approveDeviceRequest(
+        uint requestId,
         uint date,
         uint capacity,
-        uint state,
         string memory location,
         string memory image
-        ) external onlyAdmin onlyAble returns (uint) {
-        return Plant(_plants[plantId]).addDevice(date, capacity, state, location, image);
+        ) external onlyAdmin onlyAble{
+        DeviceRegisterRequest memory request = _deviceRegisterRequests[requestId];
+        Plant(request.plantId).addDevice(request.deviceId, date, capacity, location, image);
+        // remove request from storage
+        delete _deviceRegisterRequests[requestId];
     }
     
     // only admins can call this
-    function requestDevice(
-        address issuer, 
-        uint plantId,
-        uint deviceId,
+    function requestApproveDevice(
+        address plantId,
+        address deviceId,
         string memory deviceLocation
         ) external onlyAdmin onlyAble {
-        _issuer = issuer;
-        Issuer(issuer).requestDevice(_orgInfo.id, plantId, deviceId,deviceLocation);
+        // Issuer(_issuerContract).requestApproveDevice(plantId, deviceId, deviceLocation);
     }
     
-    function changeDeviceState(uint plantId, uint deviceId, uint state) external onlyAdmin onlyAble {
-        Plant(_plants[plantId]).changeDeviceState(deviceId, state);
+    // only admins can call this
+    // function changeDeviceState(uint plantId, uint deviceId, uint state) external onlyAdmin onlyAble {
+    //     Plant(_plants[plantId]).changeDeviceState(deviceId, state);
+    // }
+    
+    // only admins can call this
+    // CompilerError: Stack too deep when compiling inline assembly: Variable headStart is 1 slot(s) too deep inside the stack.
+    // Plant.SimplifiedPower[][] 
+    function requestCertificate(
+        uint number,
+        address plantId,
+        Plant.SimplifiedPower[][] memory simplifiedPowers,
+        string[] memory metadataUriList
+        ) external onlyAdmin onlyAble {
+        // Issuer(_issuerContract).requestCertificate(number, plantContract, simplifiedPowers, metadataUriList);
     }
+    
+    
 }

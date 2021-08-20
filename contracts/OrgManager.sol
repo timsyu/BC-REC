@@ -3,45 +3,52 @@ pragma solidity ^0.8.4;
 
 import "./Org.sol";
 
+// https://ethereum.stackexchange.com/questions/13167/are-there-well-solved-and-simple-storage-patterns-for-solidity
 contract OrgManager {
     
-    event CreateOrgEvent(uint indexed orgId, address orgAddress, string description);
-    uint _orgNum;
-    // org id => Org contract address
-    mapping(uint => address) _orgs; 
-    address _user;
+    // org contract address => _orgs index
+    mapping(address => uint) _orgIndexes;
+    address[] _orgs;
+    address _userContract;
     
-    constructor(address user) {
-        _user = user;
-        _orgNum = 0;
+    event CreateOrgEvent(address indexed owner, address orgContract);
+    event JoinOrgEvent(address indexed member, address orgContract);
+    
+    constructor(address userContract) {
+        _userContract = userContract;
     }
     
-    modifier onlyOwner(uint orgId) {
-        require( Org(_orgs[orgId]).getOwner() == msg.sender, "only org owner can call this");
-        _;
-    }
+    // modifier onlyOwner(address orgContract) {
+    //     require( _orgs[orgContract] == true, "this orgContract is not exist");
+    //     require( Org(orgContract).getOwner() == msg.sender, "only org owner can call this");
+    //     _;
+    // }
     
     // new a contract to owner
-    function createOrg (uint date, string memory description) external {
-        Org org = new Org(_user, _orgNum, msg.sender, date, description);
-        _orgs[_orgNum] = address(org);
-        emit CreateOrgEvent(_orgNum++, address(org), description);
+    function createOrg (string memory name, uint date, string memory description) external returns (address) {
+        address owner = msg.sender;
+        Org org = new Org(_userContract, owner, name, date, description);
+        address orgAddress = address(org);
+        _orgs.push(orgAddress);
+        _orgIndexes[orgAddress] = _orgs.length - 1;
+        emit CreateOrgEvent(owner, orgAddress);
+        return (orgAddress);
     }
     
-    function getOrg (uint orgId) external view returns (address) {
-        return _orgs[orgId];
+    function getOrgInfo (address orgContract) private view returns (Org.OrgInfo memory) {
+        return Org(orgContract).getOrgInfo();
     }
     
-    function getOrgInfo (uint orgId) private view returns (Org.OrgInfo memory) {
-        return Org(_orgs[orgId]).getOrgInfo();
-    }
-    
-    function getAllOrgInfo () external view returns (Org.OrgInfo[] memory result) {
-        result = new Org.OrgInfo[](_orgNum);
-        for(uint i = 0; i < _orgNum; i++) {
-            Org.OrgInfo memory orgInfo = getOrgInfo(i);
-            result[i] = orgInfo;
+    function getAllOrgInfo () external view returns (Org.OrgInfo[] memory) {
+        Org.OrgInfo[] memory result = new Org.OrgInfo[](_orgs.length);
+        for(uint i = 0; i < _orgs.length; i++) {
+            result[i] = getOrgInfo(_orgs[i]);
         }
+        return result;
+    }
+    
+    function contains (address orgContract) external view returns (bool) {
+        return (_orgs[_orgIndexes[orgContract]] == orgContract);
     }
     
     // function deleteOrg (uint orgId) external onlyOwner(orgId) {
@@ -49,7 +56,7 @@ contract OrgManager {
     //     _orgNum --;
     // }
     
-    function transferOwner (uint orgId, address newOwner) external onlyOwner(orgId) {
-        Org(_orgs[orgId]).setOwner(newOwner);
-    }
+    // function transferOwner (uint orgId, address newOwner) external onlyOwner(orgId) {
+    //     Org(_orgs[orgId]).setOwner(newOwner);
+    // }
 }
