@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/timsyu/BC-REC#readme",
   "devDependencies": {
+    "@truffle/hdwallet-provider": "^1.4.3",
     "ganache-cli": "^6.12.2",
     "truffle": "^5.4.1"
   },

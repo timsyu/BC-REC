@@ -34,6 +34,12 @@ contract OrgManager {
         emit CreateOrgEvent(owner, orgAddress);
     }
     
+    function testCreateOrg (uint date) external {
+        address owner = msg.sender;
+        Org org = new Org(_userContract, owner, "n", date, "d");
+        emit CreateOrgEvent(owner, address(org));
+    }
+
     function getOrgInfo (address orgContract) private view returns (Org.OrgInfo memory) {
         return Org(orgContract).getOrgInfo();
     }
