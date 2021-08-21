@@ -25,14 +25,13 @@ contract OrgManager {
     // }
     
     // new a contract to owner
-    function createOrg (string memory name, uint date, string memory description) external returns (address) {
+    function createOrg (string memory name, uint date, string memory description) external {
         address owner = msg.sender;
         Org org = new Org(_userContract, owner, name, date, description);
         address orgAddress = address(org);
         _orgs.push(orgAddress);
         _orgIndexes[orgAddress] = _orgs.length - 1;
         emit CreateOrgEvent(owner, orgAddress);
-        return (orgAddress);
     }
     
     function getOrgInfo (address orgContract) private view returns (Org.OrgInfo memory) {
