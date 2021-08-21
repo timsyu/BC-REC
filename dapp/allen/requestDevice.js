@@ -1,5 +1,5 @@
 const Web3 = require("web3");
-const { abi } = require("./resource/allenOrg");
+const { abi } = require("../resource/allenOrg");
 
 async function main () {
 	try {

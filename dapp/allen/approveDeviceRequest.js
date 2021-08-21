@@ -1,5 +1,5 @@
 const Web3 = require("web3");
-const { abi } = require("./resource/allenOrg");
+const { abi } = require("../resource/allenOrg");
 
 async function main () {
 	try {
@@ -25,7 +25,7 @@ async function main () {
 
         // request Org register Device
 		await org.methods.const Web3 = require("web3");
-const { abi } = require("./resource/allenOrg");
+const { abi } = require("../resource/allenOrg");
 
 async function main () {
 	try {

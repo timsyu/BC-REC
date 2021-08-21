@@ -87,31 +87,36 @@ contract Issuer {
     }
     
     // Admin After calculating, will call this
-    // function requestCertificate(uint number, address plantId, Plant.SimplifiedPower[][] memory simplifiedPowers, string[] memory metadataUriList) external {
-        // address orgAddress = OrgManager(_orgManager).getOrg(orgId);
-        // Org org = Org(orgAddress);
-        // require(msg.sender == orgAddress, "only Org can call this");
-        // Plant plant = Plant(org.getPlant(plantId));
+    // function requestCertificate(
+    //     uint number,
+    //     address plantId, uint[][] memory powerIds,
+    //     uint[][] memory values,
+    //     string[] memory metadataUriList
+    //     ) external {
+    //     address orgAddress = OrgManager(_orgManager).getOrg(orgId);
+    //     Org org = Org(orgAddress);
+    //     require(msg.sender == orgAddress, "only Org can call this");
+    //     Plant plant = Plant(org.getPlant(plantId));
         
-        // // 1. calculate in plant contract
-        // bool valid = plant.validate(number, powerIds, values);
+    //     // 1. calculate in plant contract
+    //     bool valid = plant.validate(number, powerIds, values);
         
-        // address receiver = org.getPlantAccount();
-        // uint start = 0;
-        // for (uint i = 0;i < number;i++) {
-        //     uint[] memory oneTokenPowerIds = new uint[](numbers[i]);
-        //     for (uint j = start;j < start + numbers[i];j++) {
-        //         oneTokenPowerIds[j - start] = powerIds[j];
-        //         start = numbers[i];
-        //     }
+    //     address receiver = org.getPlantAccount();
+    //     uint start = 0;
+    //     for (uint i = 0;i < number;i++) {
+    //         uint[] memory oneTokenPowerIds = new uint[](numbers[i]);
+    //         for (uint j = start;j < start + numbers[i];j++) {
+    //             oneTokenPowerIds[j - start] = powerIds[j];
+    //             start = numbers[i];
+    //         }
             
            
-        //     tokenId++;
-        //     // 3. emit one token
-        //     emit ReqCertEvent(tokenId, orgId , plantId, oneTokenPowerIds, oneTokenValues, dateRanges[i].sdate, dateRanges[i].edate);
-        // }
-        //  // 2. mint
-        // uint tokenId = _nft.mintNft(receiver, "");
-        // // emit this requestCertificate which tokenIds?
+    //         tokenId++;
+    //         // 3. emit one token
+    //         emit ReqCertEvent(tokenId, orgId , plantId, oneTokenPowerIds, oneTokenValues, dateRanges[i].sdate, dateRanges[i].edate);
+    //     }
+    //      // 2. mint
+    //     uint tokenId = _nft.mintNft(receiver, "");
+    //     // emit this requestCertificate which tokenIds?
     // }
 }

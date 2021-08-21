@@ -152,9 +152,9 @@ contract Org {
     
     // each smart meter has its wallet
     // smart meter dapp will call this
-    function registerDevice(address plantId) external onlyAble {
+    function registerDevice(address plantContract) external onlyAble {
         address deviceAccount = msg.sender;
-        _deviceRegisterRequests.push(DeviceRegisterRequest(deviceAccount, plantId));
+        _deviceRegisterRequests.push(DeviceRegisterRequest(deviceAccount, plantContract));
     }
     
     function getAllDeviceRegisterRequest() external view returns (DeviceRegisterRequest[] memory) {
@@ -192,14 +192,15 @@ contract Org {
     
     // only admins can call this
     // CompilerError: Stack too deep when compiling inline assembly: Variable headStart is 1 slot(s) too deep inside the stack.
-    // Plant.SimplifiedPower[][] 
+    // Plant.SimplifiedPower[][] -> uint[][], uintp[][]
     function requestCertificate(
         uint number,
         address plantId,
-        Plant.SimplifiedPower[][] memory simplifiedPowers,
+        uint[][] memory powerIds,
+        uint[][] memory values,
         string[] memory metadataUriList
         ) external onlyAdmin onlyAble {
-        // Issuer(_issuerContract).requestCertificate(number, plantContract, simplifiedPowers, metadataUriList);
+        // Issuer(_issuerContract).requestCertificate(number, plantContract, powerIds, values, metadataUriList);
     }
     
     
