@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Web3 from 'web3';
 import CreateOrgFrom from './components/createOrgFrom';
 import LoginFrom from './components/loginForm';
+import Home from './components/home';
 import {orgManagerAbi} from './resource/abi/orgManager';
 import { BrowserRouter, HashRouter, Route, Switch, Link } from "react-router-dom";
 
@@ -24,29 +25,7 @@ class App extends Component {
   }
 
   async loadBlockChain() {
-    // const web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/4d6cbd5116f74b6eb0f688f165b87286'));
-    if (typeof window.ethereum == 'undefined') {
-      console.log('MetaMask is not installed!');
-    } else {
-      console.log('MetaMask is installed!');
-      await window.ethereum.send('eth_requestAccounts');
-      const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-      console.log(accounts);
-      this.setState({account: accounts[0]});
-    }
-    const web3 = new Web3(Web3.givenProvider);
-    this.setState({web3: web3});
-    const network = await web3.eth.net.getNetworkType();
-    console.log("network: ", network);
     
-    // const accounts = await web3.eth.getAccounts();
-    // console.log("accounts: ", accounts);
-    // this.setState({accounts: accounts});
-    // this.setState({account: accounts[0]});
-    // const wallet = await web3.eth.accounts.create();
-    // console.log(wallet);
-    // this.setState({account: wallet.address});
-    // this.setState({privateKey: wallet.privateKey});
   }
 
   render() {
@@ -63,11 +42,13 @@ class App extends Component {
       <div>
         <HashRouter>
         <nav>
-          <Link to="/">登入</Link>
+          <Link to="/" style={{marginLeft:"20px"}}>首頁</Link>
+          <Link to="/login" style={{marginLeft:"20px"}}>登入</Link>
           <Link to="/createOrg" style={{marginLeft:"20px"}}>註冊組織</Link>
         </nav> 
           <Switch>
-            <Route exact path="/" component={LoginFrom}/>
+            <Route exact path="/" component={Home}/>
+            <Route exact path="/login" component={LoginFrom}/>
             <Route path="/createOrg" component={CreateOrgFrom}/>
           </Switch>
         </HashRouter>

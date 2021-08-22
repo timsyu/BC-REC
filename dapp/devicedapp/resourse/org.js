@@ -31,6 +31,25 @@ const orgAbi = [
         "type": "constructor"
     },
     {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "creator",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "plantContract",
+                "type": "address"
+            }
+        ],
+        "name": "CreatePlantEvent",
+        "type": "event"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
@@ -90,13 +109,7 @@ const orgAbi = [
             }
         ],
         "name": "createPlant",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
+        "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
