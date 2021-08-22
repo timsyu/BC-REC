@@ -42,6 +42,8 @@ contract Org {
     // device register requests
     DeviceRegisterRequest[] _deviceRegisterRequests;
     
+    event CreatePlantEvent(address indexed creator, address plantContract);
+     
     modifier onlyAdmin() {
         require(_userInfoMap[msg.sender].role == Role.Admin, "only admin can call this");
         _;
@@ -129,13 +131,13 @@ contract Org {
     }
     
     // only admins can call this
-    function createPlant(string memory plantName, string memory plantLocation) external onlyAdmin onlyAble returns (address) {
+    function createPlant(string memory plantName, string memory plantLocation) external onlyAdmin onlyAble {
         // create plant contract
         Plant plant = new Plant(_issuerContract, plantName, plantLocation);
         address plantAddress = address(plant);
         _plants.push(plantAddress);
         _plantIndexes[plantAddress] = _plants.length - 1;
-        return plantAddress;
+        emit CreatePlantEvent(msg.sender, plantAddress);
     }
     
     // // only admins can call this

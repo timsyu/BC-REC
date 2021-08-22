@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Web3 from 'web3';
-import CreateOrgFrom from './component/orgManager';
+import CreateOrgFrom from './components/createOrgFrom';
 import {orgManagerAbi} from './resource/abi/orgManager';
 
 class App extends Component {
@@ -27,7 +27,6 @@ class App extends Component {
       console.log('MetaMask is not installed!');
     } else {
       console.log('MetaMask is installed!');
-      // window.ethereum
       await window.ethereum.send('eth_requestAccounts');
       const accounts = await window.ethereum.request({ method: 'eth_accounts' });
       console.log(accounts);
