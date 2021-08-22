@@ -15,7 +15,7 @@ class App extends Component {
       accounts: [],
       account: '',
       privateKey: '',
-      orgManagerAddress: '0x1a1040B5870879b849eD3b379ac3380c3934A198',
+      orgManagerAddress: '0x593B77c68a94c264Ae5643F29357f6B965dEDD57',
       orgManagerAbi: orgManagerAbi
     }
   }
