@@ -1,4 +1,4 @@
-export const orgManagerAbi  = [
+export const OrgManagerAbi  = [
 	{
 		"inputs": [
 			{
@@ -123,19 +123,6 @@ export const orgManagerAbi  = [
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "date",
-				"type": "uint256"
-			}
-		],
-		"name": "testCreateOrg",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]

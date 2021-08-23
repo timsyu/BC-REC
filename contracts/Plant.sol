@@ -7,14 +7,14 @@ import "./Issuer.sol";
 contract Plant {
     
     event RecordEvent(uint indexed powerId, address indexed deviceId, uint date, uint value);
-    event RecordTxHashEvent(uint indexed powerId, address txHash);
+    event RecordTxHashEvent(uint indexed powerId, bytes32 txHash);
     
     struct Power {
         address deviceId;
     	uint date; // timestamp
     	uint value; // float? 上傳電量
     	uint remainValue; // remainValue - 被用來申請憑證的電量
-    	address txHash; // record tx hash
+    	bytes32 txHash; // record tx hash
     }
     
     struct SimplifiedPower {
@@ -108,7 +108,7 @@ contract Plant {
         ) external onlyDevice returns (uint){
         require(_deviceInfoMap[deviceId].state == Org.State.Approve, "this device must be approved by issuer");
         // store record value to the storage
-        _powers.push(Power(deviceId, date, value, value, address(0x0)));
+        _powers.push(Power(deviceId, date, value, value, bytes32(0x0)));
         _powerIndexes[++_powerCount] = _powers.length - 1;
         // emit record event to the chain
         emit RecordEvent(_powerCount, deviceId, date, value);
@@ -118,8 +118,8 @@ contract Plant {
     function bindPowerAndTxHash(
         address deviceId,
         uint powerId,
-        address txHash
-        ) external onlyDevice {
+        bytes32 txHash
+        ) external {
         require(_deviceInfoMap[deviceId].state == Org.State.Approve, "this device must be approved by issuer");
         _powers[_powerIndexes[powerId]].txHash = txHash;
         emit RecordTxHashEvent(powerId, txHash);

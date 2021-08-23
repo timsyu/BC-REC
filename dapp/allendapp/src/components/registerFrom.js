@@ -5,8 +5,8 @@ class RegisterFrom extends Component {
 
     constructor(props) {
         super(props);
-        console.log("RegisterFrom constructor");
-        this.state = {web3: '', account: '', privateKey: ''};
+        let isLogin = localStorage.getItem('isLogin');
+        this.state = {isLogin: isLogin, web3: '', account: '', privateKey: ''};
         
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -56,11 +56,10 @@ class RegisterFrom extends Component {
     render() {
         return(
             <div>
-                <button className="btn btn-secondary" type="button" name="metamask" onClick = {this.handleSubmit}>login</button>
                 <div className="input-group mb-3">
                     <input type="text" className="form-control" placeholder="account" name="account" value={this.state.account} onChange={this.handleChange}/>
                     <input type="text" className="form-control" placeholder="privateKey" name="privateKey" value={this.state.privateKey} onChange={this.handleChange}/>
-                    <button className="btn btn-secondary" type="button" name="without_metamask" onClick = {this.handleSubmit}>login</button>
+                    <button className="btn btn-secondary" type="button" name="register" onClick = {this.handleSubmit}>register</button>
                 </div>
             </div>
         );

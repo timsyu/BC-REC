@@ -1,4 +1,4 @@
-export const orgAbi = [
+export const OrgAbi = [
     {
         "inputs": [
             {
@@ -29,6 +29,25 @@ export const orgAbi = [
         ],
         "stateMutability": "nonpayable",
         "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "creator",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "plantContract",
+                "type": "address"
+            }
+        ],
+        "name": "CreatePlantEvent",
+        "type": "event"
     },
     {
         "inputs": [
@@ -90,13 +109,7 @@ export const orgAbi = [
             }
         ],
         "name": "createPlant",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
+        "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
@@ -344,7 +357,3 @@ export const orgAbi = [
         "type": "function"
     }
 ]
-
-export default {
-    orgAbi,
-}

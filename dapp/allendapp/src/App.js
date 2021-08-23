@@ -1,30 +1,27 @@
 import React, { Component } from 'react';
-import Web3 from 'web3';
 import CreateOrgFrom from './components/createOrgFrom';
 import LoginFrom from './components/loginForm';
 import RegisterFrom from './components/registerFrom';
 import Home from './components/home';
 import UnloginHome from './components/unloginHome';
-import {orgManagerAbi} from './resource/abi/orgManager';
-import { BrowserRouter, HashRouter, Route, Switch, Link, Redirect } from "react-router-dom";
+import { HashRouter, Route, Switch } from "react-router-dom";
 
 class App extends Component {
 
   constructor(props) {
     super(props);
+    
     this.state = {
       web3: '',
       accounts: [],
       account: '',
-      privateKey: '',
-      orgManagerAddress: '0x593B77c68a94c264Ae5643F29357f6B965dEDD57',
-      orgManagerAbi: orgManagerAbi
+      privateKey: ''
     }
     
   }
 
   componentDidMount() {
-    console.log("componentDidMount");
+    // console.log("componentDidMount");
     // this.loadBlockChain();
   }
 
