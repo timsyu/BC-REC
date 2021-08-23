@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import Web3 from 'web3';
 import CreateOrgFrom from './components/createOrgFrom';
 import LoginFrom from './components/loginForm';
+import RegisterFrom from './components/registerFrom';
 import Home from './components/home';
+import UnloginHome from './components/unloginHome';
 import {orgManagerAbi} from './resource/abi/orgManager';
-import { BrowserRouter, HashRouter, Route, Switch, Link } from "react-router-dom";
+import { BrowserRouter, HashRouter, Route, Switch, Link, Redirect } from "react-router-dom";
 
 class App extends Component {
 
@@ -18,10 +20,12 @@ class App extends Component {
       orgManagerAddress: '0x593B77c68a94c264Ae5643F29357f6B965dEDD57',
       orgManagerAbi: orgManagerAbi
     }
+    
   }
 
   componentDidMount() {
-    this.loadBlockChain()
+    console.log("componentDidMount");
+    // this.loadBlockChain();
   }
 
   async loadBlockChain() {
@@ -29,32 +33,29 @@ class App extends Component {
   }
 
   render() {
-    return (
-      // <div>
-      //   {/* {this.state.accounts.map((i, idx) => (
-      //     <p key={idx}>帳號{idx}: {i} </p>
-      //   ))} */}
-      //    <p>account: {this.state.account} </p>
-      //    {/* <p>privateKey: {this.state.privateKey} </p> */}
-      //   <CreateOrgFrom web3={this.state.web3} account={this.state.account}
-      //     orgManagerAddress={this.state.orgManagerAddress} orgManagerAbi={this.state.orgManagerAbi}/>
-      // </div>
-      <div>
+      return (
         <HashRouter>
-        <nav>
-          <Link to="/" style={{marginLeft:"20px"}}>首頁</Link>
-          <Link to="/login" style={{marginLeft:"20px"}}>登入</Link>
-          <Link to="/createOrg" style={{marginLeft:"20px"}}>註冊組織</Link>
-        </nav> 
           <Switch>
-            <Route exact path="/" component={Home}/>
+          <Route
+              exact
+              path="/"
+              component={UnloginHome}
+              // render={() => {
+              //     return (
+              //       this.state.isLogin ?
+              //       <Redirect to="/home" /> :
+              //       <Redirect to="/unloginHome" /> 
+              //     )
+              // }}
+            />
+            <Route exact path="/home" component={Home}/>
+            <Route exact path="/unloginHome" component={UnloginHome}/>
             <Route exact path="/login" component={LoginFrom}/>
-            <Route path="/createOrg" component={CreateOrgFrom}/>
+            <Route exact path="/createOrg" component={CreateOrgFrom}/>
+            <Route path="/register" component={RegisterFrom}/>
           </Switch>
         </HashRouter>
-      </div>
-      
-    );
+      );
   }
 }
 

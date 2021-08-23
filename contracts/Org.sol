@@ -156,7 +156,7 @@ contract Org {
     // smart meter dapp will call this
     function registerDevice(address plantContract) external onlyAble {
         address deviceAccount = msg.sender;
-        _deviceRegisterRequests.push(DeviceRegisterRequest(deviceAccount, plantContract));
+        _deviceRegisterRequests.push(DeviceRegisterRequest(plantContract, deviceAccount));
     }
     
     function getAllDeviceRegisterRequest() external view returns (DeviceRegisterRequest[] memory) {

@@ -56,7 +56,7 @@ contract Plant {
     }
     
     modifier onlyOrg() {
-        require(_orgContract == msg.sender, "only Device can call this");
+        require(_orgContract == msg.sender, "only Org can call this");
         _;
     }
     

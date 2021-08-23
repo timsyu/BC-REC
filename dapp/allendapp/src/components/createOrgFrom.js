@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
+import { Link, Redirect } from "react-router-dom";
 
 class CreateOrgFrom extends Component {
     constructor(props) {
         super(props);
+        console.log("CreateOrgFrom constructor");
         this.state = {orgName: '', orgDescription: ''};
 
         this.handleChange = this.handleChange.bind(this);
@@ -49,10 +51,19 @@ class CreateOrgFrom extends Component {
 
     render() {
         return(
-            <div className="input-group mb-3">
-                <input type="text" className="form-control" placeholder="org name" name="orgName" value={this.state.orgName} onChange={this.handleChange}/>
-                <input type="text" className="form-control" placeholder="description" name="orgDescription" value={this.state.orgDescription} onChange={this.handleChange}/>
-                <button className="btn btn-secondary" type="button" onClick = {this.handleSubmit}>Create</button>
+            <div>
+                <nav>
+                    <Link to={{
+                        pathname: '/',
+                        state: { isLogin: this.state.isLogin }
+                    }} style={{marginLeft:"20px"}}>首頁</Link>
+                    <button className="btn btn-secondary" type="button" name="logout" onClick = {this.handleSubmit}>登出</button>
+                </nav> 
+                <div className="input-group mb-3">
+                    <input type="text" className="form-control" placeholder="org name" name="orgName" value={this.state.orgName} onChange={this.handleChange}/>
+                    <input type="text" className="form-control" placeholder="description" name="orgDescription" value={this.state.orgDescription} onChange={this.handleChange}/>
+                    <button className="btn btn-secondary" type="button" onClick = {this.handleSubmit}>Create</button>
+                </div>
             </div>
         );
     }
