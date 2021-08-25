@@ -43,13 +43,23 @@ class Home extends Component {
                         }} style={{marginLeft:"20px"}}>首頁</Link>
                         <Link to={{
                             pathname: '/createOrg'
-                        }} style={{marginLeft:"20px"}}>創建組織</Link>
+                        }} style={{marginLeft:"20px"}}>創建組織/案廠</Link>
+                        <Link to={{
+                            pathname: '/deviceRegisterRequestList'
+                        }} style={{marginLeft:"20px"}}>裝置註冊請求列表</Link>
+                        <Link to={{
+                            pathname: '/requestApproveDeviceForm'
+                        }} style={{marginLeft:"20px"}}>裝置審核請求</Link>
+                        <Link to={{
+                            pathname: '/issuer'
+                        }} style={{marginLeft:"20px"}}>Issuer介面</Link>
+                        <Link to={{
+                            pathname: '/power'
+                        }} style={{marginLeft:"20px"}}>電量列表</Link>
                         <button className="btn btn-secondary" type="button" name="logout" onClick = {this.handleSubmit}>登出</button>
                     </nav> 
-                    <p>首頁</p>
-                    <div className="input-group mb-3">
-                        <button className="btn btn-secondary" type="button" onClick = {this.handleSubmit}>Create</button>
-                    </div>
+                    <p>Home</p>
+                    
                 </div>
             );
         } else {

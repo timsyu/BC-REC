@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Web3 from 'web3';
 import { Redirect } from "react-router-dom";
 
-class LoginFrom extends Component {
+class LoginForm extends Component {
     constructor(props) {
         super(props);
         let isLogin = localStorage.getItem('isLogin');
@@ -77,4 +77,4 @@ class LoginFrom extends Component {
     }
 }
 
-export default LoginFrom;
+export default LoginForm;

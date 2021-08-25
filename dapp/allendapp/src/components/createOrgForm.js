@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Link, Redirect } from "react-router-dom";
 import Web3 from 'web3';
-import { OrgManagerAddress } from '../resource/address/contractAddress';
+import { OrgManagerAddress, IssuerAddress } from '../resource/address/contractAddress';
 import { OrgManagerAbi } from '../resource/abi/orgManager';
 import { OrgAbi } from '../resource/abi/org';
 
-class CreateOrgFrom extends Component {
+class CreateOrgForm extends Component {
     constructor(props) {
         super(props);
         let isLogin = localStorage.getItem('isLogin');
@@ -20,7 +20,7 @@ class CreateOrgFrom extends Component {
             orgAddress: orgAddress,
             plantName: '',
             plantDescription: '',
-            plantAddress: ''
+            plantAddress: plantAddress
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -42,7 +42,7 @@ class CreateOrgFrom extends Component {
             localStorage.setItem('isLogin', false);
             this.setState({isLogin: false});
         } else if(name === "createOrg") {
-            this.createOrg();
+            this.createOrgAndSetIssuer();
         } else if(name === "createPlant") {
             let orgAddress = localStorage.getItem('orgAddress');
             this.createPlant(orgAddress);
@@ -50,9 +50,10 @@ class CreateOrgFrom extends Component {
         
     }
 
-    async createOrg() {
+    async createOrgAndSetIssuer() {
         const web3 = new Web3(Web3.givenProvider);
         const orgManagerAddress = OrgManagerAddress;
+        const issuerAddress = IssuerAddress;
         const orgManagerAbi = OrgManagerAbi;
         const orgManager = new web3.eth.Contract(orgManagerAbi, orgManagerAddress);
         
@@ -82,6 +83,21 @@ class CreateOrgFrom extends Component {
                 localStorage.setItem('orgAddress', orgAddress);
                 // store orgAddress in state
                 that.setState({orgAddress: orgAddress});
+                console.log('set issuer contract');
+                const orgAbi = OrgAbi;
+                const org = new web3.eth.Contract(orgAbi, orgAddress);
+                org.methods.setIssuerContract(issuerAddress)
+                .send({from: account})
+                .on('sending', function(confirmationNumber, receipt){
+                    console.log('sending');
+                })
+                .on('receipt', function(receipt){
+                    console.log('receipt');
+                    // console.log(receipt);
+                })
+                .on('error', function(error, receipt) {
+                    console.log(error);
+                });
             })
             .on('error', function(error, receipt) {
                 console.log(error);
@@ -167,4 +183,4 @@ class CreateOrgFrom extends Component {
     }
 }
 
-export default CreateOrgFrom;
+export default CreateOrgForm;

@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
-import CreateOrgFrom from './components/createOrgFrom';
-import LoginFrom from './components/loginForm';
-import RegisterFrom from './components/registerFrom';
+import CreateOrgForm from './components/createOrgForm';
+import LoginForm from './components/loginForm';
+import RegisterForm from './components/registerForm';
+import RequestApproveDeviceForm from './components/requestApproveDeviceForm';
 import Home from './components/home';
 import UnloginHome from './components/unloginHome';
+import DeviceRegisterRequestList from './components/deviceRegisterRequestList';
+import Issuer from './components/issuer';
+import Power from './components/power';
 import { HashRouter, Route, Switch } from "react-router-dom";
 
 class App extends Component {
@@ -47,9 +51,13 @@ class App extends Component {
             />
             <Route exact path="/home" component={Home}/>
             <Route exact path="/unloginHome" component={UnloginHome}/>
-            <Route exact path="/login" component={LoginFrom}/>
-            <Route exact path="/createOrg" component={CreateOrgFrom}/>
-            <Route path="/register" component={RegisterFrom}/>
+            <Route exact path="/login" component={LoginForm}/>
+            <Route exact path="/createOrg" component={CreateOrgForm}/>
+            <Route exact path="/deviceRegisterRequestList" component={DeviceRegisterRequestList}/>
+            <Route exact path="/requestApproveDeviceForm" component={RequestApproveDeviceForm}/>
+            <Route exact path="/issuer" component={Issuer}/>
+            <Route exact path="/power" component={Power}/>
+            <Route path="/register" component={RegisterForm}/>
           </Switch>
         </HashRouter>
       );

@@ -22,8 +22,8 @@ async function main() {
         balance = web3.utils.fromWei(balance, 'ether');
         console.log("balance: ", balance," ether");
         // init org contract
-        const orgAddress = '0x7CAe00f861080f69902e04E4949995e596debbBe';
-        const plantAddress = '0x6fD98df019c9f523B38fE62b582cb829A060f34f';
+        const orgAddress = '0xb83fcA742832163CB9486dc3326fB08966f18E91';
+        const plantAddress = '0xc58Fe30596A3B7470A72B0449e7b2967b38445e5';
         const org = new web3.eth.Contract(orgAbi, orgAddress);
         // request Org register Device
         const data_abi = org.methods.registerDevice(plantAddress).encodeABI();

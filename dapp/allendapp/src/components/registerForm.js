@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Web3 from 'web3';
 
-class RegisterFrom extends Component {
+class RegisterForm extends Component {
 
     constructor(props) {
         super(props);
@@ -66,4 +66,4 @@ class RegisterFrom extends Component {
     }
 }
 
-export default RegisterFrom;
+export default RegisterForm;
