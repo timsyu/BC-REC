@@ -8,6 +8,11 @@ export const OrgAbi = [
             },
             {
                 "internalType": "address",
+                "name": "issuerContract",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "owner",
                 "type": "address"
             },

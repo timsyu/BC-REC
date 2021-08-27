@@ -3,7 +3,7 @@ import { Link, Redirect } from "react-router-dom";
 import Web3 from 'web3';
 import { OrgAbi } from '../resource/abi/org';
 import { PlantAbi } from '../resource/abi/plant';
-import DeviceRecord from './deviceRecord';
+// import DeviceRecord from './deviceRecord';
 
 class RequestApproveDeviceForm extends Component {
     constructor(props) {
@@ -50,6 +50,16 @@ class RequestApproveDeviceForm extends Component {
                 that.setState({data: data});
             })
         }
+    }
+    
+    componentDidMount(){
+        // store this
+        let that = this;
+        let orgAddress = localStorage.getItem('orgAddress');
+        this.getAllDevice(orgAddress).then(data => {
+            // console.log(data);
+            that.setState({data: data});
+        });
     }
 
     async getAllDevice(orgAddress) {
@@ -153,16 +163,20 @@ class RequestApproveDeviceForm extends Component {
                     <div className="input-group mb-3" style={{marginTop:"10px"}}>
                         <button className="btn btn-secondary" type="button" name="update" onClick = {this.handleSubmit}>Update</button>
                     </div>
+                    <h1 style={{textAlign: "center"}}>案廠裝置列表</h1>
                     <div>
                         {list}
                     </div>
+                    <br />
+                    <br />
+                    <h1 style={{textAlign: "center"}}>發送裝置審查請求</h1>
                     <div className="input-group mb-3">
                         <input type="text" className="form-control" placeholder="plantId" name="plantId" value={this.state.plantId} onChange={this.handleChange}/>
                         <input type="text" className="form-control" placeholder="deviceId" name="deviceId" value={this.state.deviceId} onChange={this.handleChange}/>
                         <input type="text" className="form-control" placeholder="deviceLocation" name="deviceLocation" value={this.state.deviceLocation} onChange={this.handleChange}/>
                         <button className="btn btn-secondary" type="button" name="request" onClick = {this.handleSubmit}>request</button>
                     </div>
-                    <DeviceRecord />
+                    {/* <DeviceRecord /> */}
                 </div>
             );
         } else {

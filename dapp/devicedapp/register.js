@@ -1,5 +1,6 @@
 const Web3 = require("web3");
-const { orgAbi } = require("./resourse/org");
+const { OrgAbi } = require("./resourse/abi/org");
+const { OrgAddress, PlantAddress} = require("./resourse/address/contractAddress");
 const WalletTools = require("./walletTools");
 
 async function main() {
@@ -10,11 +11,11 @@ async function main() {
     try {
         const BN = web3.utils.BN;
         // init wallet, account
-        const account = '0xdF8F0e43F20f3c2079cb57Bc868fC169EEC196C1';
-        const privateKey = 'bf1b7a1b3d2ca43669172d21abd1b0db75838a99929e1af1bc763b3dd0fc6b42';
-        // const wallet = await walletTools.init();
-        // const account = wallet.address;
-        // const privateKey = wallet.privateKey;
+        // const account = '0xdF8F0e43F20f3c2079cb57Bc868fC169EEC196C1';
+        // const privateKey = 'bf1b7a1b3d2ca43669172d21abd1b0db75838a99929e1af1bc763b3dd0fc6b42';
+        const wallet = await walletTools.init();
+        const account = wallet.address;
+        const privateKey = wallet.privateKey;
         console.log("account: ", account);
         console.log("privateKey: ", privateKey);
         // get balance
@@ -22,9 +23,9 @@ async function main() {
         balance = web3.utils.fromWei(balance, 'ether');
         console.log("balance: ", balance," ether");
         // init org contract
-        const orgAddress = '0xb83fcA742832163CB9486dc3326fB08966f18E91';
-        const plantAddress = '0xc58Fe30596A3B7470A72B0449e7b2967b38445e5';
-        const org = new web3.eth.Contract(orgAbi, orgAddress);
+        const orgAddress = OrgAddress;
+        const plantAddress = PlantAddress;
+        const org = new web3.eth.Contract(OrgAbi, orgAddress);
         // request Org register Device
         const data_abi = org.methods.registerDevice(plantAddress).encodeABI();
         let gasPrice = await web3.eth.getGasPrice();

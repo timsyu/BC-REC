@@ -1,4 +1,4 @@
-export const PlantAbi =  [
+const PlantAbi = [
     {
         "inputs": [
             {
@@ -267,3 +267,7 @@ export const PlantAbi =  [
         "type": "function"
     }
 ]
+
+module.exports = {
+    PlantAbi
+}

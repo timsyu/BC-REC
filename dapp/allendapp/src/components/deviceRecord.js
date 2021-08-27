@@ -31,7 +31,7 @@ class DeviceRecord extends Component {
 
   onRecord = async (event) => {
     event.preventDefault();
-    const web3 = new Web3(Web3.givenProvider ||'https://ropsten.infura.io/v3/4d6cbd5116f74b6eb0f688f165b87286');
+    const web3 = new Web3(Web3.givenProvider || 'https://ropsten.infura.io/v3/4d6cbd5116f74b6eb0f688f165b87286');
     const balance = await web3.eth.getBalance(this.state.userwallet.address); 
     console.log(balance);
     const targetContract = new web3.eth.Contract(PlantAbi, this.state.plantId);

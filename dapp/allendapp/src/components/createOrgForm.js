@@ -9,18 +9,15 @@ class CreateOrgForm extends Component {
     constructor(props) {
         super(props);
         let isLogin = localStorage.getItem('isLogin');
-        // test
-        let orgAddress = localStorage.getItem('orgAddress');
-        let plantAddress = localStorage.getItem('plantAddress');
 
         this.state = {
             isLogin: isLogin,
             orgName: '',
             orgDescription: '',
-            orgAddress: orgAddress,
+            orgAddress: '',
             plantName: '',
             plantDescription: '',
-            plantAddress: plantAddress
+            plantAddress: ''
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -52,10 +49,7 @@ class CreateOrgForm extends Component {
 
     async createOrgAndSetIssuer() {
         const web3 = new Web3(Web3.givenProvider);
-        const orgManagerAddress = OrgManagerAddress;
-        const issuerAddress = IssuerAddress;
-        const orgManagerAbi = OrgManagerAbi;
-        const orgManager = new web3.eth.Contract(orgManagerAbi, orgManagerAddress);
+        const orgManager = new web3.eth.Contract(OrgManagerAbi, OrgManagerAddress);
         
         if (typeof window.ethereum == 'undefined') {
             console.log('MetaMask is not installed!');
@@ -69,7 +63,7 @@ class CreateOrgForm extends Component {
             var that = this;
             let dateTime = new Date().getTime();
             const date = Math.floor(dateTime / 1000);
-            orgManager.methods.createOrg(this.state.orgName, date, this.state.orgDescription)
+            orgManager.methods.createOrg(this.state.orgName, date, this.state.orgDescription, IssuerAddress)
             .send({from: account})
             .on('sending', function(confirmationNumber, receipt){
                 console.log('sending');
@@ -83,21 +77,6 @@ class CreateOrgForm extends Component {
                 localStorage.setItem('orgAddress', orgAddress);
                 // store orgAddress in state
                 that.setState({orgAddress: orgAddress});
-                console.log('set issuer contract');
-                const orgAbi = OrgAbi;
-                const org = new web3.eth.Contract(orgAbi, orgAddress);
-                org.methods.setIssuerContract(issuerAddress)
-                .send({from: account})
-                .on('sending', function(confirmationNumber, receipt){
-                    console.log('sending');
-                })
-                .on('receipt', function(receipt){
-                    console.log('receipt');
-                    // console.log(receipt);
-                })
-                .on('error', function(error, receipt) {
-                    console.log(error);
-                });
             })
             .on('error', function(error, receipt) {
                 console.log(error);
@@ -149,10 +128,12 @@ class CreateOrgForm extends Component {
                     <nav>
                         <Link to={{
                             pathname: '/'
-                        }} style={{marginLeft:"20px"}}>首頁</Link>
+                        }} style={{marginLeft:"20px", fontSize:"25px"}}>首頁</Link>
+                        <br />
+                        <br />
                         <button className="btn btn-secondary" type="button" name="logout" onClick = {this.handleSubmit}>登出</button>
                     </nav> 
-                    
+                    <h1 style={{textAlign: "center"}}>創建組織</h1>
                     <div className="card">
                         <div className="input-group mb-3" style={{marginTop:"10px"}}>
                             <input type="text" className="form-control" placeholder="org name" name="orgName" value={this.state.orgName} onChange={this.handleChange}/>
@@ -163,6 +144,9 @@ class CreateOrgForm extends Component {
                             <p>org contract address: {this.state.orgAddress}</p>
                         </div>
                     </div>
+                    <br />
+                    <br />
+                    <h1 style={{textAlign: "center"}}>創建案廠</h1>
                     <div className="card">
                         <div className="input-group mb-3" style={{marginTop:"10px"}}>
                             <input type="text" className="form-control" placeholder="plant name" name="plantName" value={this.state.plantName} onChange={this.handleChange}/>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import CreateOrgForm from './components/createOrgForm';
 import LoginForm from './components/loginForm';
-import RegisterForm from './components/registerForm';
+// import RegisterForm from './components/registerForm';
 import RequestApproveDeviceForm from './components/requestApproveDeviceForm';
 import Home from './components/home';
 import UnloginHome from './components/unloginHome';
@@ -57,7 +57,7 @@ class App extends Component {
             <Route exact path="/requestApproveDeviceForm" component={RequestApproveDeviceForm}/>
             <Route exact path="/issuer" component={Issuer}/>
             <Route exact path="/power" component={Power}/>
-            <Route path="/register" component={RegisterForm}/>
+            {/* <Route path="/register" component={RegisterForm}/> */}
           </Switch>
         </HashRouter>
       );

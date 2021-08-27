@@ -40,24 +40,27 @@ class Home extends Component {
                     <nav>
                         <Link to={{
                             pathname: '/'
-                        }} style={{marginLeft:"20px"}}>首頁</Link>
+                        }} style={{marginLeft:"20px", fontSize:"25px"}}>首頁</Link>
                         <Link to={{
                             pathname: '/createOrg'
-                        }} style={{marginLeft:"20px"}}>創建組織/案廠</Link>
+                        }} style={{marginLeft:"20px", fontSize:"25px"}}>創建組織/案廠</Link>
                         <Link to={{
                             pathname: '/deviceRegisterRequestList'
-                        }} style={{marginLeft:"20px"}}>裝置註冊請求列表</Link>
+                        }} style={{marginLeft:"20px", fontSize:"25px"}}>裝置註冊請求列表</Link>
                         <Link to={{
                             pathname: '/requestApproveDeviceForm'
-                        }} style={{marginLeft:"20px"}}>裝置審核請求</Link>
+                        }} style={{marginLeft:"20px", fontSize:"25px"}}>裝置審核請求/列表</Link>
                         <Link to={{
                             pathname: '/issuer'
-                        }} style={{marginLeft:"20px"}}>Issuer介面</Link>
+                        }} style={{marginLeft:"20px", fontSize:"25px"}}>Issuer介面</Link>
                         <Link to={{
                             pathname: '/power'
-                        }} style={{marginLeft:"20px"}}>電量列表</Link>
+                        }} style={{marginLeft:"20px", fontSize:"25px"}}>電量列表</Link>
+                        <br />
+                        <br />
                         <button className="btn btn-secondary" type="button" name="logout" onClick = {this.handleSubmit}>登出</button>
-                    </nav> 
+                    </nav>
+                    <br />
                     <p>Home</p>
                     
                 </div>

@@ -42,9 +42,9 @@ class UnloginHome extends Component {
                         <Link to={{
                             pathname: '/login'
                         }} style={{marginLeft:"20px"}}>登入</Link>
-                        <Link to={{
+                        {/* <Link to={{
                             pathname: '/register'
-                        }} style={{marginLeft:"20px"}}>註冊</Link>
+                        }} style={{marginLeft:"20px"}}>註冊</Link> */}
                     </nav> 
                     <p>未登入首頁</p>
                     <div className="input-group mb-3">

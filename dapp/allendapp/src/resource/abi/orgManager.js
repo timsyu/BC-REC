@@ -83,6 +83,11 @@ export const OrgManagerAbi  = [
 				"internalType": "string",
 				"name": "description",
 				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "issuerContract",
+				"type": "address"
 			}
 		],
 		"name": "createOrg",

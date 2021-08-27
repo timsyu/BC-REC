@@ -130,6 +130,7 @@ class DeviceRequestList extends Component {
                     <div className="input-group mb-3" style={{marginTop:"10px"}}>
                         <button className="btn btn-secondary" type="button" name="update" onClick = {this.handleSubmit}>Update</button>
                     </div>
+                    <h1 style={{textAlign: "center"}}>裝置註冊請求列表</h1>
                     <div>
                         {list}
                     </div>

@@ -14,7 +14,10 @@ class Power extends Component {
         this.state = {
             isLogin: isLogin,
             orgAddress: orgAddress,
-            data: []
+            data: [],
+            plantIds: [],
+            plantId: '',
+            number: ''
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -40,72 +43,130 @@ class Power extends Component {
                 // console.log(data);
                 that.setState({data: data});
             })
+        } else if(name === "calculate") {
+            const plantId = this.state.plantId;
+            const number = this.state.number;
+            const powers = await this.getPlantAllPower(plantId);
+            const { powerIds, values } = this.calculate(powers, number);
+            console.log(powerIds);
+            console.log(values);
         }
     }
 
     async getAllPower(orgAddress) {
         const web3 = new Web3(Web3.givenProvider);
         const orgAbi = OrgAbi;
-        const plantAbi = PlantAbi;
         const org = new web3.eth.Contract(orgAbi, orgAddress);
         let plantIds = await org.methods.getAllPlant().call();
+        this.setState({plantIds: plantIds});
         let plantList = [];
-        let info = {
-            'plantId': '',
-            'deviceId': '',
-            'date': '',
-            'value': '',
-            'remainValue': '',
-            'txHash': ''
-        };
         for(let i = 0; i < plantIds.length; i++) {
-            let plant = new web3.eth.Contract(plantAbi, plantIds[i]);
-            let powers = await plant.methods.getAllPower().call();
-            let powerList = [];
-            for(let i = 0; i < powers.length; i++) {
-                let power = powers[i];
-                info.plantId = plantIds[i];
-                info.deviceId = power.deviceId;
-                info.date = this.getTime(power.date);
-                info.value = power.value;
-                info.remainValue = power.remainValue;
-                info.txHash = power.txHash;
-                powerList.push(info);
-            }
-            plantList.push(powerList);
+            let powers = await this.getPlantAllPower(plantIds[i]);
+            let info = {
+                'plantId': plantIds[i],
+                'powers': powers
+            };
+            plantList.push(info);
         }
+        
         return plantList;
     }
 
-    getTime(d) {
-        let date = new Date(+d);
-        let year = date.getFullYear();
-        let month = ("0" + (date.getMonth() + 1)).substr(-2);
-        let day = ("0" + date.getDate()).substr(-2);
-        let hour = ("0" + date.getHours()).substr(-2);
-        let minutes = ("0" + date.getMinutes()).substr(-2);
-        let seconds = ("0" + date.getSeconds()).substr(-2);
-      
-        return year + "-" + month + "-" + day + " " + hour + ":" + minutes + ":" + seconds;
+    async getPlantAllPower(plantId) {
+        const web3 = new Web3(Web3.givenProvider);
+        const plantAbi = PlantAbi;
+        let plant = new web3.eth.Contract(plantAbi, plantId);
+        let powers = await plant.methods.getAllPower().call();
+        let powerList = [];
+        for(let i = 0; i < powers.length; i++) {
+            let power = powers[i];
+            let info = {
+                'deviceId': power.deviceId,
+                'date': power.date,
+                'value': power.value,
+                'remainValue': power.remainValue,
+                'txHash': power.txHash
+            };
+            powerList.push(info);
+        }
+        return powerList;
     }
 
+    // powers: powers of plant
+    // number: cert. number
+    calculate(powers, number) {
+        let powerIds = [];
+        let values = [];
+        let currentNumber = 0;
+        for (let i = 0;i < number;i++) {
+            let iPowerIds = [];
+            let iValues = [];
+            let target = 333;
+            let count = 0;
+            for (let j = 0;j < powers.length;j++) {
+                let p = powers[j];
+                if (p.remainValue != 0) {
+                    iPowerIds[count] = j;
+                    if (target > p.remainValue) {
+                        target -= p.remainValue;
+                        iValues[count] = p.remainValue;
+                        count++;
+                        p.remainValue = 0;
+                    } else { // generate a cert.
+                        p.remainValue -= target;
+                        iValues[count] = target;
+                        count++;
+                        currentNumber++;
+                        target = 0;
+                        break;
+                    }
+                }
+            }
+            powerIds[i] = iPowerIds;
+            values[i] = iValues;
+        }
+        
+        if (currentNumber == number ) {
+            return {'powerIds': powerIds, 'values': values};
+        } else {
+            return {'powerIds': [], 'values': []};
+        }
+    }
+
+    componentDidMount(){
+        // store this
+        let that = this;
+        let orgAddress = localStorage.getItem('orgAddress');
+        this.getAllPower(orgAddress).then(data => {
+            // console.log(data);
+            that.setState({data: data});
+        });
+    }
+    
     render() {
         let isLogin = localStorage.getItem('isLogin');
         if (isLogin === 'true') {
-            let list = this.state.data.map((plant, i) =>
-                plant.map((power, j) =>
-                    <div className="card" key={j}>
-                        <div className="card-body">
-                            <p>plantId: {power.plantId}</p>
-                            <p>deviceId: {power.deviceId}</p>
-                            <p>date: {power.date}</p>
-                            <p>value: {power.value}</p>
-                            <p>remain value: {power.remainValue}</p>
-                            <p>tx hash: {power.txHash}</p>
-                        </div>
+            let list = this.state.data.map((plant, i) => 
+                <div className="card" key={i}>
+                    <p>plantId: {plant.plantId}</p>
+                    <div className="card-body">
+                    {
+                        plant.powers.map((power, j) =>
+                            <div className="card" key={j}>
+                                <div className="card-body">
+                                    <p>deviceId: {power.deviceId}</p>
+                                    <p>date: {power.date}</p>
+                                    <p>value: {power.value}</p>
+                                    <p>remain value: {power.remainValue}</p>
+                                    <p>tx hash: {power.txHash}</p>
+                                </div>
+                            </div>
+                        )
+                    }
                     </div>
-                )
+                </div>
             )
+            
             return(
                 <div>
                     <nav>
@@ -117,8 +178,14 @@ class Power extends Component {
                     <div className="input-group mb-3" style={{marginTop:"10px"}}>
                         <button className="btn btn-secondary" type="button" name="update" onClick = {this.handleSubmit}>Update</button>
                     </div>
+                    <h1 style={{textAlign: "center"}}>發電量資訊</h1>
                     <div>
                         {list}
+                    </div>
+                    <div className="input-group mb-3" style={{marginTop:"10px"}}>
+                        <input type="text" className="form-control" placeholder="plantId" name="plantId" value={this.state.plantId} onChange={this.handleChange}/>
+                        <input type="text" className="form-control" placeholder="number" name="number" value={this.state.number} onChange={this.handleChange}/>
+                        <button className="btn btn-secondary" type="button" name="calculate" onClick = {this.handleSubmit}>Calculate</button>
                     </div>
                 </div>
             );

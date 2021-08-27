@@ -1,9 +1,14 @@
-const orgAbi = [
+const OrgAbi = [
     {
         "inputs": [
             {
                 "internalType": "address",
                 "name": "userContract",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "issuerContract",
                 "type": "address"
             },
             {
@@ -359,5 +364,5 @@ const orgAbi = [
 ]
 
 module.exports = {
-    orgAbi
+    OrgAbi
 }
