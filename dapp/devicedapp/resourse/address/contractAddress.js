@@ -1,5 +1,5 @@
-const OrgAddress  = '0xea9da8144302fc1471d4A098b1e42a1fbE13185b';
-const PlantAddress  = '0xc4D6b8D26F8a75528b93B739E7C01CD6Bb0A9616';
+const OrgAddress  = '0xa76e0F6D04ca40391940aF2352E088b90Bb00ba7';
+const PlantAddress  = '0xA4CE02E5D686fD61f2B2bb119b978dDA73cb8966';
 
 module.exports = {
     OrgAddress,

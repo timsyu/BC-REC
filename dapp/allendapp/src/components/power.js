@@ -52,7 +52,7 @@ class Power extends Component {
             console.log(values);
         }
     }
-
+    
     async getAllPower(orgAddress) {
         const web3 = new Web3(Web3.givenProvider);
         const orgAbi = OrgAbi;

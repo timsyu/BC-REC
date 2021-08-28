@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link, Redirect } from "react-router-dom";
+import TraceOrgEvent from "./traceOrgEvent";
 
 class Home extends Component {
     constructor(props) {
@@ -62,7 +63,7 @@ class Home extends Component {
                     </nav>
                     <br />
                     <p>Home</p>
-                    
+                    <TraceOrgEvent />
                 </div>
             );
         } else {

@@ -67,9 +67,7 @@ class DeviceRequestList extends Component {
         // test
         let result = [];
         for(let i = 0; i < data.length; i++) {
-            if (data[i].deviceId !== '0x0000000000000000000000000000000000000000') {
-                result.push(data[i]);
-            }
+            result.push(data[i]);
         }
         return result;
     }

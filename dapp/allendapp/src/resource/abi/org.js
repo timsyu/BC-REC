@@ -71,6 +71,11 @@ export const OrgAbi = [
         "inputs": [
             {
                 "internalType": "uint256",
+                "name": "index",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
                 "name": "requestId",
                 "type": "uint256"
             },
@@ -124,6 +129,11 @@ export const OrgAbi = [
         "outputs": [
             {
                 "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "id",
+                        "type": "uint256"
+                    },
                     {
                         "internalType": "address",
                         "name": "plantId",

@@ -122,6 +122,25 @@ export const PlantAbi =  [
         "type": "function"
     },
     {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "deviceId",
+                "type": "address"
+            }
+        ],
+        "name": "contains",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [],
         "name": "getAllDevice",
         "outputs": [

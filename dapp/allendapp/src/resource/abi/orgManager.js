@@ -97,34 +97,12 @@ export const OrgManagerAbi  = [
 	},
 	{
 		"inputs": [],
-		"name": "getAllOrgInfo",
+		"name": "getAllOrg",
 		"outputs": [
 			{
-				"components": [
-					{
-						"internalType": "address",
-						"name": "owner",
-						"type": "address"
-					},
-					{
-						"internalType": "string",
-						"name": "name",
-						"type": "string"
-					},
-					{
-						"internalType": "uint256",
-						"name": "date",
-						"type": "uint256"
-					},
-					{
-						"internalType": "string",
-						"name": "description",
-						"type": "string"
-					}
-				],
-				"internalType": "struct Org.OrgInfo[]",
+				"internalType": "address[]",
 				"name": "",
-				"type": "tuple[]"
+				"type": "address[]"
 			}
 		],
 		"stateMutability": "view",
