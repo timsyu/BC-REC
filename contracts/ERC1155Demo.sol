@@ -2,7 +2,7 @@ pragma solidity ^0.8.4;
 // SPDX-License-Identifier: MIT
 
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Counters.sol";
 
 // https://forum.openzeppelin.com/t/function-settokenuri-in-erc721-is-gone-with-pragma-0-8-0/5978/3
 
@@ -14,9 +14,9 @@ contract NFT1155Demo is ERC1155Supply {
     // using Strings for uint256;
     
     // Optional mapping for token URIs
-    mapping (uint256 => string) private _tokenURIs;
+    mapping (uint256 => string) _tokenURIs;
     // token id => power ids
-    
+    mapping (uint256 => uint[]) _powerIds;
     
     // Base URI
     // string private _baseURIextended;
@@ -61,54 +61,31 @@ contract NFT1155Demo is ERC1155Supply {
     //     return string(abi.encodePacked(base, tokenId.toString()));
     // }
     
-    function mintNft(address receiver, string memory _tokenURI) external onlyOwner returns (uint256) {
+    function mintNft(address receiver, uint[][] memory powerIds, string memory metadataUri) external onlyOwner returns (uint256) {
+        
         _tokenIds.increment();
-
-        uint256 newNftTokenId = _tokenIds.current();
-        _mint(receiver, newNftTokenId, 1, new bytes(0));
-        _setTokenURI(newNftTokenId, _tokenURI);
-        require(false);
-        return newNftTokenId;
+        uint256 id = _tokenIds.current();
+        _mint(receiver, id, 1, new bytes(0));
+        _setTokenURI(id, metadataUri);
+        _powerIds[id] = powerIds[0];
+        
+        return id;
     }
     
-    function mintManyNft(address receiver, uint256 number) external onlyOwner returns (uint256[] memory) {
-        uint256[] memory ids = new uint256[](number);
-        for (uint256 i = 0; i < number; i++) {
-            _tokenIds.increment();
-            ids[i] = _tokenIds.current();
-            _mint(receiver, ids[i], 1, new bytes(0));
-        }
-
-        return ids;
-    }
-    
-    function mintBatchNft(address receiver, uint256 number) external onlyOwner returns (uint256[] memory) {
-        // uint256 num = _tokenURI.length;
-        // require(num == number);
+    function mintBatchNft(address receiver, uint number, uint[][] memory powerIds, string memory metadataUri) external onlyOwner returns (uint256[] memory) {
+        
         uint256[] memory ids = new uint256[](number);
         uint256[] memory amounts = new uint256[](number);
         for (uint256 i = 0; i < number; i++) {
             _tokenIds.increment();
             ids[i] = _tokenIds.current();
             amounts[i] = 1;
-            // _setTokenURI(ids[i], _tokenURI[i]);
+            _setTokenURI(ids[i], metadataUri);
+            _powerIds[ids[i]] = powerIds[i];
         }
         
         _mintBatch(receiver, ids, amounts, new bytes(0));
 
         return ids;
-    }
-    
-    uint256[] _data;
-    function testArray(uint256[] memory data) external {
-       _data = data;
-    }
-    
-    function getData() external view returns (uint256[] memory) {
-       return _data;
-    }
-    
-    function getSender() external view returns (address) {
-       return tx.origin;
     }
 }

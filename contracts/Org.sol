@@ -7,8 +7,8 @@ import "./Issuer.sol";
 
 contract Org {
     
-    enum Role { Admin, Device} // Role.Device not used...
-    enum State { Idle, Pending, Approve, DisApprove}
+    enum Role { None, Admin , Device} // Role.Device not used...
+    enum State { None, Idle, Pending, Approve, DisApprove}
     struct OrgInfo {
         address owner; // who creates this Org
         string name;
@@ -22,8 +22,20 @@ contract Org {
     }
     
     struct DeviceRegisterRequest {
+        uint index;
+        uint id;
         address plantId;
         address deviceId;
+    }
+    
+    struct CertificateRequest {
+        uint index;
+        uint id;
+        uint number;
+        address plantId;
+        uint[][] powerIds;
+        uint[][] values;
+        // string metadatauri;
     }
     
     address _userContract;
@@ -39,10 +51,21 @@ contract Org {
     // plant contract address => _plants index
     mapping(address => uint) _plantIndexes;
     address[] _plants;
-    // device register requests
-    DeviceRegisterRequest[] _deviceRegisterRequests;
+    
+    // device register request
+    uint _deviceRegisterRequestCount;
+    // request id => DeviceRegisterRequest
+    mapping(uint => DeviceRegisterRequest) _deviceRegisterRequestMap;
+    uint[] _deviceRegisterRequests;
+
+    // certificate request
+    uint _certificateRequestCount;
+    // request id => CertificateRequest
+    mapping(uint => CertificateRequest) _certificateRequestMap;
+    uint[] _certificateRequests;
     
     event CreatePlantEvent(address indexed creator, address plantContract);
+    // event CertificateRequestEvent(uint indexed requestId, uint number, address plantId, uint[][] powerIds, uint[][] values, string metadatauri);
      
     modifier onlyAdmin() {
         require(_userInfoMap[msg.sender].role == Role.Admin, "only admin can call this");
@@ -69,9 +92,10 @@ contract Org {
         _disable = disable;
     }
     
-    constructor(address userContract, address owner, string memory name, uint date, string memory description) {
+    constructor(address userContract, address issuerContract, address owner, string memory name, uint date, string memory description) {
         // init contract address
         _userContract = userContract;
+        _issuerContract = issuerContract;
         _orgManagerContract = msg.sender; // orgManager contract will call this
         // set org info
         _orgInfo = OrgInfo(owner, name, date, description);
@@ -79,6 +103,8 @@ contract Org {
         _disable = false;
         // set org owner to org admin
         addUser(owner, Role.Admin);
+        _deviceRegisterRequestCount = 0;
+        _certificateRequestCount = 0;
     }
     
     // only admins can call this
@@ -124,7 +150,10 @@ contract Org {
     // only admins can call this
     function removeAdmin(address account) external onlyAdmin onlyAble {
         uint index = _userInfoMap[account].userIndex;
-        delete _users[index];
+        address last = _users[_users.length - 1];
+        _users[index] = last;
+        _userInfoMap[last].userIndex = index;
+        _users.pop();
         delete _userInfoMap[account];
         // remove org id from the target user storing in the user contract
         // User(_user).removeOrgIdToUser(account, _orgInfo.id);
@@ -155,12 +184,22 @@ contract Org {
     // each smart meter has its wallet
     // smart meter dapp will call this
     function registerDevice(address plantContract) external onlyAble {
-        address deviceAccount = msg.sender;
-        _deviceRegisterRequests.push(DeviceRegisterRequest(plantContract, deviceAccount));
+        for(uint i = 0; i < _plants.length; i++) {
+            require(Plant(_plants[i]).contains(msg.sender) == false);
+        }
+        _deviceRegisterRequests.push(_deviceRegisterRequestCount);
+        _deviceRegisterRequestMap[_deviceRegisterRequestCount] = DeviceRegisterRequest(_deviceRegisterRequests.length - 1, _deviceRegisterRequestCount, plantContract, msg.sender);
+        _deviceRegisterRequestCount++;
     }
     
     function getAllDeviceRegisterRequest() external view returns (DeviceRegisterRequest[] memory) {
-        return _deviceRegisterRequests;
+        uint length = _deviceRegisterRequests.length;
+        DeviceRegisterRequest[] memory result = new DeviceRegisterRequest[](length);
+        for(uint i = 0; i < length; i++) {
+            uint id = _deviceRegisterRequests[i];
+            result[i] = _deviceRegisterRequestMap[id];
+        }
+        return result;
     }
     
     // only admins can call this
@@ -172,10 +211,15 @@ contract Org {
         string memory location,
         string memory image
         ) external onlyAdmin onlyAble{
-        DeviceRegisterRequest memory request = _deviceRegisterRequests[requestId];
+        DeviceRegisterRequest memory request = _deviceRegisterRequestMap[requestId];
         Plant(request.plantId).addDevice(request.deviceId, date, capacity, location, image);
-        // remove request from storage
-        delete _deviceRegisterRequests[requestId];
+        // remove request
+        uint index = request.index;
+        uint last = _deviceRegisterRequests[_deviceRegisterRequests.length - 1];
+        _deviceRegisterRequests[index] = last;
+        _deviceRegisterRequestMap[last].index = index;
+        _deviceRegisterRequests.pop();
+        delete _deviceRegisterRequestMap[requestId];
     }
     
     // only admins can call this
@@ -183,8 +227,10 @@ contract Org {
         address plantId,
         address deviceId,
         string memory deviceLocation
-        ) external onlyAdmin onlyAble {
-        // Issuer(_issuerContract).requestApproveDevice(plantId, deviceId, deviceLocation);
+        ) external onlyAdmin onlyAble returns (uint) {
+        uint id = Issuer(_issuerContract).requestApproveDevice(plantId, deviceId, deviceLocation);
+        Plant(plantId).setDevicePending(deviceId);
+        return id;
     }
     
     // only admins can call this
@@ -200,10 +246,41 @@ contract Org {
         address plantId,
         uint[][] memory powerIds,
         uint[][] memory values,
-        string[] memory metadataUriList
-        ) external onlyAdmin onlyAble {
-        // Issuer(_issuerContract).requestCertificate(number, plantContract, powerIds, values, metadataUriList);
+        string memory metadataUri
+        ) external onlyAdmin onlyAble returns (uint) {
+        require(powerIds.length == number);
+        require(values.length == number);
+        uint id = Issuer(_issuerContract).requestCertificate(number, plantId, powerIds, values, metadataUri);
+        // emit CertificateRequestEvent(id, number, plantId, powerIds, values, metadataUri);
+        _certificateRequests.push(_certificateRequestCount);
+        _certificateRequestMap[_certificateRequestCount] = CertificateRequest(_certificateRequests.length - 1, _certificateRequestCount, number, plantId, powerIds, values);
+        _certificateRequestCount++;
+        return id;
     }
     
+    function getAllCertificateRequest() external view returns (CertificateRequest[] memory) {
+        uint length = _certificateRequests.length;
+        CertificateRequest[] memory result = new CertificateRequest[](length);
+        for(uint i = 0; i < length; i++) {
+            uint id = _certificateRequests[i];
+            result[i] = _certificateRequestMap[id];
+        }
+        return result;
+    }
     
+    function reducePower(
+        uint requestId,
+        address plantId,
+        uint[][] memory powerIds,
+        uint[][] memory values
+        ) external onlyAdmin onlyAble {
+        Plant(plantId).reducePower(powerIds, values);
+        // remove request
+        uint index = _certificateRequestMap[requestId].index;
+        uint last = _certificateRequests[_certificateRequests.length - 1];
+        _certificateRequests[index] = last;
+        _certificateRequestMap[last].index = index;
+        _certificateRequests.pop();
+        delete _certificateRequestMap[requestId];
+    }
 }

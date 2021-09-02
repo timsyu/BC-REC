@@ -4,18 +4,22 @@ pragma solidity ^0.8.4;
 import "./Org.sol";
 import "./OrgManager.sol";
 import "./Plant.sol";
-import "./NFT721Demo.sol";
+import "./NFT1155Demo.sol";
 
 contract Issuer {
     
     address _issuerAccount;
     OrgManager _orgManager;
-    NFT721Demo _nft;
+    NFT1155Demo _nft;
     
     event DeviceRequestEvent(uint indexed requestId, address orgContract, address plantContract, address deviceAccount, bool approve);
-    event ReqCertEvent(uint indexed tokenId, uint orgId ,uint plantId, uint[] powerIds, uint sdate, uint edate);
+    event CertificateRequestEvent(uint indexed requestId);
+    event CertificateRequestApprovedEvent(uint indexed tokenId, address orgId ,address plantId, uint[] powerIds);
+    event CertificateRequestDisApprovedEvent(uint indexed requestId);
+    event PowerReqCertEvent(uint powerId, uint value);
     
     struct DeviceRequest {
+        uint id;
         address orgContract;
         address plantContract;
         address deviceAccount;
@@ -23,11 +27,13 @@ contract Issuer {
     }
     
     struct CertificateRequest {
+        uint id;
         uint number;
         address orgId;
         address plantId;
-        Plant.SimplifiedPower[][] simplifiedPowers;
-        string[] metadatauri;
+        uint[][] powerIds;
+        uint[][] values;
+        string metadataUri;
     }
     
     uint _deviceRequestCount;
@@ -39,13 +45,13 @@ contract Issuer {
     mapping(uint => uint) _certificateRequestIndexes;
     CertificateRequest[] _certificateRequests;
     
-    constructor(address orgManagerContract, address nft) {
+    constructor(address orgManagerContract) {
         _orgManager = OrgManager(orgManagerContract);
-        _nft = NFT721Demo(nft);
+        _nft = new NFT1155Demo();
         _deviceRequestCount = 0;
         _certificateRequestCount = 0;
         // test
-        _issuerAccount = 0x17F6AD8Ef982297579C203069C1DbfFE4348c372;
+        _issuerAccount = msg.sender;
     }
     
     modifier onlyOrg() {
@@ -58,15 +64,23 @@ contract Issuer {
         _;
     }
     
+    // function setIssuerAccount(address issuerAccount) external {
+    //     _issuerAccount = issuerAccount;
+    // }
+    
     // only org contract can call this
     // return requestId
     function requestApproveDevice(
         address plantId,
         address deviceId,
         string memory deviceLocation
-        ) external onlyOrg returns (uint){
-        _deviceRequests.push(DeviceRequest(msg.sender, plantId, deviceId, deviceLocation));
-        _deviceRequestIndexes[_deviceRequestCount++] = _deviceRequests.length - 1;
+        ) external onlyOrg returns (uint) {
+        for(uint i = 0; i < _deviceRequests.length; i++) {
+            require(_deviceRequests[i].deviceAccount != deviceId);
+        }
+        _deviceRequestCount++;
+        _deviceRequests.push(DeviceRequest(_deviceRequestCount, msg.sender, plantId, deviceId, deviceLocation));
+        _deviceRequestIndexes[_deviceRequestCount] = _deviceRequests.length - 1;
         return _deviceRequestCount;
     }
     
@@ -81,42 +95,70 @@ contract Issuer {
         emit DeviceRequestEvent(requestId, request.orgContract, request.plantContract, request.deviceAccount, approve);
         // update device state
         Plant(request.plantContract).updateDeviceState(request.deviceAccount, approve);
-        // remove request from storage
-        delete _deviceRequests[index];
+        // remove request
+        _deviceRequestIndexes[_deviceRequests.length - 1] = index;
+        _deviceRequests[index] = _deviceRequests[_deviceRequests.length - 1];
+        _deviceRequests.pop();
         delete _deviceRequestIndexes[requestId];
     }
     
-    // Admin After calculating, will call this
-    // function requestCertificate(
-    //     uint number,
-    //     address plantId, uint[][] memory powerIds,
-    //     uint[][] memory values,
-    //     string[] memory metadataUriList
-    //     ) external {
-    //     address orgAddress = OrgManager(_orgManager).getOrg(orgId);
-    //     Org org = Org(orgAddress);
-    //     require(msg.sender == orgAddress, "only Org can call this");
-    //     Plant plant = Plant(org.getPlant(plantId));
+    function requestCertificate(
+        uint number,
+        address plantId,
+        uint[][] memory powerIds,
+        uint[][] memory values,
+        string memory metadataUri
+    ) external onlyOrg returns (uint) {
+        _certificateRequestCount++;
+        _certificateRequests.push(CertificateRequest(_certificateRequestCount, number, msg.sender, plantId, powerIds, values, metadataUri));
+        _certificateRequestIndexes[_certificateRequestCount] = _certificateRequests.length - 1;
+        emit CertificateRequestEvent(_certificateRequestCount);
+        return _certificateRequestCount;
+    }
+
+    function getCertificateRequest(uint requestId) external view returns (CertificateRequest memory) {
+        uint index = _certificateRequestIndexes[requestId];
+        return _certificateRequests[index];
+    }
+    
+    // After Issuer validate, will call this
+    function approveCertificateRequest(
+        uint requestId,
+        bool approve
+        ) external onlyIssuer {
         
-    //     // 1. calculate in plant contract
-    //     bool valid = plant.validate(number, powerIds, values);
-        
-    //     address receiver = org.getPlantAccount();
-    //     uint start = 0;
-    //     for (uint i = 0;i < number;i++) {
-    //         uint[] memory oneTokenPowerIds = new uint[](numbers[i]);
-    //         for (uint j = start;j < start + numbers[i];j++) {
-    //             oneTokenPowerIds[j - start] = powerIds[j];
-    //             start = numbers[i];
-    //         }
+        if(approve == false) {
+            emit CertificateRequestDisApprovedEvent(requestId);
+        } else {
+            uint index = _certificateRequestIndexes[requestId];
+            CertificateRequest memory certReq = _certificateRequests[index];
+            // 1. emit PowerReqCertEvents
+            uint number = certReq.number;
+            uint[][] memory powerIds = certReq.powerIds;
+            uint[][] memory values = certReq.values;
+            for(uint i = 0; i < number; i++) {
+                uint[] memory pIds = powerIds[i];
+                uint[] memory vs = values[i];
+                for(uint j = 0; j < vs.length; j++) {
+                    emit PowerReqCertEvent(pIds[j], vs[j]);
+                }
+            }
             
-           
-    //         tokenId++;
-    //         // 3. emit one token
-    //         emit ReqCertEvent(tokenId, orgId , plantId, oneTokenPowerIds, oneTokenValues, dateRanges[i].sdate, dateRanges[i].edate);
-    //     }
-    //      // 2. mint
-    //     uint tokenId = _nft.mintNft(receiver, "");
-    //     // emit this requestCertificate which tokenIds?
-    // }
+            // 2. mint
+            address orgId = certReq.orgId;
+            address plantId = certReq.plantId;
+            string memory metadataUri = certReq.metadataUri;
+            uint[] memory tokenIds = _nft.mintBatchNft(orgId, number, powerIds, metadataUri);
+            // 3. emit CertificateRequestApprovedEvent
+            for(uint i = 0; i < number; i++) {
+                emit CertificateRequestApprovedEvent(tokenIds[i], orgId , plantId, powerIds[i]);
+            }
+            
+            // 4. remove request
+            _certificateRequestIndexes[_certificateRequests.length - 1] = index;
+            _certificateRequests[index] = _certificateRequests[_deviceRequests.length - 1];
+            _certificateRequests.pop();
+            delete _certificateRequestIndexes[requestId];
+        }
+    }
 }

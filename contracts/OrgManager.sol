@@ -25,31 +25,21 @@ contract OrgManager {
     // }
     
     // new a contract to owner
-    function createOrg (string memory name, uint date, string memory description) external {
+    function createOrg (string memory name, uint date, string memory description, address issuerContract) external {
         address owner = msg.sender;
-        Org org = new Org(_userContract, owner, name, date, description);
+        Org org = new Org(_userContract, issuerContract, owner, name, date, description);
         address orgAddress = address(org);
         _orgs.push(orgAddress);
         _orgIndexes[orgAddress] = _orgs.length - 1;
         emit CreateOrgEvent(owner, orgAddress);
     }
     
-    function testCreateOrg (uint date) external {
-        address owner = msg.sender;
-        Org org = new Org(_userContract, owner, "n", date, "d");
-        emit CreateOrgEvent(owner, address(org));
-    }
-
     function getOrgInfo (address orgContract) private view returns (Org.OrgInfo memory) {
         return Org(orgContract).getOrgInfo();
     }
     
-    function getAllOrgInfo () external view returns (Org.OrgInfo[] memory) {
-        Org.OrgInfo[] memory result = new Org.OrgInfo[](_orgs.length);
-        for(uint i = 0; i < _orgs.length; i++) {
-            result[i] = getOrgInfo(_orgs[i]);
-        }
-        return result;
+    function getAllOrg () external view returns (address[] memory) {
+        return _orgs;
     }
     
     function contains (address orgContract) external view returns (bool) {
