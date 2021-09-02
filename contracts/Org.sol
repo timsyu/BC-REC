@@ -4,8 +4,9 @@ pragma solidity ^0.8.4;
 import "./Plant.sol";
 import "./Issuer.sol";
 // import "./User.sol";
+import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
-contract Org {
+contract Org is ERC1155Holder {
     
     enum Role { None, Admin , Device} // Role.Device not used...
     enum State { None, Idle, Pending, Approve, DisApprove}
@@ -59,7 +60,7 @@ contract Org {
     uint[] _deviceRegisterRequests;
 
     // certificate request
-    uint _certificateRequestCount;
+    // uint _certificateRequestCount;
     // request id => CertificateRequest
     mapping(uint => CertificateRequest) _certificateRequestMap;
     uint[] _certificateRequests;
@@ -104,7 +105,7 @@ contract Org {
         // set org owner to org admin
         addUser(owner, Role.Admin);
         _deviceRegisterRequestCount = 0;
-        _certificateRequestCount = 0;
+        // _certificateRequestCount = 0;
     }
     
     // only admins can call this
@@ -252,9 +253,8 @@ contract Org {
         require(values.length == number);
         uint id = Issuer(_issuerContract).requestCertificate(number, plantId, powerIds, values, metadataUri);
         // emit CertificateRequestEvent(id, number, plantId, powerIds, values, metadataUri);
-        _certificateRequests.push(_certificateRequestCount);
-        _certificateRequestMap[_certificateRequestCount] = CertificateRequest(_certificateRequests.length - 1, _certificateRequestCount, number, plantId, powerIds, values);
-        _certificateRequestCount++;
+        _certificateRequests.push(id);
+        _certificateRequestMap[id] = CertificateRequest(_certificateRequests.length - 1, id, number, plantId, powerIds, values);
         return id;
     }
     
@@ -268,15 +268,11 @@ contract Org {
         return result;
     }
     
-    function reducePower(
-        uint requestId,
-        address plantId,
-        uint[][] memory powerIds,
-        uint[][] memory values
-        ) external onlyAdmin onlyAble {
-        Plant(plantId).reducePower(powerIds, values);
+    function reducePower(uint requestId) external onlyAdmin onlyAble {
+        CertificateRequest memory request = _certificateRequestMap[requestId];
+        Plant(request.plantId).reducePower(request.powerIds, request.values);
         // remove request
-        uint index = _certificateRequestMap[requestId].index;
+        uint index = request.index;
         uint last = _certificateRequests[_certificateRequests.length - 1];
         _certificateRequests[index] = last;
         _certificateRequestMap[last].index = index;

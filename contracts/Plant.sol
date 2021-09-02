@@ -10,6 +10,7 @@ contract Plant {
     event RecordTxHashEvent(uint indexed powerId, bytes32 txHash);
     
     struct Power {
+        uint id;
         address deviceId;
     	uint date; // timestamp
     	uint value; // float? 上傳電量
@@ -112,7 +113,7 @@ contract Plant {
         require(_deviceInfoMap[msg.sender].state == Org.State.Approve, "this device must be approved by issuer");
         // store record value to the storage
         _powerCount++;
-        _powers.push(Power(msg.sender, date, value, value, bytes32(0x0)));
+        _powers.push(Power(_powerCount, msg.sender, date, value, value, bytes32(0x0)));
         _powerIndexes[_powerCount] = _powers.length - 1;
         // emit record event to the chain
         emit RecordEvent(_powerCount, msg.sender, date, value);
@@ -147,7 +148,6 @@ contract Plant {
         return _deviceInfoMap[deviceId].date > 0 ;
     }
     
-    // remove POwer if reaminValue == 0
     // safe math??
     function reducePower(
         uint[][] memory powerIds,
@@ -160,10 +160,21 @@ contract Plant {
             uint powerLength = pIds.length;
             require(powerLength == values[i].length);
             uint[] memory vs = values[i];
-            for(uint j = 0; j < powerLength; j++) {
+            uint j;
+            for(j = 0; j < powerLength; j++) {
                 uint index = _powerIndexes[pIds[j]];
                 // reduce power from storage
                 _powers[index].remainValue -= vs[j];
+            }
+            // remove power which remainValue == 0
+            if(_powers[j].remainValue == 0) {
+                uint id = _powers[j].id;
+                uint index = _powerIndexes[id];
+                Power memory last = _powers[_powers.length - 1];
+                _powerIndexes[last.id] = index;
+                _powers[index] = last;
+                _powers.pop();
+                delete _powerIndexes[id];
             }
         }
     }

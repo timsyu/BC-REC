@@ -1,5 +1,5 @@
 const Web3 = require("web3");
-const Plant = require('../resource/plant.json');
+const Plant = require('./resource/plant.json');
 const WalletTools = require("./walletTools");
 // const web3 = new Web3(Web3.givenProvider ||'https://ropsten.infura.io/v3/4d6cbd5116f74b6eb0f688f165b87286');
 const web3 = new Web3(Web3.givenProvider ||'https://besu-allen-704319b4e1-node-2aae4c9e.baas.twcc.ai');

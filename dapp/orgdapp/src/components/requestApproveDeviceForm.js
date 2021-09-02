@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Link, Redirect } from "react-router-dom";
 import Web3 from 'web3';
-import { OrgAbi } from '../resource/abi/org';
-import { PlantAbi } from '../resource/abi/plant';
+// import { OrgAbi } from '../resource/abi/org';
+// import { PlantAbi } from '../resource/abi/plant';
 // import DeviceRecord from './deviceRecord';
 import Org from '../resource/org.json';
 import Plant from '../resource/plant.json';
@@ -17,9 +17,6 @@ class RequestApproveDeviceForm extends Component {
         this.state = {
             isLogin: isLogin,
             orgAddress: orgAddress,
-            plantId: '',
-            deviceId: '',
-            deviceLocation: '',
             data: []
         };
 
@@ -38,12 +35,7 @@ class RequestApproveDeviceForm extends Component {
         const target = event.target;
         const name = target.name;
         let orgAddress = localStorage.getItem('orgAddress');
-        if(name === "request") {
-            const plantId = this.state.plantId;
-            const deviceId = this.state.deviceId;
-            const deviceLocation = this.state.deviceLocation;
-            this.requestApproveDevice(orgAddress, plantId, deviceId, deviceLocation);
-        } else if(name === "update") {
+        if(name === "update") {
             // store this
             let that = this;
             this.getAllDevice(orgAddress)
@@ -53,7 +45,15 @@ class RequestApproveDeviceForm extends Component {
             })
         }
     }
-    
+
+    async handleRequest(i, j) {
+        const plantId = this.state.data[i][j].plantId;
+        const deviceId = this.state.data[i][j].deviceId;
+        const deviceLocation = this.state.data[i][j].location;
+        let orgAddress = localStorage.getItem('orgAddress');
+        this.requestApproveDevice(orgAddress, plantId, deviceId, deviceLocation); 
+    }
+
     componentDidMount(){
         // store this
         let that = this;
@@ -66,7 +66,7 @@ class RequestApproveDeviceForm extends Component {
 
     async getAllDevice(orgAddress) {
         const web3 = new Web3(Web3.givenProvider);
-        const org = new web3.eth.Contract(Org.bi, orgAddress);
+        const org = new web3.eth.Contract(Org.abi, orgAddress);
         let plantIds = await org.methods.getAllPlant().call();
         let plantList = [];
         for(let i = 0; i < plantIds.length; i++) {
@@ -131,7 +131,7 @@ class RequestApproveDeviceForm extends Component {
         let isLogin = localStorage.getItem('isLogin');
         if (isLogin === 'true') {
             let list = this.state.data.map((plant, i) =>
-                plant.map((device, j) =>
+                plant.map((device, j) => 
                     <div className="card" key={j}>
                         <div className="card-body">
                             <p>plantId: {device.plantId}</p>
@@ -140,6 +140,11 @@ class RequestApproveDeviceForm extends Component {
                             <p>state: {device.state}</p>
                             <p>location: {device.location}</p>
                             <p>image: {device.image}</p>
+                            {
+                                (device.state === "Idle")
+                                    ? <button className="btn btn-secondary" type="button" name="request" onClick = {() => this.handleRequest(i, j)}>request</button>
+                                    : null
+                            }
                         </div>
                     </div>
                 )
@@ -159,16 +164,6 @@ class RequestApproveDeviceForm extends Component {
                     <div>
                         {list}
                     </div>
-                    <br />
-                    <br />
-                    <h1 style={{textAlign: "center"}}>發送裝置審查請求</h1>
-                    <div className="input-group mb-3">
-                        <input type="text" className="form-control" placeholder="plantId" name="plantId" value={this.state.plantId} onChange={this.handleChange}/>
-                        <input type="text" className="form-control" placeholder="deviceId" name="deviceId" value={this.state.deviceId} onChange={this.handleChange}/>
-                        <input type="text" className="form-control" placeholder="deviceLocation" name="deviceLocation" value={this.state.deviceLocation} onChange={this.handleChange}/>
-                        <button className="btn btn-secondary" type="button" name="request" onClick = {this.handleSubmit}>request</button>
-                    </div>
-                    {/* <DeviceRecord /> */}
                 </div>
             );
         } else {

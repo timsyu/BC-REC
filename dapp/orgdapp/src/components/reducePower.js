@@ -19,8 +19,6 @@ class ReducePower extends Component {
         this.state = {
             isLogin: isLogin,
             orgAddress: orgAddress,
-            plantId: '',
-            requestId: '',
             data: []
         };
 
@@ -35,6 +33,13 @@ class ReducePower extends Component {
         this.setState({[name]: value});
     }
 
+    handleReduce(i) {
+        const requestId = this.state.data[i].id;
+        let orgAddress = localStorage.getItem('orgAddress');
+        // console.log(requestId);
+        this.reducePower(orgAddress, requestId);
+    }
+
     async handleSubmit(event) {
         const target = event.target;
         const name = target.name;
@@ -47,17 +52,6 @@ class ReducePower extends Component {
                 // console.log(data);
                 that.setState({data: data});
             })
-            
-        } else if(name === "reduce") {
-            const plantId = this.state.plantId;
-            const powerIds = this.state.data[0].powerIds;
-            const values = this.state.data[0].values;
-            const requestId = 1;
-            console.log(powerIds);
-            console.log(values);
-            // console.log(JSON.stringify(powerIds));
-            // console.log(JSON.stringify(values));
-            this.reducePower(orgAddress, requestId, plantId, powerIds, values);
         }
     }
 
@@ -71,16 +65,14 @@ class ReducePower extends Component {
             let id = request.id;
             let number = request.number;
             let plantId = request.plantId;
-            let { approved, tokenId } = await this.getCertRequestApprovedEvent(id);
-            if (approved) {
-                let info = {
-                    'id': id,
-                    'number': number,
-                    'plantId': plantId,
-                    'tokenId': tokenId
-                };
-                requestList.push(info);
-            }
+            let state = await this.getCertRequestApprovedEvent(id);
+            let info = {
+                'id': id,
+                'state': state,
+                'number': number,
+                'plantId': plantId
+            };
+            requestList.push(info);
         }
         // console.log(requestList);
         return requestList;
@@ -89,18 +81,22 @@ class ReducePower extends Component {
     async getCertRequestApprovedEvent(requestId) {
         const web3 = new Web3(Web3.givenProvider);
         const issuer = new web3.eth.Contract(Issuer.abi, Issuer.address);
-        let approve = false;
+        let state = '';
         await issuer.getPastEvents('CertificateRequestApprovedEvent', {
             filter: {requestId: requestId},
             fromBlock: 0
         }, function(error, event){
             // console.log(event)
-            if(!error && event.length > 0) {
-                let returnValues = event[0].returnValues;
-                approve = returnValues.approved
+            if(!error) {
+                if (event.length > 0) {
+                    let returnValues = event[0].returnValues;
+                    state = (returnValues.approve) ? 'Approved' : 'DisApproved';
+                } else {
+                    state = 'Pending';
+                }
             }
         });
-        return approve;
+        return state;
     }
 
     async getCertificateEvent(requestId) {
@@ -132,7 +128,7 @@ class ReducePower extends Component {
             const accounts = await window.ethereum.request({ method: 'eth_accounts' });
             const account = accounts[0];
             
-            org.methods.reducePower(requestId, plantId, powerIds, values)
+            org.methods.reducePower(requestId)
             .send({from: account})
             .on('sending', function(confirmationNumber, receipt){
                 console.log('sending');
@@ -164,9 +160,13 @@ class ReducePower extends Component {
                 <div className="card" key={i}>
                     <div className="card-body">
                         <p>requestId: {request.id}</p>
+                        <p>state: {request.state}</p>
                         <p>plantId: {request.plantId}</p>
-                        {/* <p>powerIds: {request.powerIds}</p>
-                        <p>values: {request.values}</p> */}
+                        {
+                            (request.state == "Approved")
+                            ? <button className="btn btn-secondary" type="button" name="reduce" onClick = {() => this.handleReduce(i)}>Reduce</button>
+                            : null
+                        }
                     </div>
                 </div>
             )
@@ -180,14 +180,6 @@ class ReducePower extends Component {
                     </nav> 
                     <div className="input-group mb-3" style={{marginTop:"10px"}}>
                         <button className="btn btn-secondary" type="button" name="update" onClick = {this.handleSubmit}>Update</button>
-                    </div>
-                    <br />
-                    <br />
-                    <h1 style={{textAlign: "center"}}>刪除電量</h1>
-                    <div className="input-group mb-3" style={{marginTop:"10px"}}>
-                        <input type="text" className="form-control" placeholder="requestId" name="requestId" onChange={this.handleChange}/>
-                        <input type="text" className="form-control" placeholder="plantId" name="plantId" onChange={this.handleChange}/>
-                        <button className="btn btn-secondary" type="button" name="reduce" onClick = {this.handleSubmit}>Reduce</button>
                     </div>
                     <br />
                     <br />

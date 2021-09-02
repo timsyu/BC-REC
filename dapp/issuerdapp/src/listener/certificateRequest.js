@@ -46,7 +46,6 @@ async function checkPowerOveruse(issuer, certificateRequest, oriValueMap) {
     // let values = certificateRequest.values;
     let values = certificateRequest[5];
     // console.log(values);
-    console.log(oriValueMap)
     for (let i = 0; i < number; i++) {
         let pIds = powerIds[i];
         let vs = values[i];
@@ -74,17 +73,15 @@ async function checkPowerOveruse(issuer, certificateRequest, oriValueMap) {
     return false;
 }
 
-async function checkPowerEnough(number, values) {
+function checkPowerEnough(number, values) {
 
-    const target = 1000;
+    const target = 111;
     for(let i = 0; i < number; i++) {
         let vs = values[i];
         let total = 0;
         for(let j = 0; j < vs.length; j++) {
-            total += vs[j];
+            total += parseInt(vs[j]);
         }
-        console.log(target);
-        console.log(total);
         if(target != total) {
             return false;
         }
@@ -150,7 +147,6 @@ async function main() {
             try {
                 let certificateRequest = await issuer.methods.getCertificateRequest(requestId).call();
                 let number = certificateRequest.number;
-                console.log(number)
                 let plantId = certificateRequest.plantId;
                 let plant = new web3.eth.Contract(Plant.abi, plantId);
                 let allPowerIds = [];
@@ -183,9 +179,9 @@ async function main() {
                     }
                 }
                 console.log("valid:", valid);
-                
-                // let txHash = await approveCertificateRequest(issuer, Issuer.address, account, privateKey, requestId, valid);
-                // console.log("txHash:", txHash);
+                console.log("sending");
+                let txHash = await approveCertificateRequest(issuer, Issuer.address, account, privateKey, requestId, valid);
+                console.log("txHash:", txHash);
             } catch (error) {
                 console.log("Certificate Request id", requestId, "is not in storage");
             } 

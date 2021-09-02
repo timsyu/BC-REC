@@ -1,5 +1,6 @@
 const Web3 = require("web3");
-const Org = require('../resource/org.json');
+const Org = require('./resource/org.json');
+const Plant = require('./resource/plant.json');
 const WalletTools = require("./walletTools");
 
 async function main() {

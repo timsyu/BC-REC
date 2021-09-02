@@ -35,7 +35,7 @@ contract NFT1155Demo is ERC1155Supply {
     // }
     
     function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
-        require(exists(tokenId), "ERC721Metadata: URI set of nonexistent token");
+        // require(exists(tokenId), "ERC1155Metadata: URI set of nonexistent token");
         _tokenURIs[tokenId] = _tokenURI;
     }
     

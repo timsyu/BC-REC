@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link, Redirect } from "react-router-dom";
-import TraceOrgEvent from "./traceOrgEvent";
+import TraceToken from "./traceToken";
 
 class Home extends Component {
     constructor(props) {
@@ -68,6 +68,8 @@ class Home extends Component {
                         <button className="btn btn-secondary" type="button" name="logout" onClick = {this.handleSubmit}>登出</button>
                     </nav>
                     <br />
+                    <br />
+                    <TraceToken />
                 </div>
             );
         } else {

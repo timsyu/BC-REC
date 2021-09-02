@@ -14,9 +14,9 @@ contract Issuer {
     
     event DeviceRequestEvent(uint indexed requestId, address orgContract, address plantContract, address deviceAccount, bool approve);
     event CertificateRequestEvent(uint indexed requestId);
-    event CertificateRequestApprovedEvent(uint indexed tokenId, address orgId ,address plantId, uint[] powerIds);
-    event CertificateRequestDisApprovedEvent(uint indexed requestId);
-    event PowerReqCertEvent(uint powerId, uint value);
+    event CertificateEvent(uint indexed requestId, uint indexed tokenId, address orgId ,address plantId, uint[] powerIds, uint[] values);
+    event CertificateRequestApprovedEvent(uint indexed requestId, bool approve);
+    event PowerReqCertEvent(uint indexed powerId, uint value);
     
     struct DeviceRequest {
         uint id;
@@ -96,8 +96,9 @@ contract Issuer {
         // update device state
         Plant(request.plantContract).updateDeviceState(request.deviceAccount, approve);
         // remove request
-        _deviceRequestIndexes[_deviceRequests.length - 1] = index;
-        _deviceRequests[index] = _deviceRequests[_deviceRequests.length - 1];
+        DeviceRequest memory last = _deviceRequests[_deviceRequests.length - 1];
+        _deviceRequestIndexes[last.id] = index;
+        _deviceRequests[index] = last;
         _deviceRequests.pop();
         delete _deviceRequestIndexes[requestId];
     }
@@ -121,18 +122,22 @@ contract Issuer {
         return _certificateRequests[index];
     }
     
+    function getNFTContract() external view returns (address) {
+        return address(_nft);
+    }
+    
     // After Issuer validate, will call this
     function approveCertificateRequest(
         uint requestId,
         bool approve
         ) external onlyIssuer {
         
-        if(approve == false) {
-            emit CertificateRequestDisApprovedEvent(requestId);
-        } else {
-            uint index = _certificateRequestIndexes[requestId];
+        // 1. emit CertificateRequestApprovedEvent
+        emit CertificateRequestApprovedEvent(requestId, approve);
+        uint index = _certificateRequestIndexes[requestId];
+        if(approve) {
             CertificateRequest memory certReq = _certificateRequests[index];
-            // 1. emit PowerReqCertEvents
+            // 2. emit PowerReqCertEvents
             uint number = certReq.number;
             uint[][] memory powerIds = certReq.powerIds;
             uint[][] memory values = certReq.values;
@@ -144,21 +149,22 @@ contract Issuer {
                 }
             }
             
-            // 2. mint
+            // 3. mint
             address orgId = certReq.orgId;
             address plantId = certReq.plantId;
             string memory metadataUri = certReq.metadataUri;
             uint[] memory tokenIds = _nft.mintBatchNft(orgId, number, powerIds, metadataUri);
-            // 3. emit CertificateRequestApprovedEvent
+            // 4. emit CertificateEvent
             for(uint i = 0; i < number; i++) {
-                emit CertificateRequestApprovedEvent(tokenIds[i], orgId , plantId, powerIds[i]);
+                emit CertificateEvent(requestId, tokenIds[i], orgId , plantId, powerIds[i], values[i]);
             }
-            
-            // 4. remove request
-            _certificateRequestIndexes[_certificateRequests.length - 1] = index;
-            _certificateRequests[index] = _certificateRequests[_deviceRequests.length - 1];
-            _certificateRequests.pop();
-            delete _certificateRequestIndexes[requestId];
         }
+        
+        // 4. remove request
+        CertificateRequest memory last = _certificateRequests[_certificateRequests.length - 1];
+        _certificateRequestIndexes[last.id] = index;
+        _certificateRequests[index] = last;
+        _certificateRequests.pop();
+        delete _certificateRequestIndexes[requestId];
     }
 }
