@@ -1,13 +1,8 @@
 import React, { Component } from 'react';
 import { Link, Redirect } from "react-router-dom";
 import Web3 from 'web3';
-// import { IssuerAbi } from '../resource/abi/issuer';
-// import { IssuerAddress } from '../resource/address/contractAddress';
-// import { OrgAbi } from '../resource/abi/org';
-// import { PlantAbi } from '../resource/abi/plant';
 import Issuer from '../resource/issuer.json';
 import Org from '../resource/org.json';
-import Plant from '../resource/plant.json';
 
 class ReducePower extends Component {
     constructor(props) {
@@ -116,7 +111,7 @@ class ReducePower extends Component {
         return approve;
     }
 
-    async reducePower(orgAddress, requestId, plantId, powerIds, values) {
+    async reducePower(orgAddress, requestId) {
         const web3 = new Web3(Web3.givenProvider);
         const org = new web3.eth.Contract(Org.abi, orgAddress);
         if (typeof window.ethereum == 'undefined') {
@@ -163,7 +158,7 @@ class ReducePower extends Component {
                         <p>state: {request.state}</p>
                         <p>plantId: {request.plantId}</p>
                         {
-                            (request.state == "Approved")
+                            (request.state === "Approved")
                             ? <button className="btn btn-secondary" type="button" name="reduce" onClick = {() => this.handleReduce(i)}>Reduce</button>
                             : null
                         }

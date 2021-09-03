@@ -52,41 +52,32 @@ class Power extends Component {
         } else if(name === "request") {
             const plantId = this.state.plantId;
             const number = this.state.number;
-            const powers = await this.getPlantAllPower(plantId);
+            // const powers = await this.getPlantAllPower(plantId);
+            const allPlantPowers = await this.getAllPower(orgAddress);
+            const powerMap = allPlantPowers.get(plantId);
+            const powers = [...powerMap.entries()];
             const { powerIds, values } = this.calculate(powers, number);
             console.log(powerIds);
             console.log(values);
             let metadataUri = "metadata_uri";
             this.requestCertificate(orgAddress, number, plantId, powerIds, values, metadataUri);
-        } else if(name === "reduce") {
-            const plantId = this.state.plantId;
-            const number = this.state.number;
-            const powers = await this.getPlantAllPower(plantId);
-            const { powerIds, values } = this.calculate(powers, number);
-            console.log(powerIds);
-            console.log(values);
-            console.log(JSON.stringify(powerIds));
-            console.log(JSON.stringify(values));
-            this.reducePower(orgAddress, plantId, powerIds, values);
         }
     }
     
     calcertNum(data) {
         let certNumList = [];
-        for (let i = 0; i < data.length; i++) {
-            let plantId = data[i].plantId;
-            let powers = data[i].powers;
+        data.forEach((powers, plantId) => {
             let total = 0;
-            for (let i = 0; i < powers.length; i++) {
-                total += powers[i].remainValue;
-            }
+            powers.forEach((power, powerId) => {
+                total += power.remainValue;
+            });
             let certNum = Math.floor(total / 111);
             let info = {
                 'plantId': plantId,
                 'certNum': certNum
             };
             certNumList.push(info);
-        }
+        });
         return certNumList;
     }
 
@@ -95,23 +86,44 @@ class Power extends Component {
         const org = new web3.eth.Contract(Org.abi, orgAddress);
         let plantIds = await org.methods.getAllPlant().call();
         this.setState({plantIds: plantIds});
-        let plantList = [];
+        let plantMap = new Map();
         for(let i = 0; i < plantIds.length; i++) {
             let powers = await this.getPlantAllPower(plantIds[i]);
-            let info = {
-                'plantId': plantIds[i],
-                'powers': powers
-            };
-            plantList.push(info);
+            plantMap.set(plantIds[i], powers);
         }
-        return plantList;
+        let requests = await this.getAllCertificateRequest(orgAddress);
+        for (let i = 0; i < requests.length; i++) {
+            let request = requests[i];
+            let number = request.number;
+            let plantId = request.plantId;
+            let powerIds = request.powerIds;
+            let values = request[5];
+            let powers = plantMap.get(plantId);
+            for (let j = 0; j < number; j++) {
+                let pIds = powerIds[j];
+                let vs = values[j];
+                for (let k = 0; k < pIds.length; k++) {
+                    let powerId = pIds[k];
+                    let value = parseInt(vs[k]);
+                    let power = powers.get(powerId);
+                    let v = power.remainValue;
+                    power.remainValue = v - value
+                    // powers.set(powerId, power);
+                    if (power.remainValue === 0) {
+                        powers.delete(powerId);
+                    }
+                }
+            }
+            // plantMap.set(plantId, powers);
+        }
+        return plantMap;
     }
 
     async getPlantAllPower(plantId) {
         const web3 = new Web3(Web3.givenProvider);
         let plant = new web3.eth.Contract(Plant.abi, plantId);
         let powers = await plant.methods.getAllPower().call();
-        let powerList = [];
+        let powerMap = new Map();
         for(let i = 0; i < powers.length; i++) {
             let power = powers[i];
             let info = {
@@ -122,14 +134,15 @@ class Power extends Component {
                 'remainValue': parseInt(power.remainValue),
                 'txHash': power.txHash
             };
-            powerList.push(info);
+            powerMap.set(power.id, info);
         }
-        return powerList;
+        return powerMap;
     }
 
     // powers: powers of plant
     // number: cert. number
     calculate(powers, number) {
+        number = parseInt(number);
         let powerIds = [];
         let values = [];
         let currentNumber = 0;
@@ -139,7 +152,7 @@ class Power extends Component {
             let target = 111;
             let count = 0;
             for (let j = 0;j < powers.length;j++) {
-                let p = powers[j];
+                let p = powers[j][1];
                 if (p.remainValue != 0) {
                     iPowerIds[count] = p.id;
                     if (target > p.remainValue) {
@@ -195,6 +208,14 @@ class Power extends Component {
         }
     }
 
+    async getAllCertificateRequest(orgAddress) {
+        const web3 = new Web3(Web3.givenProvider);
+        const org = new web3.eth.Contract(Org.abi, orgAddress);
+        let requests = await org.methods.getAllCertificateRequest().call();
+        // console.log(requests);
+        return requests;
+    }
+
     componentDidMount(){
         // store this
         let that = this;
@@ -207,30 +228,40 @@ class Power extends Component {
         });
     }
     
+    getPowerElements() {
+        const elements = [];
+        this.state.data.forEach((powers, plantId) => {
+            let list = [];
+            powers.forEach((power, powerId) => {
+                list.push(
+                    <div className="card" key={powerId}>
+                        <div className="card-body">
+                            <p>powerId: {power.id}</p>
+                            <p>deviceId: {power.deviceId}</p>
+                            <p>date: {power.date}</p>
+                            <p>value: {power.value}</p>
+                            <p>remain value: {power.remainValue}</p>
+                            <p>tx hash: {power.txHash}</p>
+                        </div>
+                    </div>
+                );
+            })
+            elements.push(
+                <div className="card" key={plantId}>
+                    <p>plantId: {plantId}</p>
+                    <div className="card-body">
+                    {list}
+                    </div>
+                </div>
+            );
+        });
+        return elements;
+    }
+
     render() {
         let isLogin = localStorage.getItem('isLogin');
         if (isLogin === 'true') {
-            let list = this.state.data.map((plant, i) => 
-                <div className="card" key={i}>
-                    <p>plantId: {plant.plantId}</p>
-                    <div className="card-body">
-                    {
-                        plant.powers.map((power, j) =>
-                            <div className="card" key={j}>
-                                <div className="card-body">
-                                    <p>powerId: {power.id}</p>
-                                    <p>deviceId: {power.deviceId}</p>
-                                    <p>date: {power.date}</p>
-                                    <p>value: {power.value}</p>
-                                    <p>remain value: {power.remainValue}</p>
-                                    <p>tx hash: {power.txHash}</p>
-                                </div>
-                            </div>
-                        )
-                    }
-                    </div>
-                </div>
-            )
+            let elements = this.getPowerElements();
             let certNumlist = this.state.certData.map((plant, i) => 
                 <div className="card" key={i}>
                     <p>plantId: {plant.plantId}</p>
@@ -268,7 +299,7 @@ class Power extends Component {
                     <br />
                     <h1 style={{textAlign: "center"}}>發電量資訊</h1>
                     <div>
-                        {list}
+                        {elements}
                     </div>
                 </div>
             );

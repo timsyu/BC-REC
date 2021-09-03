@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { Link, Redirect } from "react-router-dom";
 import Web3 from 'web3';
-import OrgManager from '../resource/orgManager.json';
+// import OrgManager from '../resource/orgManager.json';
 import Issuer from '../resource/issuer.json';
-import Token from '../resource/token.json';
-import Org from '../resource/org.json';
+// import Token from '../resource/token.json';
+// import Org from '../resource/org.json';
 import Plant from '../resource/plant.json';
 
 class TraceToken extends Component {

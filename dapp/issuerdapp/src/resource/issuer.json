@@ -1,5 +1,5 @@
 {
-    "address": "0xb5AC033450E0baaE9652dce21F89A2bEFfde9B90",
+    "address": "0x3Ad44917A36882623C982a371F48a35A4eF084d5",
     "abi": [
 		{
 			"inputs": [
@@ -43,6 +43,12 @@
 					"indexed": false,
 					"internalType": "uint256[]",
 					"name": "powerIds",
+					"type": "uint256[]"
+				},
+				{
+					"indexed": false,
+					"internalType": "uint256[]",
+					"name": "values",
 					"type": "uint256[]"
 				}
 			],
@@ -122,7 +128,7 @@
 			"anonymous": false,
 			"inputs": [
 				{
-					"indexed": false,
+					"indexed": true,
 					"internalType": "uint256",
 					"name": "powerId",
 					"type": "uint256"

@@ -183,7 +183,8 @@ async function main() {
                 let txHash = await approveCertificateRequest(issuer, Issuer.address, account, privateKey, requestId, valid);
                 console.log("txHash:", txHash);
             } catch (error) {
-                console.log("Certificate Request id", requestId, "is not in storage");
+                // console.log("Certificate Request id", requestId, "is not in storage");
+                console.log(error);
             } 
         })
         .on('changed', function(event){

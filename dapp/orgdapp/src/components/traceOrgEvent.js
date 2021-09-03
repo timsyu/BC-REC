@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import { Link, Redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Web3 from 'web3';
-// import { OrgAbi } from '../resource/abi/org';
-// import { OrgManagerAbi } from '../resource/abi/orgManager';
-// import { OrgManagerAddress } from '../resource/address/contractAddress';
 import OrgManager from '../resource/orgManager.json';
 import Org from '../resource/org.json';
 
@@ -41,7 +38,7 @@ class TraceOrgEvent extends Component {
             this.getCreateOrg().then( data => {
                 this.setState({data: data});
             });
-        } else if(name == "select") {
+        } else if(name === "select") {
 
         }
         
