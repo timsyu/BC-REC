@@ -165,16 +165,15 @@ contract Plant {
                 uint index = _powerIndexes[pIds[j]];
                 // reduce power from storage
                 _powers[index].remainValue -= vs[j];
-            }
-            // remove power which remainValue == 0
-            if(_powers[j].remainValue == 0) {
-                uint id = _powers[j].id;
-                uint index = _powerIndexes[id];
-                Power memory last = _powers[_powers.length - 1];
-                _powerIndexes[last.id] = index;
-                _powers[index] = last;
-                _powers.pop();
-                delete _powerIndexes[id];
+                // remove power which remainValue == 0
+                if(_powers[index].remainValue == 0) {
+                    uint id = _powers[index].id;
+                    Power memory last = _powers[_powers.length - 1];
+                    _powerIndexes[last.id] = index;
+                    _powers[index] = last;
+                    _powers.pop();
+                    delete _powerIndexes[id];
+                }
             }
         }
     }
