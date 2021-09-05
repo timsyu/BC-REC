@@ -1,5 +1,5 @@
 {
-    "address": "0x3Ad44917A36882623C982a371F48a35A4eF084d5",
+    "address": "0x1ee538706C0fFd880E3859eEeA2C26a96DD86BED",
     "abi": [
 		{
 			"inputs": [
@@ -11,49 +11,6 @@
 			],
 			"stateMutability": "nonpayable",
 			"type": "constructor"
-		},
-		{
-			"anonymous": false,
-			"inputs": [
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "requestId",
-					"type": "uint256"
-				},
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "tokenId",
-					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "address",
-					"name": "orgId",
-					"type": "address"
-				},
-				{
-					"indexed": false,
-					"internalType": "address",
-					"name": "plantId",
-					"type": "address"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256[]",
-					"name": "powerIds",
-					"type": "uint256[]"
-				},
-				{
-					"indexed": false,
-					"internalType": "uint256[]",
-					"name": "values",
-					"type": "uint256[]"
-				}
-			],
-			"name": "CertificateEvent",
-			"type": "event"
 		},
 		{
 			"anonymous": false,

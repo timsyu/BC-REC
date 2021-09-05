@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import Web3 from 'web3';
 // import OrgManager from '../resource/orgManager.json';
-import Issuer from '../resource/issuer.json';
-// import Token from '../resource/token.json';
+// import Issuer from '../resource/issuer.json';
 // import Org from '../resource/org.json';
 import Plant from '../resource/plant.json';
+import Token from '../resource/token.json';
 
 class TraceToken extends Component {
     constructor(props) {
@@ -39,7 +39,7 @@ class TraceToken extends Component {
                 const requestId = cert.requestId;
                 const plantId = cert.plantId;
                 const powerIds = cert.powerIds;
-                // const usedValues = cert.values;
+                const usedValues = cert.values;
                 let oriPowers = [];
                 let usedPowers = [];
                 for (let i = 0; i < powerIds.length; i++) {
@@ -65,7 +65,7 @@ class TraceToken extends Component {
     
                     let usedPower = {
                         'powerId': powerId,
-                        // 'value': usedValues[i],
+                        'value': usedValues[i],
                     };
                     
                     oriPowers.push(oriPower);
@@ -90,9 +90,9 @@ class TraceToken extends Component {
 
     async getCertBy(tokenId) {
         const web3 = new Web3(Web3.givenProvider);
-        const issuer = new web3.eth.Contract(Issuer.abi, Issuer.address);
+        const token = new web3.eth.Contract(Token.abi, Token.address);
         let info;
-        await issuer.getPastEvents('CertificateEvent', {
+        await token.getPastEvents('CertificateEvent', {
             filter: {tokenId: tokenId},
             fromBlock: 0
         }, function(error, event){
@@ -103,7 +103,8 @@ class TraceToken extends Component {
                     'tokenId': tokenId,
                     'orgId': returnValues.orgId,
                     'plantId': returnValues.plantId,
-                    'powerIds': returnValues.powerIds
+                    'powerIds': returnValues.powerIds,
+                    'values': returnValues.values
                 };
             }
         });
@@ -154,7 +155,7 @@ class TraceToken extends Component {
             <div className="card" key={i}>
                 <div className="card-body">
                     <p>powerId: {usedPower.powerId}</p>
-                    {/* <p>value: {usedPower.value}</p> */}
+                    <p>value: {usedPower.value}</p>
                 </div>
             </div>
         )

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link, Redirect } from "react-router-dom";
 import TraceToken from "./traceToken";
+import GetOrgToken from "./getOrgToken";
 
 class Home extends Component {
     constructor(props) {
@@ -67,6 +68,9 @@ class Home extends Component {
                         <br />
                         <button className="btn btn-secondary" type="button" name="logout" onClick = {this.handleSubmit}>登出</button>
                     </nav>
+                    <br />
+                    <br />
+                    <GetOrgToken />
                     <br />
                     <br />
                     <TraceToken />
