@@ -10,6 +10,8 @@ contract NFT1155Demo is ERC1155Supply {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     
+    event CertificateEvent(uint indexed requestId, uint indexed tokenId, address orgId ,address plantId, uint[] powerIds, uint[] values);
+    
     address _owner;
     // using Strings for uint256;
     
@@ -72,7 +74,7 @@ contract NFT1155Demo is ERC1155Supply {
         return id;
     }
     
-    function mintBatchNft(address receiver, uint number, uint[][] memory powerIds, string memory metadataUri) external onlyOwner returns (uint256[] memory) {
+    function mintBatchNft(uint requestId, address receiver, address plantId, uint number, uint[][] memory powerIds, uint[][] memory values, string memory metadataUri) external onlyOwner returns (uint256[] memory) {
         
         uint256[] memory ids = new uint256[](number);
         uint256[] memory amounts = new uint256[](number);
@@ -82,6 +84,8 @@ contract NFT1155Demo is ERC1155Supply {
             amounts[i] = 1;
             _setTokenURI(ids[i], metadataUri);
             _powerIds[ids[i]] = powerIds[i];
+            // emit CertificateEvent
+            emit CertificateEvent(requestId, ids[i], receiver , plantId, powerIds[i], values[i]);
         }
         
         _mintBatch(receiver, ids, amounts, new bytes(0));

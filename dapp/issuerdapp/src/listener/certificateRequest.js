@@ -53,7 +53,7 @@ async function checkPowerOveruse(issuer, certificateRequest, oriValueMap) {
             let pId = pIds[j];
             let v = vs[j];
             await issuer.getPastEvents('PowerReqCertEvent', {
-                filter: {powerId: pId},
+                filter: {plantId: Plant.address, powerId: pId},
                 fromBlock: 0
             }, function(error, events){
                 if (!error && events.length > 0) {
@@ -135,9 +135,6 @@ async function main() {
         issuer.events.CertificateRequestEvent({
             fromBlock: 0
         }, function(error, event){ console.log("event"); })
-        issuer.events.CertificateRequestEvent({
-            fromBlock: 0
-        }, function(error, event){ console.log("event"); })
         .on("connected", function(subscriptionId){
             console.log("subscriptionId: ",subscriptionId);
         })
@@ -183,8 +180,8 @@ async function main() {
                 let txHash = await approveCertificateRequest(issuer, Issuer.address, account, privateKey, requestId, valid);
                 console.log("txHash:", txHash);
             } catch (error) {
-                // console.log("Certificate Request id", requestId, "is not in storage");
-                console.log(error);
+                console.log("Certificate Request id", requestId, "is not in storage");
+                // console.log(error);
             } 
         })
         .on('changed', function(event){

@@ -14,9 +14,8 @@ contract Issuer {
     
     event DeviceRequestEvent(uint indexed requestId, address orgContract, address plantContract, address deviceAccount, bool approve);
     event CertificateRequestEvent(uint indexed requestId);
-    event CertificateEvent(uint indexed requestId, uint indexed tokenId, address orgId ,address plantId, uint[] powerIds, uint[] values);
     event CertificateRequestApprovedEvent(uint indexed requestId, bool approve);
-    event PowerReqCertEvent(uint indexed powerId, uint value);
+    event PowerReqCertEvent(address indexed plantId, uint indexed powerId, uint value);
     
     struct DeviceRequest {
         uint id;
@@ -145,7 +144,7 @@ contract Issuer {
                 uint[] memory pIds = powerIds[i];
                 uint[] memory vs = values[i];
                 for(uint j = 0; j < vs.length; j++) {
-                    emit PowerReqCertEvent(pIds[j], vs[j]);
+                    emit PowerReqCertEvent(certReq.plantId, pIds[j], vs[j]);
                 }
             }
             
@@ -153,11 +152,8 @@ contract Issuer {
             address orgId = certReq.orgId;
             address plantId = certReq.plantId;
             string memory metadataUri = certReq.metadataUri;
-            uint[] memory tokenIds = _nft.mintBatchNft(orgId, number, powerIds, metadataUri);
-            // 4. emit CertificateEvent
-            for(uint i = 0; i < number; i++) {
-                emit CertificateEvent(requestId, tokenIds[i], orgId , plantId, powerIds[i], values[i]);
-            }
+            _nft.mintBatchNft(requestId, orgId, plantId, number, powerIds, values, metadataUri);
+   
         }
         
         // 4. remove request
