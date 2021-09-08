@@ -63,7 +63,7 @@ class Home extends Component {
                         }} style={{marginLeft:"20px", fontSize:"25px"}}>電量列表</Link>
                         <Link to={{
                             pathname: '/reducePower'
-                        }} style={{marginLeft:"20px", fontSize:"25px"}}>刪除申請憑證之電量</Link>
+                        }} style={{marginLeft:"20px", fontSize:"25px"}}>申請憑證請求列表</Link>
                         <br />
                         <br />
                         <button className="btn btn-secondary" type="button" name="logout" onClick = {this.handleSubmit}>登出</button>

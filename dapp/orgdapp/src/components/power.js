@@ -71,10 +71,11 @@ class Power extends Component {
             powers.forEach((power, powerId) => {
                 total += power.remainValue;
             });
-            let certNum = Math.floor(total / 111);
+            let certNum = Math.floor(total / 1000);
             let info = {
                 'plantId': plantId,
-                'certNum': certNum
+                'certNum': certNum,
+                'totalPower': total
             };
             certNumList.push(info);
         });
@@ -149,7 +150,7 @@ class Power extends Component {
         for (let i = 0;i < number;i++) {
             let iPowerIds = [];
             let iValues = [];
-            let target = 111;
+            let target = 1000;
             let count = 0;
             for (let j = 0;j < powers.length;j++) {
                 let p = powers[j][1];
@@ -266,7 +267,8 @@ class Power extends Component {
                 <div className="card" key={i}>
                     <p>plantId: {plant.plantId}</p>
                     <div className="card-body">
-                        <p>certNum: {plant.certNum}</p>
+                        <p>cert. number: {plant.certNum}</p>
+                        <p>total power: {plant.totalPower}</p>
                     </div>
                 </div>
             )

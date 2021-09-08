@@ -28,11 +28,15 @@ class ReducePower extends Component {
         this.setState({[name]: value});
     }
 
-    handleReduce(i) {
+    handleRequestButton(i, name) {
         const requestId = this.state.data[i].id;
         let orgAddress = localStorage.getItem('orgAddress');
         // console.log(requestId);
-        this.reducePower(orgAddress, requestId);
+        if (name === "Approved") {
+            this.reducePower(orgAddress, requestId);
+        } else if (name === "DisApproved") {
+            this.deleteRequestCertificate(orgAddress, requestId);
+        }
     }
 
     async handleSubmit(event) {
@@ -138,6 +142,33 @@ class ReducePower extends Component {
         }
     }
 
+    async deleteRequestCertificate(orgAddress, requestId) {
+        const web3 = new Web3(Web3.givenProvider);
+        const org = new web3.eth.Contract(Org.abi, orgAddress);
+        if (typeof window.ethereum == 'undefined') {
+            console.log('MetaMask is not installed!');
+        } else {
+            console.log('MetaMask is installed!');
+            // await window.ethereum.send('eth_requestAccounts');
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+            const account = accounts[0];
+            
+            org.methods.deleteRequestCertificate(requestId)
+            .send({from: account})
+            .on('sending', function(confirmationNumber, receipt){
+                console.log('sending');
+            })
+            .on('receipt', function(receipt){
+                console.log('receipt');
+                // console.log(receipt);
+            })
+            .on('error', function(error, receipt) {
+                console.log(error);
+            });
+        }
+    }
+
     componentDidMount(){
         // store this
         let that = this;
@@ -148,6 +179,17 @@ class ReducePower extends Component {
         });
     }
     
+    renderButtons(requestState, i) {
+        switch (requestState) {
+            case "Approved":
+                return <button className="btn btn-secondary" type="button" onClick = {() => this.handleRequestButton(i, requestState)}>Reduce</button>;
+            case "DisApproved":
+                return <button className="btn btn-secondary" type="button" onClick = {() => this.handleRequestButton(i, requestState)}>Delete Request</button>;
+            default:
+                return null;
+        }
+    }
+
     render() {
         let isLogin = localStorage.getItem('isLogin');
         if (isLogin === 'true') {
@@ -157,11 +199,7 @@ class ReducePower extends Component {
                         <p>requestId: {request.id}</p>
                         <p>state: {request.state}</p>
                         <p>plantId: {request.plantId}</p>
-                        {
-                            (request.state === "Approved")
-                            ? <button className="btn btn-secondary" type="button" name="reduce" onClick = {() => this.handleReduce(i)}>Reduce</button>
-                            : null
-                        }
+                        {this.renderButtons(request.state, i)}
                     </div>
                 </div>
             )

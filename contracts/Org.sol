@@ -258,6 +258,18 @@ contract Org is ERC1155Holder {
         return id;
     }
     
+    function deleteRequestCertificate(uint requestId) external onlyAdmin onlyAble {
+        CertificateRequest memory request = _certificateRequestMap[requestId];
+        require(request.number > 0);
+        // remove request
+        uint index = request.index;
+        uint last = _certificateRequests[_certificateRequests.length - 1];
+        _certificateRequests[index] = last;
+        _certificateRequestMap[last].index = index;
+        _certificateRequests.pop();
+        delete _certificateRequestMap[requestId];
+    }
+    
     function getAllCertificateRequest() external view returns (CertificateRequest[] memory) {
         uint length = _certificateRequests.length;
         CertificateRequest[] memory result = new CertificateRequest[](length);

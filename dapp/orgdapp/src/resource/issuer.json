@@ -1,5 +1,5 @@
 {
-    "address": "0x0EcDD0e768E0fa54faaaB984A2F9540439b3c7fe",
+    "address": "0xeb310110FABCF50696387660CA08F620c6D7b891",
     "abi": [
 		{
 			"inputs": [
@@ -84,6 +84,12 @@
 		{
 			"anonymous": false,
 			"inputs": [
+				{
+					"indexed": true,
+					"internalType": "address",
+					"name": "plantId",
+					"type": "address"
+				},
 				{
 					"indexed": true,
 					"internalType": "uint256",

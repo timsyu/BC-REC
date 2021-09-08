@@ -45,7 +45,8 @@ async function checkPowerOveruse(issuer, certificateRequest, oriValueMap) {
     let powerIds = certificateRequest.powerIds;
     // let values = certificateRequest.values;
     let values = certificateRequest[5];
-    // console.log(values);
+    let plantId = certificateRequest.plantId;
+    // console.log(certificateRequest);
     for (let i = 0; i < number; i++) {
         let pIds = powerIds[i];
         let vs = values[i];
@@ -53,7 +54,7 @@ async function checkPowerOveruse(issuer, certificateRequest, oriValueMap) {
             let pId = pIds[j];
             let v = vs[j];
             await issuer.getPastEvents('PowerReqCertEvent', {
-                filter: {plantId: Plant.address, powerId: pId},
+                filter: {plantId: plantId, powerId: pId},
                 fromBlock: 0
             }, function(error, events){
                 if (!error && events.length > 0) {
@@ -75,7 +76,7 @@ async function checkPowerOveruse(issuer, certificateRequest, oriValueMap) {
 
 function checkPowerEnough(number, values) {
 
-    const target = 111;
+    const target = 1000;
     for(let i = 0; i < number; i++) {
         let vs = values[i];
         let total = 0;
@@ -134,7 +135,9 @@ async function main() {
         console.log("---listening certificate request---");
         issuer.events.CertificateRequestEvent({
             fromBlock: 0
-        }, function(error, event){ console.log("event"); })
+        }
+        // , function(error, event){ console.log("event"); }
+        )
         .on("connected", function(subscriptionId){
             console.log("subscriptionId: ",subscriptionId);
         })
@@ -163,22 +166,25 @@ async function main() {
                 // console.log(allExist);
                 // console.log(oriValueMap);
                 if (allExist) {
+                    // console.log("requestId:", requestId, "allExist:", allExist);
                     // console.log(certificateRequest);
                     let overuse = await checkPowerOveruse(issuer, certificateRequest, oriValueMap);
                     // console.log(overuse);
+                    // console.log("requestId:", requestId, "overuse:", overuse);
                     if (!overuse) {
                         // let values = certificateRequest.values;
                         let values = certificateRequest[5];
                         let enough = checkPowerEnough(number, values);
+                        // console.log("requestId:", requestId, "enough:", enough);
                         if(enough) {
                             valid = true;
                         }
                     }
                 }
-                console.log("valid:", valid);
-                console.log("sending");
+                console.log("requestId:", requestId, "valid:", valid);
+                console.log("requestId:", requestId, "sending");
                 let txHash = await approveCertificateRequest(issuer, Issuer.address, account, privateKey, requestId, valid);
-                console.log("txHash:", txHash);
+                console.log("requestId:", requestId, "txHash:", txHash);
             } catch (error) {
                 console.log("Certificate Request id", requestId, "is not in storage");
                 // console.log(error);

@@ -1,5 +1,5 @@
 {
-    "address": "0x10698baeF0c6aAd9454517C139ECbaCe79825c51",
+    "address": "0x4E325574F611D13f6E3dF92bA76f65c7D7C344AE",
     "abi": [
         {
             "inputs": [
@@ -116,6 +116,19 @@
                 }
             ],
             "name": "createPlant",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "requestId",
+                    "type": "uint256"
+                }
+            ],
+            "name": "deleteRequestCertificate",
             "outputs": [],
             "stateMutability": "nonpayable",
             "type": "function"

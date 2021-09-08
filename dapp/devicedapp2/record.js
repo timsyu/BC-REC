@@ -76,7 +76,7 @@ async function main() {
         // device record power
         // test power value, date
         console.log("---device record power---");
-        let value = Math.floor(Math.random() * 100) + 66;
+        let value = Math.floor(Math.random() * 100) + 234;
         let dateTime = new Date().getTime();
         const date = Math.floor(dateTime / 1000);
         const { powerId, txHash } = await record(account, privateKey, date, value);

@@ -118,6 +118,7 @@ contract Issuer {
 
     function getCertificateRequest(uint requestId) external view returns (CertificateRequest memory) {
         uint index = _certificateRequestIndexes[requestId];
+        require(_certificateRequests[index].number > 0);
         return _certificateRequests[index];
     }
     
@@ -130,12 +131,12 @@ contract Issuer {
         uint requestId,
         bool approve
         ) external onlyIssuer {
-        
         // 1. emit CertificateRequestApprovedEvent
         emit CertificateRequestApprovedEvent(requestId, approve);
         uint index = _certificateRequestIndexes[requestId];
+        CertificateRequest memory certReq = _certificateRequests[index];
+        require(certReq.number > 0);
         if(approve) {
-            CertificateRequest memory certReq = _certificateRequests[index];
             // 2. emit PowerReqCertEvents
             uint number = certReq.number;
             uint[][] memory powerIds = certReq.powerIds;
