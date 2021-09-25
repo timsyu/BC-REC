@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Web3 from 'web3';
 import Token from '../resource/token.json';
-// import Issuer from '../resource/issuer.json';
+import Issuer from '../resource/issuer.json';
 
 class GetOrgToken extends Component {
     constructor(props) {
@@ -45,7 +45,7 @@ class GetOrgToken extends Component {
         let totalTokenList = [];
         let orgAddressList = [];
         await token.getPastEvents('TransferBatch', {
-            // filter: {operator: Issuer.address},
+            filter: {operator: Issuer.address},
             fromBlock: 0
         }, function(error, event){
             if (!error) {
@@ -64,24 +64,39 @@ class GetOrgToken extends Component {
         let data = await token.methods.balanceOfBatch(orgAddressList, totalTokenList).call();
         for (let i = 0; i < data.length; i++) {
             if (parseInt(data[i]) > 0) {
-                myTokenList.push(totalTokenList[i]);
+                let tokenId = totalTokenList[i];
+                let isClaim = await this.getTokenClaimState(tokenId);
+                let info = {
+                    'tokenId': tokenId,
+                    'isClaim': isClaim + ""
+                };
+                myTokenList.push(info);
             }
         }
         // console.log(myTokenList);
         return myTokenList;
     }
 
+    async getTokenClaimState(tokenId) {
+        const web3 = new Web3(Web3.givenProvider);
+        const token = new web3.eth.Contract(Token.abi, Token.address);
+        let isClaim = await token.methods.getClaim(tokenId).call();
+        // console.log(isClaim);
+        return isClaim;
+    }
+
     render() {
-        let list = this.state.data.map((tokenId, index) =>
+        let list = this.state.data.map((info, index) =>
             <div className="card" key={index}>
                 <div className="card-body">
-                    <p>token id: {tokenId}</p>        
+                    <p>token id: {info.tokenId}</p>
+                    <p>claim: {info.isClaim}</p>  
                 </div>
             </div>
         )
         return(
             <div>
-                <h1 style={{textAlign: "center"}}>Own Token</h1>
+                <h1 style={{textAlign: "center"}}>擁有的Certificate</h1>
                 {list}
             </div>
         );

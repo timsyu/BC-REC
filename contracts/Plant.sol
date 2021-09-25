@@ -18,6 +18,11 @@ contract Plant {
     	bytes32 txHash; // record tx hash
     }
     
+    uint _powerCount;
+    // power id => _powers index
+    mapping(uint => uint) _powerIndexes;
+    Power[] _powers;
+    
     struct SimplifiedPower {
         uint powerId;
     	uint value;
@@ -46,10 +51,7 @@ contract Plant {
     mapping(address => DeviceInfo) _deviceInfoMap;
     address[] _devices;
     
-    uint _powerCount;
-    // power id => _powers index
-    mapping(uint => uint) _powerIndexes;
-    Power[] _powers;
+
     
     
     modifier onlyDevice() { // need test

@@ -267,7 +267,7 @@ class Power extends Component {
                 <div className="card" key={i}>
                     <p>plantId: {plant.plantId}</p>
                     <div className="card-body">
-                        <p>cert. number: {plant.certNum}</p>
+                        <p>certificate number: {plant.certNum}</p>
                         <p>total power: {plant.totalPower}</p>
                     </div>
                 </div>
@@ -277,15 +277,16 @@ class Power extends Component {
                     <nav>
                         <Link to={{
                             pathname: '/'
-                        }} style={{marginLeft:"20px"}}>首頁</Link>
-                        <button className="btn btn-secondary" type="button" name="logout" onClick = {this.handleSubmit}>登出</button>
-                    </nav> 
+                        }} style={{marginLeft:"20px", fontSize:"25px"}}>首頁</Link>
+                    </nav>
+                    <br />
+                    <button className="btn btn-secondary" type="button" name="logout" onClick = {this.handleSubmit}>登出</button>
                     <div className="input-group mb-3" style={{marginTop:"10px"}}>
                         <button className="btn btn-secondary" type="button" name="update" onClick = {this.handleSubmit}>Update</button>
                     </div>
                     <br />
                     <br />
-                    <h1 style={{textAlign: "center"}}>請求憑證</h1>
+                    <h1 style={{textAlign: "center"}}>申請憑證</h1>
                     <div className="input-group mb-3" style={{marginTop:"10px"}}>
                         <input type="text" className="form-control" placeholder="plantId" name="plantId" onChange={this.handleChange}/>
                         <input type="text" className="form-control" placeholder="number" name="number" onChange={this.handleChange}/>

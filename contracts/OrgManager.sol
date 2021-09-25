@@ -2,6 +2,7 @@ pragma solidity ^0.8.4;
 // SPDX-License-Identifier: MIT
 
 import "./Org.sol";
+import "./NFT1155Demo.sol";
 
 // https://ethereum.stackexchange.com/questions/13167/are-there-well-solved-and-simple-storage-patterns-for-solidity
 contract OrgManager {
@@ -25,10 +26,12 @@ contract OrgManager {
     // }
     
     // new a contract to owner
-    function createOrg (string memory name, uint date, string memory description, address issuerContract) external {
+    function createOrg (string memory name, uint date, string memory description, address issuerContract, address tokenContract) external {
         address owner = msg.sender;
-        Org org = new Org(_userContract, issuerContract, owner, name, date, description);
+        Org org = new Org(_userContract, issuerContract, tokenContract, owner, name, date, description);
         address orgAddress = address(org);
+        // let org can transfer token
+        NFT1155Demo(tokenContract).setApprovalForAll(orgAddress, true);
         _orgs.push(orgAddress);
         _orgIndexes[orgAddress] = _orgs.length - 1;
         emit CreateOrgEvent(owner, orgAddress);

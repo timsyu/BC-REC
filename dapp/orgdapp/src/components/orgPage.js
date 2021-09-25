@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Link, Redirect } from "react-router-dom";
 import TraceToken from "./traceToken";
 import GetOrgToken from "./getOrgToken";
+import TokenTransfer from "./tokenTransfer";
+import TraceTokenTransfer from "./traceTokenTransfer";
+import ClaimCertificate from './claimCertificate';
 
 class Home extends Component {
     constructor(props) {
@@ -42,7 +45,7 @@ class Home extends Component {
     render() {
         let isLogin = localStorage.getItem('isLogin');
         if (isLogin === 'true') {
-            
+            let orgAddress = localStorage.getItem('orgAddress');
             return(
                 <div>
                     <nav>
@@ -68,12 +71,22 @@ class Home extends Component {
                         <br />
                         <button className="btn btn-secondary" type="button" name="logout" onClick = {this.handleSubmit}>登出</button>
                     </nav>
+                    <h1 style={{textAlign: "center"}}>Org Address: {orgAddress}</h1>
                     <br />
                     <br />
                     <GetOrgToken />
                     <br />
                     <br />
+                    <ClaimCertificate />
+                    <br />
+                    <br />
+                    <TokenTransfer />
+                    <br />
+                    <br />
                     <TraceToken />
+                    <br />
+                    <br />
+                    <TraceTokenTransfer />
                 </div>
             );
         } else {

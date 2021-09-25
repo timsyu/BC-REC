@@ -145,49 +145,58 @@ async function main() {
             // console.log(event); // same results as the optional callback above
             let requestId = event.returnValues.requestId;
             try {
-                let certificateRequest = await issuer.methods.getCertificateRequest(requestId).call();
-                let number = certificateRequest.number;
-                let plantId = certificateRequest.plantId;
-                let plant = new web3.eth.Contract(Plant.abi, plantId);
-                let allPowerIds = [];
-                for (let i = 0; i < number; i++) {
-                    let powerIds = certificateRequest.powerIds[i];
-                    for (let j = 0; j < powerIds.length; j++) {
-                        allPowerIds.push(powerIds[j]);
-                    }
-                }
-                // filiter duplicate power id
-                let filteredAllPowerIds = allPowerIds.filter(function(ele, pos) {
-                    return allPowerIds.indexOf(ele) == pos;
-                });
-    
-                let { allExist, oriValueMap } = await checkPowerExist(plant, filteredAllPowerIds);
-                let valid = false;
-                // console.log(allExist);
-                // console.log(oriValueMap);
-                if (allExist) {
-                    // console.log("requestId:", requestId, "allExist:", allExist);
-                    // console.log(certificateRequest);
-                    let overuse = await checkPowerOveruse(issuer, certificateRequest, oriValueMap);
-                    // console.log(overuse);
-                    // console.log("requestId:", requestId, "overuse:", overuse);
-                    if (!overuse) {
-                        // let values = certificateRequest.values;
-                        let values = certificateRequest[5];
-                        let enough = checkPowerEnough(number, values);
-                        // console.log("requestId:", requestId, "enough:", enough);
-                        if(enough) {
-                            valid = true;
+                // let certificateRequest = await issuer.methods.getCertificateRequest(requestId).call();
+                let certificateRequests = await issuer.methods.getAllCertificateRequest().call();
+                for (let a = 0; a < certificateRequests.length; a++) {
+                    const certificateRequest = certificateRequests[a];
+                    
+                    if (certificateRequest.id == requestId) {
+                        // console.log(certificateRequest.id)
+                        let number = certificateRequest.number;
+                        let plantId = certificateRequest.plantId;
+                        let plant = new web3.eth.Contract(Plant.abi, plantId);
+                        let allPowerIds = [];
+                        for (let i = 0; i < number; i++) {
+                            let powerIds = certificateRequest.powerIds[i];
+                            for (let j = 0; j < powerIds.length; j++) {
+                                allPowerIds.push(powerIds[j]);
+                            }
                         }
+                        // filiter duplicate power id
+                        let filteredAllPowerIds = allPowerIds.filter(function(ele, pos) {
+                            return allPowerIds.indexOf(ele) == pos;
+                        });
+            
+                        let { allExist, oriValueMap } = await checkPowerExist(plant, filteredAllPowerIds);
+                        let valid = false;
+                        // console.log(allExist);
+                        // console.log(oriValueMap);
+                        if (allExist) {
+                            // console.log("requestId:", requestId, "allExist:", allExist);
+                            // console.log(certificateRequest);
+                            let overuse = await checkPowerOveruse(issuer, certificateRequest, oriValueMap);
+                            // console.log(overuse);
+                            // console.log("requestId:", requestId, "overuse:", overuse);
+                            if (!overuse) {
+                                // let values = certificateRequest.values;
+                                let values = certificateRequest[5];
+                                let enough = checkPowerEnough(number, values);
+                                // console.log("requestId:", requestId, "enough:", enough);
+                                if(enough) {
+                                    valid = true;
+                                }
+                            }
+                        }
+                        console.log("requestId:", requestId, "valid:", valid);
+                        console.log("requestId:", requestId, "sending");
+                        let txHash = await approveCertificateRequest(issuer, Issuer.address, account, privateKey, requestId, valid);
+                        console.log("requestId:", requestId, "txHash:", txHash);
                     }
                 }
-                console.log("requestId:", requestId, "valid:", valid);
-                console.log("requestId:", requestId, "sending");
-                let txHash = await approveCertificateRequest(issuer, Issuer.address, account, privateKey, requestId, valid);
-                console.log("requestId:", requestId, "txHash:", txHash);
+                
             } catch (error) {
-                console.log("Certificate Request id", requestId, "is not in storage");
-                // console.log(error);
+                // console.log("Certificate Request id", requestId, "is not in storage");
+                console.log(error);
             } 
         })
         .on('changed', function(event){

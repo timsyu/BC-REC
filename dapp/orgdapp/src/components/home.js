@@ -51,7 +51,7 @@ class Home extends Component {
                     </nav>
                     <br />
                     <div>
-                        <p>Home</p>
+                        <h1 style={{textAlign: "center"}}>組織列表</h1>
                         <TraceOrgEvent />
                     </div>
                 </div>

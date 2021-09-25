@@ -122,10 +122,11 @@ class DeviceRequestList extends Component {
                     <nav>
                         <Link to={{
                             pathname: '/'
-                        }} style={{marginLeft:"20px"}}>首頁</Link>
-                        <button className="btn btn-secondary" type="button" name="logout" onClick = {this.handleSubmit}>登出</button>
+                        }} style={{marginLeft:"20px", fontSize:"25px"}}>首頁</Link>
                     </nav> 
-                    
+                    <br />
+                    <button className="btn btn-secondary" type="button" name="logout" onClick = {this.handleSubmit}>登出</button>
+                    <br />
                     <div className="input-group mb-3" style={{marginTop:"10px"}}>
                         <button className="btn btn-secondary" type="button" name="update" onClick = {this.handleSubmit}>Update</button>
                     </div>

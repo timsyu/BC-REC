@@ -122,6 +122,10 @@ contract Issuer {
         return _certificateRequests[index];
     }
     
+    function getAllCertificateRequest() external view returns (CertificateRequest[] memory) {
+        return _certificateRequests;
+    }
+    
     function getNFTContract() external view returns (address) {
         return address(_nft);
     }
@@ -154,10 +158,9 @@ contract Issuer {
             address plantId = certReq.plantId;
             string memory metadataUri = certReq.metadataUri;
             _nft.mintBatchNft(requestId, orgId, plantId, number, powerIds, values, metadataUri);
-   
         }
         
-        // 4. remove request
+        // 5. remove request
         CertificateRequest memory last = _certificateRequests[_certificateRequests.length - 1];
         _certificateRequestIndexes[last.id] = index;
         _certificateRequests[index] = last;

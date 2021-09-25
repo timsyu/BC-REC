@@ -3,6 +3,7 @@ pragma solidity ^0.8.4;
 
 import "./Plant.sol";
 import "./Issuer.sol";
+import "./NFT1155Demo.sol";
 // import "./User.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
@@ -41,6 +42,7 @@ contract Org is ERC1155Holder {
     
     address _userContract;
     address _issuerContract;
+    address _tokenContract;
     address _orgManagerContract;
     
     OrgInfo _orgInfo;
@@ -93,10 +95,11 @@ contract Org is ERC1155Holder {
         _disable = disable;
     }
     
-    constructor(address userContract, address issuerContract, address owner, string memory name, uint date, string memory description) {
+    constructor(address userContract, address issuerContract, address tokenContract, address owner, string memory name, uint date, string memory description) {
         // init contract address
         _userContract = userContract;
         _issuerContract = issuerContract;
+        _tokenContract = tokenContract;
         _orgManagerContract = msg.sender; // orgManager contract will call this
         // set org info
         _orgInfo = OrgInfo(owner, name, date, description);
@@ -290,5 +293,13 @@ contract Org is ERC1155Holder {
         _certificateRequestMap[last].index = index;
         _certificateRequests.pop();
         delete _certificateRequestMap[requestId];
+    }
+    
+    function transferToken(address to, uint256[] memory ids, uint256[] memory amounts) external onlyAdmin onlyAble {
+        NFT1155Demo(_tokenContract).transferToken(to, ids, amounts);
+    }
+    
+    function claimCertificate(uint256 id) external onlyAdmin onlyAble {
+        NFT1155Demo(_tokenContract).claimCertificate(id);
     }
 }

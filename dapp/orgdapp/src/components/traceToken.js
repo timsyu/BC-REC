@@ -40,6 +40,7 @@ class TraceToken extends Component {
                 const plantId = cert.plantId;
                 const powerIds = cert.powerIds;
                 const usedValues = cert.values;
+                const orgId = cert.orgId;
                 let oriPowers = [];
                 let usedPowers = [];
                 for (let i = 0; i < powerIds.length; i++) {
@@ -74,6 +75,7 @@ class TraceToken extends Component {
                 let result = {
                     'tokenId': tokenId,
                     'requestId': requestId,
+                    'orgId': orgId,
                     'plantId': plantId,
                     'oriPowers': oriPowers,
                     'usedPowers': usedPowers
@@ -136,6 +138,7 @@ class TraceToken extends Component {
         // this.setState({isTrace: false});
         let tokenId = this.state.data.tokenId;
         let requestId = this.state.data.requestId;
+        let orgId = this.state.data.orgId;
         let plantId = this.state.data.plantId;
         let oriPowers = this.state.data.oriPowers;
         let usedPowers = this.state.data.usedPowers;
@@ -164,6 +167,7 @@ class TraceToken extends Component {
             <div className="card">
                 <p>tokenId: {tokenId}</p>
                 <p>requestId: {requestId}</p>
+                <p>orgId: {orgId}</p>
                 <p>plantId: {plantId}</p>
                 <h1 style={{textAlign: "center"}}>申請憑證之發電量</h1>
                 <div className="card-body">
@@ -180,7 +184,7 @@ class TraceToken extends Component {
     render() {
         return(
             <div>
-                <h1 style={{textAlign: "center"}}>Token Trace</h1>
+                <h1 style={{textAlign: "center"}}>Certificate Trace</h1>
                 <input type="text" className="form-control" placeholder="token id" name="tokenId" onChange={this.handleChange}/>
                 <button className="btn btn-secondary" type="button" name="trace" onClick = {this.handleSubmit}>Trace</button>
                 {

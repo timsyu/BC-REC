@@ -1,5 +1,5 @@
 {
-    "address": "0xeb310110FABCF50696387660CA08F620c6D7b891",
+    "address": "0x198993A604CbBF5d1f5883Db9cB98407B712AA80",
     "abi": [
 		{
 			"inputs": [
@@ -140,6 +140,56 @@
 			"name": "approveDeviceRequest",
 			"outputs": [],
 			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "getAllCertificateRequest",
+			"outputs": [
+				{
+					"components": [
+						{
+							"internalType": "uint256",
+							"name": "id",
+							"type": "uint256"
+						},
+						{
+							"internalType": "uint256",
+							"name": "number",
+							"type": "uint256"
+						},
+						{
+							"internalType": "address",
+							"name": "orgId",
+							"type": "address"
+						},
+						{
+							"internalType": "address",
+							"name": "plantId",
+							"type": "address"
+						},
+						{
+							"internalType": "uint256[][]",
+							"name": "powerIds",
+							"type": "uint256[][]"
+						},
+						{
+							"internalType": "uint256[][]",
+							"name": "values",
+							"type": "uint256[][]"
+						},
+						{
+							"internalType": "string",
+							"name": "metadataUri",
+							"type": "string"
+						}
+					],
+					"internalType": "struct Issuer.CertificateRequest[]",
+					"name": "",
+					"type": "tuple[]"
+				}
+			],
+			"stateMutability": "view",
 			"type": "function"
 		},
 		{

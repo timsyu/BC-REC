@@ -1,5 +1,5 @@
 {
-    "address": "0xD385b3a10b700581Fa390b3885c1A940eb335b94",
+    "address": "0x3c3ac1163f745130E8DDfAd2B90addF2F7F5B67E",
     "abi": [
         {
             "inputs": [
@@ -89,6 +89,11 @@
                 {
                     "internalType": "address",
                     "name": "issuerContract",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "tokenContract",
                     "type": "address"
                 }
             ],

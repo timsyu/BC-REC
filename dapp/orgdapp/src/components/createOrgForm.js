@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { Link, Redirect } from "react-router-dom";
 import Web3 from 'web3';
-// import { OrgManagerAddress, IssuerAddress } from '../resource/address/contractAddress';
-// import { OrgManagerAbi } from '../resource/abi/orgManager';
 import OrgManager from '../resource/orgManager.json';
 import Issuer from '../resource/issuer.json';
+import Token from '../resource/token.json';
 
 class CreateOrgForm extends Component {
     constructor(props) {
@@ -57,7 +56,7 @@ class CreateOrgForm extends Component {
             var that = this;
             let dateTime = new Date().getTime();
             const date = Math.floor(dateTime / 1000);
-            orgManager.methods.createOrg(this.state.orgName, date, this.state.orgDescription, Issuer.address)
+            orgManager.methods.createOrg(this.state.orgName, date, this.state.orgDescription, Issuer.address, Token.address)
             .send({from: account})
             .on('sending', function(confirmationNumber, receipt){
                 console.log('sending');

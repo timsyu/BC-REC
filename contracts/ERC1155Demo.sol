@@ -11,10 +11,13 @@ contract NFT1155Demo is ERC1155Supply {
     Counters.Counter private _tokenIds;
     
     event CertificateEvent(uint indexed requestId, uint indexed tokenId, address orgId ,address plantId, uint[] powerIds, uint[] values);
+    event CertificateClaimEvent(uint256 indexed tokenId);
     
     address _owner;
     // using Strings for uint256;
     
+    // token id => is claim
+    mapping (uint256 => bool) _isClaims;
     // Optional mapping for token URIs
     mapping (uint256 => string) _tokenURIs;
     // token id => power ids
@@ -32,36 +35,10 @@ contract NFT1155Demo is ERC1155Supply {
         _owner = msg.sender;
     }
     
-    // function setBaseURI(string memory baseURI_) external {
-    //     _baseURIextended = baseURI_;
-    // }
-    
     function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
         // require(exists(tokenId), "ERC1155Metadata: URI set of nonexistent token");
         _tokenURIs[tokenId] = _tokenURI;
     }
-    
-    // function _baseURI() internal view virtual override returns (string memory) {
-    //     return _baseURIextended;
-    // }
-    
-    // function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-    //     require(exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
-
-    //     string memory _tokenURI = _tokenURIs[tokenId];
-    //     string memory base = _baseURI();
-        
-    //     // If there is no base URI, return the token URI.
-    //     if (bytes(base).length == 0) {
-    //         return _tokenURI;
-    //     }
-    //     // If both are set, concatenate the baseURI and tokenURI (via abi.encodePacked).
-    //     if (bytes(_tokenURI).length > 0) {
-    //         return string(abi.encodePacked(base, _tokenURI));
-    //     }
-    //     // If there is a baseURI but no tokenURI, concatenate the tokenID to the baseURI.
-    //     return string(abi.encodePacked(base, tokenId.toString()));
-    // }
     
     function mintNft(address receiver, uint[][] memory powerIds, string memory metadataUri) external onlyOwner returns (uint256) {
         
@@ -91,5 +68,24 @@ contract NFT1155Demo is ERC1155Supply {
         _mintBatch(receiver, ids, amounts, new bytes(0));
 
         return ids;
+    }
+    
+    function transferToken(address to, uint256[] memory ids, uint256[] memory amounts) external {
+        for (uint256 i = 0; i < ids.length; i++) {
+            require(_isClaims[ids[i]] == false);
+        }
+        safeBatchTransferFrom(msg.sender, to, ids, amounts, new bytes(0));
+    }
+    
+    function claimCertificate(uint256 tokenId) external {
+        require(isApprovedForAll(_owner, msg.sender));
+        require(_isClaims[tokenId] == false);
+        // _burn(msg.sender, tokenId, 1);
+        _isClaims[tokenId] = true;
+        emit CertificateClaimEvent(tokenId);
+    }
+    
+    function getClaim(uint256 tokenId) external view returns (bool) {
+        return _isClaims[tokenId];
     }
 }
