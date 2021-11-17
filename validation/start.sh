@@ -2,7 +2,7 @@
 
 dir=$(dirname "$0")
 
-# init org device file and permissions
+# create org device file and permissions
 # create files
 touch $dir/org/orglist.txt
 touch $dir/org/servicelist.txt
@@ -25,11 +25,7 @@ true > $dir/org/orglist.txt
 true > $dir/org/servicelist.txt
 true > $dir/device/devicelist.txt
 
-# read config
-# distribution
-result=( $(python3 "${dir}"/main.py --mode plant) )
-filename=${result[0]}
-echo filename: $filename
+filename=$1
 count=$(jq -r '.count' $filename)
 echo $count
 
@@ -46,13 +42,9 @@ do
     # sleep 1.5
 done
 sleep 2
-# read config
-# distribution
-result2=( $(python3 "${dir}"/main.py --filename org_device_distri.json --mode device) )
-filename2=${result2[0]}
-echo filename2: $filename2
+
+filename2=$2
 count=$(jq -r '.count' $filename2)
-# counts=$(jq -r '.counts[]' <<<$json)
 echo $count
 echo "create device Pod"
 for (( i=0; i<$count; i++))
