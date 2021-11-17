@@ -11,4 +11,7 @@ dir=$(dirname "$0")
 # $dir/issuer/stop.sh
 
 #  namespace: recval
+#  delete all pods in namespace
  kubectl delete deploy -n recval --all
+#  delete namespace
+ kubectl delete namespaces recval
