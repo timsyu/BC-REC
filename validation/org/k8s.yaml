@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: org100-dapp-deployname
+  namespace: recval
 spec:
   replicas: 1
   selector:
@@ -27,6 +28,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: org100-dapp-service
+  namespace: recval
 spec:
   type: NodePort
   selector:
