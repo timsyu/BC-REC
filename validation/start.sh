@@ -1,6 +1,8 @@
 #! /bin/bash
 
 dir=$(dirname "$0")
+# create k8s namespace
+kubectl create namespace recval
 
 # create org device file and permissions
 # create files
