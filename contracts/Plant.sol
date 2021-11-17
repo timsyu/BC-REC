@@ -1,42 +1,15 @@
 pragma solidity ^0.8.4;
 // SPDX-License-Identifier: MIT
 
-import "./Org.sol";
-import "./Issuer.sol";
+import "./Lib.sol";
+import "./IPlant.sol";
 
-contract Plant {
-    
-    event RecordEvent(uint indexed powerId, address indexed deviceId, uint date, uint value);
-    event RecordTxHashEvent(uint indexed powerId, bytes32 txHash);
-    
-    struct Power {
-        uint id;
-        address deviceId;
-    	uint date; // timestamp
-    	uint value; // float? 上傳電量
-    	uint remainValue; // remainValue - 被用來申請憑證的電量
-    	bytes32 txHash; // record tx hash
-    }
+contract Plant is IPlant {
     
     uint _powerCount;
     // power id => _powers index
     mapping(uint => uint) _powerIndexes;
     Power[] _powers;
-    
-    struct SimplifiedPower {
-        uint powerId;
-    	uint value;
-    }
-    
-    struct DeviceInfo {
-        address device;
-        uint date; // timestamp
-    	uint capacity; // float? theoretical power generation
-    	Org.State state;
-    	string location;
-    	string image;
-    	uint index;
-    }
     
     struct PlantInfo {
         string _plantName;
@@ -50,9 +23,6 @@ contract Plant {
     // device account address => DeviceInfo
     mapping(address => DeviceInfo) _deviceInfoMap;
     address[] _devices;
-    
-
-    
     
     modifier onlyDevice() { // need test
         require(_deviceInfoMap[msg.sender].date > 0, "only Device can call this");
@@ -84,23 +54,27 @@ contract Plant {
         uint capacity,
         string memory location,
         string memory image
-        ) external onlyOrg {
+        ) external override onlyOrg {
         _devices.push(device);
-        _deviceInfoMap[device] = DeviceInfo(device, date, capacity, Org.State.Idle, location, image, _devices.length - 1);
+        _deviceInfoMap[device] = DeviceInfo(device, date, capacity, Lib.State.Idle, location, image, _devices.length - 1);
     }
     
-    function setDevicePending(address deviceId) external onlyOrg {
-        _deviceInfoMap[deviceId].state = Org.State.Pending;
+    function setDevicePending(address deviceId) external override onlyOrg {
+        _deviceInfoMap[deviceId].state = Lib.State.Pending;
     }
     
     function updateDeviceState(
         address deviceId,
         bool approve
-        ) external onlyIssuer {
-        _deviceInfoMap[deviceId].state = approve ? Org.State.Approve : Org.State.DisApprove;
+        ) external override onlyIssuer {
+        _deviceInfoMap[deviceId].state = approve ? Lib.State.Approve : Lib.State.DisApprove;
     }
     
-    function getAllDevice() external view returns (DeviceInfo[] memory) {
+    function getDevice(address deviceId) external override view returns (DeviceInfo memory) {
+        return _deviceInfoMap[deviceId];
+    }
+    
+    function getAllDevice() external override view returns (DeviceInfo[] memory) {
         DeviceInfo[] memory result = new DeviceInfo[](_devices.length);
         for(uint i = 0; i < _devices.length; i++) {
             result[i] = _deviceInfoMap[_devices[i]];
@@ -111,8 +85,9 @@ contract Plant {
     function record(
         uint date,
         uint value
-        ) external onlyDevice returns (uint){
-        require(_deviceInfoMap[msg.sender].state == Org.State.Approve, "this device must be approved by issuer");
+        ) external override onlyDevice returns (uint){
+        // check device exist and approve by issuer
+        require(_deviceInfoMap[msg.sender].state == Lib.State.Approve);
         // store record value to the storage
         _powerCount++;
         _powers.push(Power(_powerCount, msg.sender, date, value, value, bytes32(0x0)));
@@ -125,28 +100,17 @@ contract Plant {
     function bindPowerAndTxHash(
         uint powerId,
         bytes32 txHash
-        ) external onlyDevice {
-        require(_deviceInfoMap[msg.sender].state == Org.State.Approve, "this device must be approved by issuer");
+        ) external override onlyDevice {
+        require(_deviceInfoMap[msg.sender].state == Lib.State.Approve, "this device must be approved by issuer");
         _powers[_powerIndexes[powerId]].txHash = txHash;
         emit RecordTxHashEvent(powerId, txHash);
     }
     
-    // function getAllDeviceByState(State state) external view returns (DeviceInfo[] memory) {
-    //     DeviceInfo[] memory result = new DeviceInfo[](_deviceInfoNum);
-    //     uint num = 0;
-    //     for(uint i = 0; i< _deviceInfoNum; i++) {
-    //         if(_deviceInfo[i].state == state) {
-    //             result[num++] = _deviceInfo[i];
-    //         }
-    //     }
-    //     return result;
-    // }
-    
-    function getAllPower() external view returns (Power[] memory) {
+    function getAllPower() external override view returns (Power[] memory) {
         return _powers;
     }
     
-    function contains(address deviceId) external view returns (bool) {
+    function contains(address deviceId) external override view returns (bool) {
         return _deviceInfoMap[deviceId].date > 0 ;
     }
     
@@ -154,7 +118,7 @@ contract Plant {
     function reducePower(
         uint[][] memory powerIds,
         uint[][] memory values
-        ) external onlyOrg {
+        ) external override onlyOrg {
         uint length = powerIds.length;
         require(length == values.length);
         for(uint i = 0; i < length; i++) {

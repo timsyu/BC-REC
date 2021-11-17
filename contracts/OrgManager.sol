@@ -2,21 +2,17 @@ pragma solidity ^0.8.4;
 // SPDX-License-Identifier: MIT
 
 import "./Org.sol";
-import "./NFT1155Demo.sol";
+import "./INFT1155Demo.sol";
+import "./IOrgManager.sol";
 
 // https://ethereum.stackexchange.com/questions/13167/are-there-well-solved-and-simple-storage-patterns-for-solidity
-contract OrgManager {
+contract OrgManager is IOrgManager {
     
     // org contract address => _orgs index
     mapping(address => uint) _orgIndexes;
     address[] _orgs;
-    address _userContract;
     
-    event CreateOrgEvent(address indexed owner, address orgContract);
-    event JoinOrgEvent(address indexed member, address orgContract);
-    
-    constructor(address userContract) {
-        _userContract = userContract;
+    constructor() {
     }
     
     // modifier onlyOwner(address orgContract) {
@@ -26,26 +22,23 @@ contract OrgManager {
     // }
     
     // new a contract to owner
-    function createOrg (string memory name, uint date, string memory description, address issuerContract, address tokenContract) external {
+    function createOrg (string memory name, uint date, string memory description, address issuerContract, address tokenContract) external override returns (address) {
         address owner = msg.sender;
-        Org org = new Org(_userContract, issuerContract, tokenContract, owner, name, date, description);
+        Org org = new Org(issuerContract, tokenContract, owner, name, date, description);
         address orgAddress = address(org);
         // let org can transfer token
-        NFT1155Demo(tokenContract).setApprovalForAll(orgAddress, true);
+        INFT1155Demo(tokenContract).setApprovalForOrg(orgAddress);
         _orgs.push(orgAddress);
         _orgIndexes[orgAddress] = _orgs.length - 1;
         emit CreateOrgEvent(owner, orgAddress);
+        return orgAddress;
     }
     
-    function getOrgInfo (address orgContract) private view returns (Org.OrgInfo memory) {
-        return Org(orgContract).getOrgInfo();
-    }
-    
-    function getAllOrg () external view returns (address[] memory) {
+    function getAllOrg () external override view returns (address[] memory) {
         return _orgs;
     }
     
-    function contains (address orgContract) external view returns (bool) {
+    function contains (address orgContract) external override view returns (bool) {
         return (_orgs[_orgIndexes[orgContract]] == orgContract);
     }
     
