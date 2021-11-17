@@ -13,11 +13,11 @@ chmod +rw $dir/org/servicelist.txt
 chmod +rw $dir/device/devicelist.txt
 
 chmod +rw $dir/org/start.sh
-chmod +rw $dir/iusser/start.sh
+chmod +rw $dir/issuer/start.sh
 chmod +rw $dir/device/start.sh
 
 chmod +rw $dir/org/stop.sh
-chmod +rw $dir/iusser/stop.sh
+chmod +rw $dir/issuer/stop.sh
 chmod +rw $dir/device/stop.sh
 
 # empty file
