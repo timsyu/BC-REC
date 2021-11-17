@@ -12,13 +12,9 @@ chmod +rw $dir/org/orglist.txt
 chmod +rw $dir/org/servicelist.txt
 chmod +rw $dir/device/devicelist.txt
 
-chmod +rw $dir/org/start.sh
-chmod +rw $dir/issuer/start.sh
-chmod +rw $dir/device/start.sh
-
-chmod +rw $dir/org/stop.sh
-chmod +rw $dir/issuer/stop.sh
-chmod +rw $dir/device/stop.sh
+chmod +e $dir/org/start.sh
+chmod +e $dir/issuer/start.sh
+chmod +e $dir/device/start.sh
 
 # empty file
 true > $dir/org/orglist.txt
