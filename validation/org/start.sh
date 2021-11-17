@@ -4,15 +4,17 @@ dir=$(dirname "$0")
 orgName=$1
 plantNum=$2
 # Deployment
-name=$orgName-dapp-deployname yq e -i '
+deploymentName=$orgName-dapp-deployname
+serviceName=$orgName-dapp-service
+name=$deploymentName yq e -i '
     . | select(.kind == "Deployment") |=
     .metadata.name = strenv(name)
 ' "${dir}"/k8s.yaml
-name=$orgName-dapp-service yq e -i '
+name=$serviceName yq e -i '
     . | select(.kind == "Deployment") |=
     .spec.selector.matchLabels.app = strenv(name)
 ' "${dir}"/k8s.yaml
-name=$orgName-dapp-service yq e -i '
+name=$serviceName yq e -i '
     . | select(.kind == "Deployment") |=
     .spec.template.metadata.labels.app = strenv(name)
 ' "${dir}"/k8s.yaml
@@ -34,14 +36,21 @@ value=$plantNum yq e -i '
 
 
 # Service
-name=$orgName-dapp-service yq e -i '
+name=$serviceName yq e -i '
     . | select(.kind == "Service") |=
     .metadata.name = strenv(name)
 ' "${dir}"/k8s.yaml
-name=$orgName-dapp-service yq e -i '
+name=$serviceName yq e -i '
     . | select(.kind == "Service") |=
     .spec.selector.app = strenv(name)
 ' "${dir}"/k8s.yaml
+
+# save deploymentName to file
+echo $deploymentName >> $dir/orglist.txt
+# save serviceName to file
+echo $serviceName >> $dir/servicelist.txt
+
+
 # build pod
-# kubectl apply -f "${dir}"/k8s.yaml
+kubectl apply -f "${dir}"/k8s.yaml
 

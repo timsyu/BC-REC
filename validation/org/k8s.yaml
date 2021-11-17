@@ -1,36 +1,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: org96-dapp-deployname
+  name: org100-dapp-deployname
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: org96-dapp-service
+      app: org100-dapp-service
   template:
     metadata:
       labels:
-        app: org96-dapp-service
+        app: org100-dapp-service
     spec:
       containers:
         - name: org-dapp
           image: f221267155/orgdapp:v1
           env:
             - name: ORG_NAME
-              value: "org96-name"
+              value: "org100-name"
             - name: ORG_DESC
-              value: "org96-desc"
+              value: "org100-desc"
             - name: PLANT_NUM
               value: "1"
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: org96-dapp-service
+  name: org100-dapp-service
 spec:
   type: NodePort
   selector:
-    app: org96-dapp-service
+    app: org100-dapp-service
   ports:
     - port: 3000
       targetPort: 3000
