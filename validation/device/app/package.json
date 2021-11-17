@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "ethers": "^5.4.7",
+    "node-schedule": "^2.0.0",
+    "web3": "^1.6.0",
+    "yargs": "^17.2.1"
+  }
+}

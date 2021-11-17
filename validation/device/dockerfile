@@ -1,0 +1,12 @@
+FROM node:12.16.3
+
+RUN apt-get update \
+    && apt-get install -y jq
+
+COPY /app /app
+RUN mkdir -p /app/out
+
+WORKDIR /app
+RUN npm install
+
+ENTRYPOINT bash start.sh

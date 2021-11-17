@@ -1,17 +1,6 @@
 {
-    "address": "0x7e679767Aeea90802d2f5e333e14B1135305E877",
-    "abi": [
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "userContract",
-                    "type": "address"
-                }
-            ],
-            "stateMutability": "nonpayable",
-            "type": "constructor"
-        },
+    "address":"0xf710FA8Bf2C79126cbc3928D80866292d7a79855",
+    "abi":[
         {
             "anonymous": false,
             "inputs": [

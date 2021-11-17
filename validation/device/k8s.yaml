@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: device96-dapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: device96-dapp
+      component: device-dapp
+  template:
+    metadata:
+      labels:
+        app: device96-dapp
+        component: device-dapp
+    spec:
+      containers:
+        - name: device-dapp
+          image: f221267155/devicedapp:v2
+          env:
+            - name: TARGET_ORG
+              value: "1"

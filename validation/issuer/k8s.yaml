@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: issuer-dapp-deployname
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: issuer-dapp
+  template:
+    metadata:
+      labels:
+        app: issuer-dapp
+    spec:
+      containers:
+      - name: issuer-dapp
+        image: f221267155/issuerdapp:v1

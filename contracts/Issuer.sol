@@ -12,7 +12,8 @@ contract Issuer {
     OrgManager _orgManager;
     NFT1155Demo _nft;
     
-    event DeviceRequestEvent(uint indexed requestId, address orgContract, address plantContract, address deviceAccount, bool approve);
+    event DeviceRequestEvent(uint indexed requestId);
+    event DeviceRequestApprovedEvent(uint indexed requestId, address orgContract, address plantContract, address deviceAccount, bool approve);
     event CertificateRequestEvent(uint indexed requestId);
     event CertificateRequestApprovedEvent(uint indexed requestId, bool approve);
     event PowerReqCertEvent(address indexed plantId, uint indexed powerId, uint value);
@@ -80,6 +81,7 @@ contract Issuer {
         _deviceRequestCount++;
         _deviceRequests.push(DeviceRequest(_deviceRequestCount, msg.sender, plantId, deviceId, deviceLocation));
         _deviceRequestIndexes[_deviceRequestCount] = _deviceRequests.length - 1;
+        emit DeviceRequestEvent(_certificateRequestCount); 
         return _deviceRequestCount;
     }
     
@@ -91,7 +93,7 @@ contract Issuer {
     function approveDeviceRequest(uint requestId, bool approve) external onlyIssuer {
         uint index = _deviceRequestIndexes[requestId];
         DeviceRequest memory request = _deviceRequests[index];
-        emit DeviceRequestEvent(requestId, request.orgContract, request.plantContract, request.deviceAccount, approve);
+        emit DeviceRequestApprovedEvent(requestId, request.orgContract, request.plantContract, request.deviceAccount, approve);
         // update device state
         Plant(request.plantContract).updateDeviceState(request.deviceAccount, approve);
         // remove request

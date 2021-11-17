@@ -1,0 +1,19 @@
+{
+    "name": "REC",
+    "description": "REC DESC",
+    "image": "",
+    "attributes": [
+        {
+            "trait_type": "org",
+            "value": "org_address"
+        },
+        {
+            "trait_type": "plant", 
+            "value": "plant_address"
+        },
+        {
+            "trait_type": "Method", 
+            "value": "Wind"
+        }
+    ]
+}

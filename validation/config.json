@@ -1,0 +1,14 @@
+{
+    "blockchain":{
+        "consensus":""
+    },
+    
+    "distribution":{
+        "org2device":{
+            "methods": "normal"
+        },
+        "org2plant":{
+            "methods": "normal"
+        }
+    }
+}

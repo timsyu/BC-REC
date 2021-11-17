@@ -1,14 +1,8 @@
 {
-    "address": "0x7e679767Aeea90802d2f5e333e14B1135305E877",
+    "address": "0xbe2e857a703c39bACA1531c3cb020080cb2240E1",
     "abi": [
         {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "userContract",
-                    "type": "address"
-                }
-            ],
+            "inputs": [],
             "stateMutability": "nonpayable",
             "type": "constructor"
         },
@@ -98,7 +92,13 @@
                 }
             ],
             "name": "createOrg",
-            "outputs": [],
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
             "stateMutability": "nonpayable",
             "type": "function"
         },

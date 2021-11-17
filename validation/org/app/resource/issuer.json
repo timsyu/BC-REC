@@ -1,17 +1,6 @@
 {
-    "address": "0x3D02c46E2F7a310Ae968D985a10bc33524BC9B04",
+    "address": "0x0130fb592470656a96cf9878a553b7E220534067",
     "abi": [
-		{
-			"inputs": [
-				{
-					"internalType": "address",
-					"name": "orgManagerContract",
-					"type": "address"
-				}
-			],
-			"stateMutability": "nonpayable",
-			"type": "constructor"
-		},
 		{
 			"anonymous": false,
 			"inputs": [
@@ -197,7 +186,7 @@
 							"type": "string"
 						}
 					],
-					"internalType": "struct Issuer.CertificateRequest[]",
+					"internalType": "struct IIssuer.CertificateRequest[]",
 					"name": "",
 					"type": "tuple[]"
 				}
@@ -237,7 +226,7 @@
 							"type": "string"
 						}
 					],
-					"internalType": "struct Issuer.DeviceRequest[]",
+					"internalType": "struct IIssuer.DeviceRequest[]",
 					"name": "",
 					"type": "tuple[]"
 				}
@@ -293,7 +282,7 @@
 							"type": "string"
 						}
 					],
-					"internalType": "struct Issuer.CertificateRequest",
+					"internalType": "struct IIssuer.CertificateRequest",
 					"name": "",
 					"type": "tuple"
 				}
