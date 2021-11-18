@@ -52,5 +52,4 @@ echo "write console to out/record.txt"
 nohup node main.js record --account $account --privatekey $privateKey --plant $plantAddress &> out/record.txt &
 echo "you can type 'tail -f out/record.txt'"
 echo "--------------------------------------------------------------------------------"
-echo "tail record.txt start"
-tail -f out/record.txt
+tail -f normalStdout.txt

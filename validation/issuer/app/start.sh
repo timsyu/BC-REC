@@ -26,5 +26,4 @@ echo "write console to out/validate.txt"
 nohup node main.js validate --account $account --privatekey $privateKey &> out/validate.txt &
 echo "you can type 'tail -f out/validate.txt'"
 echo "--------------------------------------------------------------------------------"
-echo "tail validate.txt start"
-tail -f out/validate.txt
+tail -f normalStdout.txt

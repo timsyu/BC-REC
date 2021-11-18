@@ -155,6 +155,7 @@ class CertificateRequestTools {
         // listen device request
         const issuerContract = new this.web3.eth.Contract(issuer.abi, issuer.address);
         let requests = await issuerContract.methods.getAllCertificateRequest().call();
+        let data = [];
         for (let i = 0; i < requests.length; i++) {
             let request = requests[i];
             let requestId = request.id;
@@ -178,10 +179,19 @@ class CertificateRequestTools {
                 let {txHash, gasUsed} = await this.#approveCertificateRequest(requestId, valid);
                 console.log("txHash: ", txHash);
                 console.log("gasUsed: ", gasUsed);
+                let info = {
+                    'requestId': requestId,
+                    'number': number,
+                    'valid': valid,
+                    'txHash': txHash,
+                    'gasUsed': gasUsed
+                };
+                data.push(info);
             } catch (error) {
                 console.log(error);
-            } 
+            }
         }
+        return data;
     }
 }
 

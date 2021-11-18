@@ -6,19 +6,58 @@ const ConfigTools = require("./configTools");
 const yargs = require('yargs');
 const schedule = require('node-schedule');
 
+const { Console } = require("console");
+const fs = require("fs");
+const colors = require('colors/safe');
+
+// set theme
+colors.setTheme({
+    text: 'grey',
+    out: 'cyan',
+    info: 'green',
+    action: 'yellow',
+    debug: ['blue', 'underline'],
+    error: 'red'
+});
+
+// make a new logger
+const myLogger = new Console({
+    stdout: fs.createWriteStream("out/normalStdout.txt"),
+    stderr: fs.createWriteStream("out/errStdErr.txt"),
+});
 
 // Approve all device verification
 verify = async(web3, account, privateKey, config) => {
     console.log("---verify Device start---");
     const deviceVerificationTools = new DeviceVerificationTools(web3, account, privateKey, config);
-    await deviceVerificationTools.verify();
+    let result = await deviceVerificationTools.verify();
+    for (let i = 0; i < result.length; i++) {
+        let info = result[i];
+        let requestId = info.requestId;
+        let orgAddress = info.orgAddress;
+        let deviceId = info.deviceId;
+        let approve = info.approve;
+        let txHash = info.txHash;
+        myLogger.log(new Date(), colors.action("validate "), "requestId: ", colors.out(requestId), "orgAddress: ", colors.out(orgAddress),
+            "deviceId: ", colors.out(deviceId), "approve: ", colors.out(approve), "txHash: ", colors.out(txHash));
+    }
 }
 
 // Validate and Approve certificate request
 validate = (web3, account, privateKey, config) => {
     console.log("---Certificate validation listener start---");
     const certificateRequestTools = new CertificateRequestTools(web3, account, privateKey, config);
-    certificateRequestTools.validate();
+    let result = await certificateRequestTools.validate();
+    for (let i = 0; i < result.length; i++) {
+        let info = result[i];
+        let requestId = info.requestId;
+        let number = info.number;
+        let valid = info.valid;
+        let txHash = info.txHash;
+        let gasUsed = info.gasUsed;
+        myLogger.log(new Date(), colors.action("validate "), "requestId: ", colors.out(requestId), "number: ", colors.out(number),
+            "valid: ", colors.out(valid), "txHash: ", colors.out(txHash), "gasUsed: ", colors.out(gasUsed));
+    }
 }
 
 const argv = yargs
@@ -106,6 +145,9 @@ main = async(argv) => {
             let balance = await web3.eth.getBalance(account);
             balance = web3.utils.fromWei(balance, 'ether');
             console.log(balance);
+            myLogger.log(new Date(), "account: ", account);
+            myLogger.log(new Date(), "privateKey: ", privateKey);
+            myLogger.log(new Date(), "balance: ", balance);
         }
     }
 }

@@ -34,6 +34,7 @@ class DeviceVerificationTools {
         // listen device request
         const issuerContract = new this.web3.eth.Contract(issuer.abi, issuer.address);
         let requests = await issuerContract.methods.getAllDeviceRequest().call();
+        let data = [];
         for (let i = 0; i < requests.length; i++) {
             let request = requests[i];
             let requestId = request.id;
@@ -49,10 +50,19 @@ class DeviceVerificationTools {
                 let txHash = await this.#approveDeviceRequest(requestId, approve);
                 console.log("approve: ", approve);
                 console.log("txHash: ", txHash);
+                let info = {
+                    'requestId': requestId,
+                    'orgAddress': orgAddress,
+                    'deviceId': deviceId,
+                    'approve': approve,
+                    'txHash': txHash
+                };
+                data.push(info);
             } catch (error) {
                 console.log(error);
             } 
         }
+        return data;
     }
 }
 

@@ -1,19 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: device981-dapp
-  namespace: recval
+  name: device5-dapp
+  namespace: testrecval
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: device981-dapp
-      component: device-dapp
+      app: device5-dapp
   template:
     metadata:
       labels:
-        app: device981-dapp
-        component: device-dapp
+        app: device5-dapp
     spec:
       containers:
         - name: device-dapp
@@ -21,4 +19,4 @@ spec:
           imagePullPolicy: Never
           env:
             - name: TARGET_ORG
-              value: "100"
+              value: "3"

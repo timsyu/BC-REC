@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: issuer-dapp-deployname
-  namespace: recval
+  namespace: testrecval
 spec:
   replicas: 1
   selector:
@@ -14,6 +14,6 @@ spec:
         app: issuer-dapp
     spec:
       containers:
-      - name: issuer-dapp
-        image: f221267155/issuerdapp:v1
-        imagePullPolicy: Never
+        - name: issuer-dapp
+          image: f221267155/issuerdapp:v1
+          imagePullPolicy: Never

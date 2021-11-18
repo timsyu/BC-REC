@@ -79,4 +79,4 @@ echo "write console to out/autoreducepower.txt"
 nohup node main.js autoreducepower --account $account --privatekey $privateKey --org $orgAddress &> out/autoreducepower.txt &
 echo "you can type 'tail -f out/autoreducepower.txt'"
 echo "--------------------------------------------------------------------------------"
-tail -f out/autoreducepower.txt
+tail -f normalStdout.txt

@@ -6,6 +6,26 @@ const ConfigTools = require("./configTools");
 const yargs = require('yargs');
 const schedule = require('node-schedule');
 
+const { Console } = require("console");
+const fs = require("fs");
+const colors = require('colors/safe');
+
+// set theme
+colors.setTheme({
+    text: 'grey',
+    out: 'cyan',
+    info: 'green',
+    action: 'yellow',
+    debug: ['blue', 'underline'],
+    error: 'red'
+});
+
+// make a new logger
+const myLogger = new Console({
+    stdout: fs.createWriteStream("out/normalStdout.txt"),
+    stderr: fs.createWriteStream("out/errStdErr.txt"),
+});
+
 register = async(web3, account, privateKey, config, orgAddress, plantAddress) => {
     try {
         // device register request
@@ -13,12 +33,15 @@ register = async(web3, account, privateKey, config, orgAddress, plantAddress) =>
         // console.log("---check Device already register---");
         const isRegistered = await registerTools.checkRegister(orgAddress, plantAddress);
         console.log(isRegistered);
+        let registerTxHash = "None"
         if (isRegistered == false) {
             // console.log("---device register start---");
-            const registerTxHash = await registerTools.register(orgAddress, plantAddress);
+            registerTxHash = await registerTools.register(orgAddress, plantAddress);
             console.log(registerTxHash);
             // console.log("---device register end---");
         }
+        myLogger.log(new Date(), colors.action("register "), "isRegistered: ", colors.out(isRegistered), "orgAddress: ", colors.out(orgAddress),
+            "plantAddress: ", colors.out(plantAddress), "txHash: ", colors.out(registerTxHash));
         // else {
         //     console.log("This device is already registered(ing)!!");
         // }
@@ -46,14 +69,21 @@ record = async(web3, account, privateKey, config, plantAddress, value) => {
             console.log("recordTxHash: ", recordTxHash);
             console.log("bindTxHash: ", bindTxHash);
             console.log("---device record & bind power end---");
+            myLogger.log(new Date(), colors.action("record "), "recordResult: ", colors.out(recordResult), "powerId: ", colors.out(powerId),
+                "recordTxHash: ", colors.out(recordTxHash), "bindTxHash: ", colors.out(bindTxHash));
         } else {
+            let stateLog = "None";
             if (state == 1) { // Idel
-                console.log("This device is not approved by org admin!!");
+                stateLog = "This device is not approved by org admin!!"
+                console.log(stateLog);
             } else if (state == 2) { // pending
-                console.log("This device is not approved by Issuer!!");
+                stateLog = "This device is not approved by Issuer!!"
+                console.log(stateLog);
             } else if (state == 4) { // disapproved
-                console.log("This device is disapproved by Issuer!!");
+                stateLog = "This device is disapproved by Issuer!!"
+                console.log(stateLog);
             }
+            myLogger.log(new Date(), colors.action("record "), "isVerified: ", colors.out(isVerified), "stateLog: ", colors.out(stateLog));
         }
     } catch (err) {
         console.error(err);
@@ -159,6 +189,9 @@ main = async(argv) => {
             let balance = await web3.eth.getBalance(account);
             balance = web3.utils.fromWei(balance, 'ether');
             console.log(balance);
+            myLogger.log(new Date(), "account: ", account);
+            myLogger.log(new Date(), "privateKey: ", privateKey);
+            myLogger.log(new Date(), "balance: ", balance);
         }
     }
 }

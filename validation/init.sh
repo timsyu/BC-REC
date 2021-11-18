@@ -24,5 +24,6 @@ dir=$(dirname "$0")
 
 filename=distri.json
 filename2=org_device_distri.json
+namespace=recval
 chmod +rw $dir/start.sh
-bash $dir/start.sh $filename $filename2
+bash $dir/start.sh $filename $filename2 $namespace

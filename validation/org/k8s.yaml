@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: org100-dapp-deployname
-  namespace: recval
+  name: org3-dapp-deployname
+  namespace: testrecval
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: org100-dapp-service
+      app: org3-dapp-service
   template:
     metadata:
       labels:
-        app: org100-dapp-service
+        app: org3-dapp-service
     spec:
       containers:
         - name: org-dapp
@@ -19,21 +19,21 @@ spec:
           imagePullPolicy: Never
           env:
             - name: ORG_NAME
-              value: "org100-name"
+              value: "org3-name"
             - name: ORG_DESC
-              value: "org100-desc"
+              value: "org3-desc"
             - name: PLANT_NUM
-              value: "1"
+              value: "2"
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: org100-dapp-service
-  namespace: recval
+  name: org3-dapp-service
+  namespace: testrecval
 spec:
   type: NodePort
   selector:
-    app: org100-dapp-service
+    app: org3-dapp-service
   ports:
     - port: 3000
       targetPort: 3000

@@ -3,6 +3,7 @@ dir=$(dirname "$0")
 # edit org label
 orgName=$1
 plantNum=$2
+namespace=$3
 # Deployment
 deploymentName=$orgName-dapp-deployname
 serviceName=$orgName-dapp-service
@@ -10,6 +11,10 @@ name=$deploymentName yq e -i '
     . | select(.kind == "Deployment") |=
     .metadata.name = strenv(name)
 ' "${dir}"/k8s.yaml
+namespace=$namespace yq e -i '
+    . | select(.kind == "Deployment") |=
+    .metadata.namespace = strenv(namespace)
+' $dir/k8s.yaml
 name=$serviceName yq e -i '
     . | select(.kind == "Deployment") |=
     .spec.selector.matchLabels.app = strenv(name)
@@ -40,6 +45,10 @@ name=$serviceName yq e -i '
     . | select(.kind == "Service") |=
     .metadata.name = strenv(name)
 ' "${dir}"/k8s.yaml
+namespace=$namespace yq e -i '
+    . | select(.kind == "Service") |=
+    .metadata.namespace = strenv(namespace)
+' $dir/k8s.yaml
 name=$serviceName yq e -i '
     . | select(.kind == "Service") |=
     .spec.selector.app = strenv(name)

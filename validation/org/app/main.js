@@ -6,6 +6,26 @@ const CertificateTools = require("./certificateTools")
 const yargs = require('yargs');
 const schedule = require('node-schedule');
 
+const { Console } = require("console");
+const fs = require("fs");
+const colors = require('colors/safe');
+
+// set theme
+colors.setTheme({
+    text: 'grey',
+    out: 'cyan',
+    info: 'green',
+    action: 'yellow',
+    debug: ['blue', 'underline'],
+    error: 'red'
+});
+
+// make a new logger
+const myLogger = new Console({
+    stdout: fs.createWriteStream("normalStdout.txt"),
+    stderr: fs.createWriteStream("errStdErr.txt"),
+});
+
 createOrg = async(web3, account, privateKey, config, orgName, orgDescriptsion) => {
     try {
         // init org tools
@@ -14,6 +34,7 @@ createOrg = async(web3, account, privateKey, config, orgName, orgDescriptsion) =
         let result = await orgTools.createOrg(orgName, orgDescriptsion);
         console.log(result.txHash);
         console.log(result.orgAddress);
+        myLogger.log(new Date(), colors.action("createOrg "), "org address: ", colors.out(result.orgAddress));
     } catch (err) {
         console.error(err);
     }
@@ -27,6 +48,7 @@ createPlant = async(web3, account, privateKey, config, orgAddress, plantName, pl
         result = await orgTools.createPlant(orgAddress, plantName, plantDescriptsion);
         console.log(result.txHash);
         console.log(result.plantAddress);
+        myLogger.log(new Date(), colors.action("createPlant "), "plant address: ", colors.out(result.plantAddress));
     } catch (err) {
         console.error(err);
     }
@@ -49,6 +71,7 @@ approveDeviceRegister = async(web3, account, privateKey, config, orgAddress) => 
             let imageUrl = deviceId + "'s imageUrl";
             let txHash = await orgTools.approveDeviceRegister(orgAddress, requestId, capacity, location, imageUrl);
             console.log("txHash", txHash);
+            myLogger.log(new Date(), colors.action("approveDeviceRegister "), "deviceId: ", colors.text(deviceId), "txHash: ", colors.out(txHash));
         }
     } catch (err) {
         console.error(err);
@@ -75,6 +98,7 @@ requestDeviceVerification = async(web3, account, privateKey, config, orgAddress)
                 console.log("deviceLocation:", deviceLocation);
                 let txHash = await orgTools.requestDeviceVerification(orgAddress, plantId, deviceId, deviceLocation);
                 console.log("txHash", txHash);
+                myLogger.log(new Date(), colors.action("requestDeviceVerification "), "deviceId: ", colors.text(deviceId), "txHash: ", colors.out(txHash));
             }
         }
     } catch (err) {
@@ -98,6 +122,7 @@ requestCertificate = async(web3, account, privateKey, config, orgAddress, metada
             console.log("plantId", plantId);
             console.log("certNum", certNum);
             console.log("totalPower", totalPower);
+            myLogger.log(new Date(), colors.action("requestCertificate "), "plantId: ", colors.info(plantId), "certNum: ", colors.info(certNum), "totalPower: ", colors.info(totalPower));
             if (certNum > 0) {
                 console.log("---Generate All Certificate Power Info in each Plant contract---");
                 let { powerIds, values } = await certificateTools.generatePowerInfo(orgAddress, plantId, certNum);
@@ -105,6 +130,7 @@ requestCertificate = async(web3, account, privateKey, config, orgAddress, metada
                 console.log("values", values);
                 let txHash = await orgTools.requestCertificate(orgAddress, certNum, plantId, powerIds, values, metadataUri);
                 console.log("txHash", txHash);
+                myLogger.log(new Date(), colors.action("requestCertificate "), "powerIds: ", colors.text(powerIds), "values: ", colors.text(values), "txHash: ", colors.out(txHash));
             }
         }
     } catch (err) {
@@ -353,6 +379,9 @@ main = async(argv) => {
             let balance = await web3.eth.getBalance(account);
             balance = web3.utils.fromWei(balance, 'ether');
             console.log(balance);
+            myLogger.log(new Date(), "account: ", account);
+            myLogger.log(new Date(), "privateKey: ", privateKey);
+            myLogger.log(new Date(), "balance: ", balance);
         }
     }
 }

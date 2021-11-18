@@ -1,8 +1,9 @@
 #! /bin/bash
 
 dir=$(dirname "$0")
+namespace=$3
 # create k8s namespace
-kubectl create namespace recval
+kubectl create namespace $namespace
 
 # create org device file and permissions
 # create files
@@ -36,7 +37,7 @@ do
     num=$(jq -r '.num' <<< $data)
     echo $name
     echo $num
-    bash "${dir}"/org/start.sh $name $num
+    bash "${dir}"/org/start.sh $name $num $namespace
     # sleep 1.5
 done
 sleep 2
@@ -53,6 +54,9 @@ do
     orgId=$(jq -r '.orgId' <<< $data)
     echo $name
     echo $orgId
-    bash "${dir}"/device/start.sh $name $orgId
+    bash "${dir}"/device/start.sh $name $orgId $namespace
     # sleep 1.5
 done
+
+echo "create issuer Pod"
+bash "${dir}"/issuer/start.sh $namespace

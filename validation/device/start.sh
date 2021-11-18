@@ -4,11 +4,15 @@ dir=$(dirname "$0")
 
 deviceName=$1
 targetOrg=$2
+namespace=$3
 # edit org address and plant address
 # Deployment
 deploymentName=$deviceName-dapp
 name=$deploymentName yq e -i '
     .metadata.name = strenv(name)
+' $dir/k8s.yaml
+namespace=$namespace yq e -i '
+    .metadata.namespace = strenv(namespace)
 ' $dir/k8s.yaml
 name=$deviceName-dapp yq e -i '
     .spec.selector.matchLabels.app = strenv(name) |
