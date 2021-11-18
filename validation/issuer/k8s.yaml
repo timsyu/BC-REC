@@ -16,3 +16,4 @@ spec:
       containers:
       - name: issuer-dapp
         image: f221267155/issuerdapp:v1
+        imagePullPolicy: Never

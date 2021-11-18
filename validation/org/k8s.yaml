@@ -16,6 +16,7 @@ spec:
       containers:
         - name: org-dapp
           image: f221267155/orgdapp:v1
+          imagePullPolicy: Never
           env:
             - name: ORG_NAME
               value: "org100-name"
