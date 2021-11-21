@@ -264,8 +264,25 @@ class OrgTools {
 
         var rawTx = tx.rawTransaction;
         let receipt = await web3.eth.sendSignedTransaction(rawTx);
+        let txHash = receipt.transactionHash;
+        const logs = receipt.logs;
+        let requestId = '';
+        let tokenIds = [];
+        let topicHash = web3.utils.keccak256("CertificateEvent(uint256,uint256,address,address,uint256[],uint256[])");
+        for (let i = 0; i < logs.length; i++) {
+            let topics = logs[i].topics;
+            if (topics[0] == topicHash) {
+                requestId = web3.eth.abi.decodeParameter('uint256', topics[1]);
+                let tokenId = web3.eth.abi.decodeParameter('uint256', topics[2]);
+                tokenIds.push(tokenId);
+            }
+        }
 
-        return receipt.transactionHash;
+        return {
+            'txHash': txHash,
+            'requestId': requestId,
+            'tokenIds': tokenIds,
+        };
     }
 
     #reducePower = async(orgAddress, requestId) => {

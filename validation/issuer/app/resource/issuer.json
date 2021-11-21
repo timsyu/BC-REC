@@ -1,5 +1,5 @@
 {
-    "address": "0x0130fb592470656a96cf9878a553b7E220534067",
+    "address": "0xC36B83AbB3B7e2Fe3f25F842F7F10a65eD2224D3",
     "abi": [
 		{
 			"anonymous": false,
@@ -9,28 +9,9 @@
 					"internalType": "uint256",
 					"name": "requestId",
 					"type": "uint256"
-				},
-				{
-					"indexed": false,
-					"internalType": "bool",
-					"name": "approve",
-					"type": "bool"
 				}
 			],
 			"name": "CertificateRequestApprovedEvent",
-			"type": "event"
-		},
-		{
-			"anonymous": false,
-			"inputs": [
-				{
-					"indexed": true,
-					"internalType": "uint256",
-					"name": "requestId",
-					"type": "uint256"
-				}
-			],
-			"name": "CertificateRequestEvent",
 			"type": "event"
 		},
 		{
@@ -121,77 +102,9 @@
 					"type": "bool"
 				}
 			],
-			"name": "approveCertificateRequest",
-			"outputs": [],
-			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "requestId",
-					"type": "uint256"
-				},
-				{
-					"internalType": "bool",
-					"name": "approve",
-					"type": "bool"
-				}
-			],
 			"name": "approveDeviceRequest",
 			"outputs": [],
 			"stateMutability": "nonpayable",
-			"type": "function"
-		},
-		{
-			"inputs": [],
-			"name": "getAllCertificateRequest",
-			"outputs": [
-				{
-					"components": [
-						{
-							"internalType": "uint256",
-							"name": "id",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "number",
-							"type": "uint256"
-						},
-						{
-							"internalType": "address",
-							"name": "orgId",
-							"type": "address"
-						},
-						{
-							"internalType": "address",
-							"name": "plantId",
-							"type": "address"
-						},
-						{
-							"internalType": "uint256[][]",
-							"name": "powerIds",
-							"type": "uint256[][]"
-						},
-						{
-							"internalType": "uint256[][]",
-							"name": "values",
-							"type": "uint256[][]"
-						},
-						{
-							"internalType": "string",
-							"name": "metadataUri",
-							"type": "string"
-						}
-					],
-					"internalType": "struct IIssuer.CertificateRequest[]",
-					"name": "",
-					"type": "tuple[]"
-				}
-			],
-			"stateMutability": "view",
 			"type": "function"
 		},
 		{
@@ -226,65 +139,9 @@
 							"type": "string"
 						}
 					],
-					"internalType": "struct IIssuer.DeviceRequest[]",
+					"internalType": "struct IIssuerV2.DeviceRequest[]",
 					"name": "",
 					"type": "tuple[]"
-				}
-			],
-			"stateMutability": "view",
-			"type": "function"
-		},
-		{
-			"inputs": [
-				{
-					"internalType": "uint256",
-					"name": "requestId",
-					"type": "uint256"
-				}
-			],
-			"name": "getCertificateRequest",
-			"outputs": [
-				{
-					"components": [
-						{
-							"internalType": "uint256",
-							"name": "id",
-							"type": "uint256"
-						},
-						{
-							"internalType": "uint256",
-							"name": "number",
-							"type": "uint256"
-						},
-						{
-							"internalType": "address",
-							"name": "orgId",
-							"type": "address"
-						},
-						{
-							"internalType": "address",
-							"name": "plantId",
-							"type": "address"
-						},
-						{
-							"internalType": "uint256[][]",
-							"name": "powerIds",
-							"type": "uint256[][]"
-						},
-						{
-							"internalType": "uint256[][]",
-							"name": "values",
-							"type": "uint256[][]"
-						},
-						{
-							"internalType": "string",
-							"name": "metadataUri",
-							"type": "string"
-						}
-					],
-					"internalType": "struct IIssuer.CertificateRequest",
-					"name": "",
-					"type": "tuple"
 				}
 			],
 			"stateMutability": "view",
@@ -366,6 +223,11 @@
 					"internalType": "uint256",
 					"name": "",
 					"type": "uint256"
+				},
+				{
+					"internalType": "uint256[]",
+					"name": "",
+					"type": "uint256[]"
 				}
 			],
 			"stateMutability": "nonpayable",

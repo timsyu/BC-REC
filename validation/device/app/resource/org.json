@@ -104,64 +104,6 @@
             "type": "function"
         },
         {
-            "inputs": [
-                {
-                    "internalType": "uint256",
-                    "name": "requestId",
-                    "type": "uint256"
-                }
-            ],
-            "name": "deleteRequestCertificate",
-            "outputs": [],
-            "stateMutability": "nonpayable",
-            "type": "function"
-        },
-        {
-            "inputs": [],
-            "name": "getAllCertificateRequest",
-            "outputs": [
-                {
-                    "components": [
-                        {
-                            "internalType": "uint256",
-                            "name": "index",
-                            "type": "uint256"
-                        },
-                        {
-                            "internalType": "uint256",
-                            "name": "id",
-                            "type": "uint256"
-                        },
-                        {
-                            "internalType": "uint256",
-                            "name": "number",
-                            "type": "uint256"
-                        },
-                        {
-                            "internalType": "address",
-                            "name": "plantId",
-                            "type": "address"
-                        },
-                        {
-                            "internalType": "uint256[][]",
-                            "name": "powerIds",
-                            "type": "uint256[][]"
-                        },
-                        {
-                            "internalType": "uint256[][]",
-                            "name": "values",
-                            "type": "uint256[][]"
-                        }
-                    ],
-                    "internalType": "struct IOrg.CertificateRequest[]",
-                    "name": "",
-                    "type": "tuple[]"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
             "inputs": [],
             "name": "getAllDeviceRegisterRequest",
             "outputs": [
@@ -291,19 +233,6 @@
         {
             "inputs": [
                 {
-                    "internalType": "uint256",
-                    "name": "requestId",
-                    "type": "uint256"
-                }
-            ],
-            "name": "reducePower",
-            "outputs": [],
-            "stateMutability": "nonpayable",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
                     "internalType": "address",
                     "name": "plantContract",
                     "type": "address"
@@ -390,6 +319,11 @@
                     "internalType": "uint256",
                     "name": "",
                     "type": "uint256"
+                },
+                {
+                    "internalType": "uint256[]",
+                    "name": "",
+                    "type": "uint256[]"
                 }
             ],
             "stateMutability": "nonpayable",

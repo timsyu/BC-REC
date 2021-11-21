@@ -22,8 +22,8 @@ colors.setTheme({
 
 // make a new logger
 const myLogger = new Console({
-    stdout: fs.createWriteStream("out/normalStdout.txt"),
-    stderr: fs.createWriteStream("out/errStdErr.txt"),
+    stdout: fs.createWriteStream("normalStdout.txt"),
+    stderr: fs.createWriteStream("errStdErr.txt"),
 });
 
 register = async(web3, account, privateKey, config, orgAddress, plantAddress) => {

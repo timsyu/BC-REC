@@ -22,8 +22,8 @@ colors.setTheme({
 
 // make a new logger
 const myLogger = new Console({
-    stdout: fs.createWriteStream("out/normalStdout.txt"),
-    stderr: fs.createWriteStream("out/errStdErr.txt"),
+    stdout: fs.createWriteStream("normalStdout.txt"),
+    stderr: fs.createWriteStream("errStdErr.txt"),
 });
 
 // Approve all device verification
@@ -44,7 +44,7 @@ verify = async(web3, account, privateKey, config) => {
 }
 
 // Validate and Approve certificate request
-validate = (web3, account, privateKey, config) => {
+validate = async(web3, account, privateKey, config) => {
     console.log("---Certificate validation listener start---");
     const certificateRequestTools = new CertificateRequestTools(web3, account, privateKey, config);
     let result = await certificateRequestTools.validate();
@@ -114,7 +114,7 @@ main = async(argv) => {
         if (account && privateKey) {
             const web3 = new Web3(config.provider.twcc_besu);
             let rule = new schedule.RecurrenceRule();
-            rule.second = [0, 30]; // when sec is at 0, 30,...
+            rule.second = [0, 30]; // when sec is at 0, 10, 20, 30, 40 , 50,...
             let job = schedule.scheduleJob(rule, () => {
                 verify(web3, account, privateKey, config);
             });

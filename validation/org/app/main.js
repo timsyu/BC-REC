@@ -122,15 +122,18 @@ requestCertificate = async(web3, account, privateKey, config, orgAddress, metada
             console.log("plantId", plantId);
             console.log("certNum", certNum);
             console.log("totalPower", totalPower);
-            myLogger.log(new Date(), colors.action("requestCertificate "), "plantId: ", colors.info(plantId), "certNum: ", colors.info(certNum), "totalPower: ", colors.info(totalPower));
+            myLogger.log(new Date(), colors.action("Power Info"), "plantId: ", colors.info(plantId), "certNum: ", colors.info(certNum), "totalPower: ", colors.info(totalPower));
             if (certNum > 0) {
                 console.log("---Generate All Certificate Power Info in each Plant contract---");
                 let { powerIds, values } = await certificateTools.generatePowerInfo(orgAddress, plantId, certNum);
                 console.log("powerIds", powerIds);
                 console.log("values", values);
-                let txHash = await orgTools.requestCertificate(orgAddress, certNum, plantId, powerIds, values, metadataUri);
+                myLogger.log(new Date(), colors.action("requestCertificate "),"certNum: ", colors.text(certNum),"powerIds: ", colors.text(powerIds), "values: ", colors.text(values));
+                let {txHash, requestId, tokenIds} = await orgTools.requestCertificate(orgAddress, certNum, plantId, powerIds, values, metadataUri);
                 console.log("txHash", txHash);
-                myLogger.log(new Date(), colors.action("requestCertificate "), "powerIds: ", colors.text(powerIds), "values: ", colors.text(values), "txHash: ", colors.out(txHash));
+                console.log("requestId", requestId);
+                console.log("tokenIds", tokenIds);
+                myLogger.log(new Date(), colors.action("Received Certificate "), "requestId: ", requestId, "tokenIds: ", colors.text(tokenIds), "txHash: ", colors.out(txHash));
             }
         }
     } catch (err) {

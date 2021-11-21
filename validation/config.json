@@ -1,14 +1,18 @@
 {
-    "blockchain":{
+    "blockchain": {
         "consensus":""
     },
-    
-    "distribution":{
-        "org2device":{
-            "methods": "normal"
-        },
+    "distribution": {
+        "orgNum": 3,
         "org2plant":{
-            "methods": "normal"
+            "methods": "normal",
+            "meau": 2,
+            "sigma": 1
+        },
+        "org2device":{
+            "methods": "normal",
+            "meau": 2,
+            "sigma": 1
         }
     }
 }

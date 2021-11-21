@@ -72,11 +72,12 @@ nohup node main.js autoreqcert --account $account --privatekey $privateKey --org
 echo "you can type 'tail -f out/autoreqcert.txt'"
 echo "--------------------------------------------------------------------------------"
 
-echo "--------------------------------------------------------------------------------"
-echo "auto reduce power in plants"
-echo "run in the background"
-echo "write console to out/autoreducepower.txt"
-nohup node main.js autoreducepower --account $account --privatekey $privateKey --org $orgAddress &> out/autoreducepower.txt &
-echo "you can type 'tail -f out/autoreducepower.txt'"
-echo "--------------------------------------------------------------------------------"
+# echo "--------------------------------------------------------------------------------"
+# echo "auto reduce power in plants"
+# echo "run in the background"
+# echo "write console to out/autoreducepower.txt"
+# nohup node main.js autoreducepower --account $account --privatekey $privateKey --org $orgAddress &> out/autoreducepower.txt &
+# echo "you can type 'tail -f out/autoreducepower.txt'"
+# echo "--------------------------------------------------------------------------------"
 tail -f normalStdout.txt
+# tail -f out/autoreqcert.txt
