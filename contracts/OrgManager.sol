@@ -23,6 +23,7 @@ contract OrgManager is IOrgManager {
     
     // new a contract to owner
     function createOrg (string memory name, uint date, string memory description, address issuerContract, address tokenContract) external override returns (address) {
+        require(date > 0);
         address owner = msg.sender;
         Org org = new Org(issuerContract, tokenContract, owner, name, date, description);
         address orgAddress = address(org);

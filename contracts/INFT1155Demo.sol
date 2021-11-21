@@ -14,12 +14,11 @@ interface INFT1155Demo {
         string metadataUri;
         uint[] powerIds;
         uint[] values;
-        address[] txHashes;
     }
     
-    function mintNft(address receiver, address plantId, uint[][] memory powerIds, uint[][] memory values, address[][] memory txHashes, string memory metadataUri) external returns (uint256);
+    function mintNft(address receiver, address plantId, uint[][] memory powerIds, uint[][] memory values, string memory metadataUri) external returns (uint256);
     
-    function mintBatchNft(uint requestId, address receiver, address plantId, uint number, uint[][] memory powerIds, uint[][] memory values, address[][] memory txHashes, string memory metadataUri) external returns (uint256[] memory);
+    function mintBatchNft(uint requestId, address receiver, address plantId, uint number, uint[][] memory powerIds, uint[][] memory values, string memory metadataUri) external returns (uint256[] memory);
     
     function transferToken(address to, uint256[] memory ids, uint256[] memory amounts) external;
     

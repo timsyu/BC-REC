@@ -3,9 +3,9 @@ pragma solidity ^0.8.4;
 
 import "./Lib.sol";
 import "./IOrg.sol";
-import "./Plant.sol";
+import "./PlantV2.sol";
 import "./IPlant.sol";
-import "./IIssuer.sol";
+import "./IIssuerV2.sol";
 import "./INFT1155Demo.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
@@ -34,8 +34,8 @@ contract Org is IOrg, ERC1155Holder {
     // certificate request
     // uint _certificateRequestCount;
     // request id => CertificateRequest
-    mapping(uint => CertificateRequest) _certificateRequestMap;
-    uint[] _certificateRequests;
+    // mapping(uint => CertificateRequest) _certificateRequestMap;
+    // uint[] _certificateRequests;
      
     modifier onlyAdmin() {
         require(_userInfoMap[msg.sender].role == Lib.Role.Admin, "only admin can call this");
@@ -133,7 +133,7 @@ contract Org is IOrg, ERC1155Holder {
     // only admins can call this
     function createPlant(string memory plantName, string memory plantLocation) external override onlyAdmin onlyAble returns (address) {
         // create plant contract
-        Plant plant = new Plant(_issuerContract, plantName, plantLocation);
+        PlantV2 plant = new PlantV2(_issuerContract, plantName, plantLocation);
         address plantAddress = address(plant);
         _plants.push(plantAddress);
         _plantIndexes[plantAddress] = _plants.length - 1;
@@ -195,6 +195,7 @@ contract Org is IOrg, ERC1155Holder {
         string memory location,
         string memory image
         ) external override onlyAdmin onlyAble{
+        require(date > 0);
         DeviceRegisterRequest memory request = _deviceRegisterRequestMap[requestId];
         IPlant(request.plantId).addDevice(request.deviceId, date, capacity, location, image);
         // remove request
@@ -212,7 +213,8 @@ contract Org is IOrg, ERC1155Holder {
         address deviceId,
         string memory deviceLocation
         ) external override onlyAdmin onlyAble returns (uint) {
-        uint id = IIssuer(_issuerContract).requestApproveDevice(plantId, deviceId, deviceLocation);
+        require(IPlant(plantId).getDevice(deviceId).state == Lib.State.Idle);
+        uint id = IIssuerV2(_issuerContract).requestApproveDevice(plantId, deviceId, deviceLocation);
         IPlant(plantId).setDevicePending(deviceId);
         return id;
     }
@@ -222,59 +224,56 @@ contract Org is IOrg, ERC1155Holder {
     //     Plant(_plants[plantId]).changeDeviceState(deviceId, state);
     // }
     
-    // only admins can call this
-    // CompilerError: Stack too deep when compiling inline assembly: Variable headStart is 1 slot(s) too deep inside the stack.
-    // Plant.SimplifiedPower[][] -> uint[][], uintp[][]
     function requestCertificate(
         uint number,
         address plantId,
         uint[][] memory powerIds,
         uint[][] memory values,
-        address[][] memory txHashes,
         string memory metadataUri
-        ) external override onlyAdmin onlyAble returns (uint) {
+        ) external override onlyAdmin onlyAble returns (uint, uint[] memory) {
+        require(number > 0);
         require(powerIds.length == number);
         require(values.length == number);
-        uint id = IIssuer(_issuerContract).requestCertificate(number, plantId, powerIds, values, txHashes, metadataUri);
+        (uint requestId, uint[] memory tokenIds) = IIssuerV2(_issuerContract).requestCertificate(number, plantId, powerIds, values, metadataUri);
         // emit CertificateRequestEvent(id, number, plantId, powerIds, values, metadataUri);
-        _certificateRequests.push(id);
-        _certificateRequestMap[id] = CertificateRequest(_certificateRequests.length - 1, id, number, plantId, powerIds, values);
-        return id;
+        // _certificateRequests.push(requestId);
+        // _certificateRequestMap[id] = CertificateRequest(_certificateRequests.length - 1, id, number, plantId, powerIds, values);
+        return (requestId, tokenIds);
     }
     
-    function deleteRequestCertificate(uint requestId) external override onlyAdmin onlyAble {
-        CertificateRequest memory request = _certificateRequestMap[requestId];
-        require(request.number > 0);
-        // remove request
-        uint index = request.index;
-        uint last = _certificateRequests[_certificateRequests.length - 1];
-        _certificateRequests[index] = last;
-        _certificateRequestMap[last].index = index;
-        _certificateRequests.pop();
-        delete _certificateRequestMap[requestId];
-    }
+    // function deleteRequestCertificate(uint requestId) external override onlyAdmin onlyAble {
+    //     CertificateRequest memory request = _certificateRequestMap[requestId];
+    //     require(request.number > 0);
+    //     // remove request
+    //     uint index = request.index;
+    //     uint last = _certificateRequests[_certificateRequests.length - 1];
+    //     _certificateRequests[index] = last;
+    //     _certificateRequestMap[last].index = index;
+    //     _certificateRequests.pop();
+    //     delete _certificateRequestMap[requestId];
+    // }
     
-    function getAllCertificateRequest() external override view returns (CertificateRequest[] memory) {
-        uint length = _certificateRequests.length;
-        CertificateRequest[] memory result = new CertificateRequest[](length);
-        for(uint i = 0; i < length; i++) {
-            uint id = _certificateRequests[i];
-            result[i] = _certificateRequestMap[id];
-        }
-        return result;
-    }
+    // function getAllCertificateRequest() external override view returns (CertificateRequest[] memory) {
+    //     uint length = _certificateRequests.length;
+    //     CertificateRequest[] memory result = new CertificateRequest[](length);
+    //     for(uint i = 0; i < length; i++) {
+    //         uint id = _certificateRequests[i];
+    //         result[i] = _certificateRequestMap[id];
+    //     }
+    //     return result;
+    // }
     
-    function reducePower(uint requestId) external override onlyAdmin onlyAble {
-        CertificateRequest memory request = _certificateRequestMap[requestId];
-        IPlant(request.plantId).reducePower(request.powerIds, request.values);
-        // remove request
-        uint index = request.index;
-        uint last = _certificateRequests[_certificateRequests.length - 1];
-        _certificateRequests[index] = last;
-        _certificateRequestMap[last].index = index;
-        _certificateRequests.pop();
-        delete _certificateRequestMap[requestId];
-    }
+    // function reducePower(uint requestId) external override onlyAdmin onlyAble {
+    //     CertificateRequest memory request = _certificateRequestMap[requestId];
+    //     IPlant(request.plantId).reducePower(request.powerIds, request.values);
+    //     // remove request
+    //     uint index = request.index;
+    //     uint last = _certificateRequests[_certificateRequests.length - 1];
+    //     _certificateRequests[index] = last;
+    //     _certificateRequestMap[last].index = index;
+    //     _certificateRequests.pop();
+    //     delete _certificateRequestMap[requestId];
+    // }
     
     function transferToken(address to, uint256[] memory ids, uint256[] memory amounts) external override onlyAdmin onlyAble {
         INFT1155Demo(_tokenContract).transferToken(to, ids, amounts);

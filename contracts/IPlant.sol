@@ -41,8 +41,9 @@ interface IPlant {
     
     function bindPowerAndTxHash(uint powerId, bytes32 txHash) external;
     
-   
     function getAllPower() external view returns (Power[] memory);
+    
+    function getValues(uint[][] memory powerIds) external view returns (uint[][] memory);
     
     function contains(address deviceId) external view returns (bool);
     

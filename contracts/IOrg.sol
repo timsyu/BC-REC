@@ -77,13 +77,13 @@ interface IOrg {
     // only admins can call this
     // CompilerError: Stack too deep when compiling inline assembly: Variable headStart is 1 slot(s) too deep inside the stack.
     // Plant.SimplifiedPower[][] -> uint[][], uintp[][]
-    function requestCertificate(uint number, address plantId, uint[][] memory powerIds, uint[][] memory values, address[][] memory txHashes, string memory metadataUri) external returns (uint);
+    function requestCertificate(uint number, address plantId, uint[][] memory powerIds, uint[][] memory values, string memory metadataUri) external returns (uint, uint[] memory);
     
-    function deleteRequestCertificate(uint requestId) external;
+    // function deleteRequestCertificate(uint requestId) external;
     
-    function getAllCertificateRequest() external view returns (CertificateRequest[] memory);
+    // function getAllCertificateRequest() external view returns (CertificateRequest[] memory);
     
-    function reducePower(uint requestId) external;
+    // function reducePower(uint requestId) external;
     
     function transferToken(address to, uint256[] memory ids, uint256[] memory amounts) external;
     

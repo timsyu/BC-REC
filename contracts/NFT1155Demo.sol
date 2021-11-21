@@ -45,16 +45,16 @@ contract NFT1155Demo is INFT1155Demo, ERC1155Supply {
         return _certificates[_tokenId].metadataUri;
     }
       
-    function mintNft(address receiver, address plantId, uint[][] memory powerIds, uint[][] memory values, address[][] memory txHashes, string memory metadataUri) external override onlyOwner returns (uint256) {
+    function mintNft(address receiver, address plantId, uint[][] memory powerIds, uint[][] memory values, string memory metadataUri) external override onlyOwner returns (uint256) {
         
         _tokenIds.increment();
         uint256 id = _tokenIds.current();
         _mint(receiver, id, 1, new bytes(0));
-        _certificates[id] = Certificate(id, receiver, plantId, false, metadataUri, powerIds[0], values[0], txHashes[0]);
+        _certificates[id] = Certificate(id, receiver, plantId, false, metadataUri, powerIds[0], values[0]);
         return id;
     }
     
-    function mintBatchNft(uint requestId, address receiver, address plantId, uint number, uint[][] memory powerIds, uint[][] memory values, address[][] memory txHashes, string memory metadataUri) external override onlyOwner returns (uint256[] memory) {
+    function mintBatchNft(uint requestId, address receiver, address plantId, uint number, uint[][] memory powerIds, uint[][] memory values, string memory metadataUri) external override onlyOwner returns (uint256[] memory) {
         
         uint256[] memory ids = new uint256[](number);
         uint256[] memory amounts = new uint256[](number);
@@ -63,8 +63,8 @@ contract NFT1155Demo is INFT1155Demo, ERC1155Supply {
             ids[i] = _tokenIds.current();
             amounts[i] = 1;
             // _setTokenURI(ids[i], metadataUri);
-            // _powerIds[ids[i]] = powerIds[i];
-            _certificates[ids[i]] = Certificate(ids[i], receiver, plantId, false, metadataUri, powerIds[i], values[i], txHashes[i]);
+            // _powerIds[ids[i]] = powerIds[i];bytes32
+            _certificates[ids[i]] = Certificate(ids[i], receiver, plantId, false, metadataUri, powerIds[i], values[i]);
             // emit CertificateEvent
             emit CertificateEvent(requestId, ids[i], receiver , plantId, powerIds[i], values[i]);
         }
