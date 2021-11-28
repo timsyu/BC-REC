@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bootnode
+  namespace: recval
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eth-testnet
+      component: bootnode
+  template:
+    metadata:
+      labels:
+        app: eth-testnet
+        component: bootnode
+    spec:
+      containers:
+      - name: bootnode
+        image: f221267155/eth-testnet:v1
+        command: 
+        - "/bin/bash"
+        - -c
+        - |
+          bootnode --nodekey=/opt/bootnode/boot.key
+        imagePullPolicy: Never
+        ports: 
+        - containerPort: 30303
+          name: discovery-tcp
+          protocol: TCP
+        - containerPort: 30303
+          name: discovery-udp
+          protocol: UDP
+        - containerPort: 30301
+          name: bootnode-udp
+          protocol: UDP
+        volumeMounts:
+          - name: bootkey
+            mountPath: "/opt/bootnode"
+            readOnly: true
+      volumes:
+        - name: bootkey
+          secret:
+            secretName: bootkey1
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: bootnode
+  namespace: recval
+spec:
+  selector:
+    component: bootnode
+  ports:
+    - port: 30303
+      targetPort: 30303
+      name: discovery-tcp
+      protocol: TCP
+    - port: 30303
+      targetPort: 30303
+      name: discovery-udp
+      protocol: UDP
+    - port: 30301
+      targetPort: 30301
+      name: bootnode-udp
+      protocol: UDP

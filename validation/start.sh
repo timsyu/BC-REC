@@ -2,8 +2,6 @@
 
 dir=$(dirname "$0")
 namespace=$3
-# create k8s namespace
-kubectl create namespace $namespace
 
 # create org device file and permissions
 # create files

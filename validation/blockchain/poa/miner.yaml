@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eth-testnet-miner3
+  namespace: recval
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eth-testnet
+  template:
+    metadata:
+      labels:
+        app: eth-testnet
+    spec:
+      containers:
+        - name: eth-testnet-miner3
+          image: f221267155/eth-testnet:v1
+          command:
+            - "/bin/bash"
+          args:
+            - -c
+            - >
+              geth --mine --miner.threads=4 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@$(BOOTNODE_SERVICE_HOST):30301 --datadir /ethereum  --unlock ${ACCOUNT} --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner,clique' --nousb --allow-insecure-unlock;
+
+          env:
+            - name: NETWORK_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: genesis1
+                  key: networkid
+            - name: ACCOUNT
+              valueFrom:
+                secretKeyRef:
+                  name: keystore3
+                  key: account
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8545
+              name: rpc
+            - containerPort: 30303
+              name: discovery-tcp
+              protocol: TCP
+            - containerPort: 30303
+              name: discovery-udp
+              protocol: UDP
+          volumeMounts:
+            - name: chaindata
+              mountPath: "/ethereum"
+            - name: genesis
+              mountPath: "/opt/genesis"
+              readOnly: true
+            - name: password
+              mountPath: "/opt/password"
+              readOnly: true
+            - name: bootkey
+              mountPath: "/opt/bootnode"
+              readOnly: true
+      initContainers:
+        - name: genesis
+          image: f221267155/eth-testnet:v1
+          command: ["geth"]
+          args: ["--datadir=/ethereum", "init", "/opt/genesis/genesis.json"]
+          volumeMounts:
+            - name: genesis
+              mountPath: /opt/genesis
+              readOnly: true
+            - name: chaindata
+              mountPath: "/ethereum"
+        - name: genkey
+          image: f221267155/eth-testnet:v1
+          command: ["/bin/sh", "-c", "cp /opt/miner/data/keystore/* /ethereum/keystore/"]
+          volumeMounts:
+            - name: keystore
+              mountPath: /opt/miner/data/keystore
+            - name: chaindata
+              mountPath: "/ethereum"
+      volumes:
+        - name: genesis
+          configMap:
+            name: genesis1
+        - name: chaindata
+          emptyDir: {}
+        - name: keystore
+          secret:
+            secretName: keystore3
+        - name: password
+          secret:
+            secretName: password1
+        - name: bootkey
+          secret:
+            secretName: bootkey1

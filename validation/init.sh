@@ -1,10 +1,25 @@
 #! /bin/bash
 
 dir=$(dirname "$0")
+namespace=recval
+# create k8s namespace
+kubectl create namespace $namespace
 
 # read config
 configPath=$dir/config.json
-consensus=$(jq -r '.blockchain.consensus' $configPath)
+
+# blockchain
+blockchain=$(jq -r '.blockchain' $configPath)
+platform=$(jq -r '.platform' <<< $blockchain)
+consensus=$(jq -r '.consensus' <<< $blockchain)
+miner=$(jq -r '.miner' <<< $blockchain)
+minerNum=$(jq -r '.num' <<< $miner)
+
+chmod +rw $dir/blockchain/startpow.sh
+bash $dir/blockchain/startpow.sh $minerNum $namespace
+
+# ------------------------------------
+
 distribution=$(jq -r '.distribution' $configPath)
 orgNum=$(jq -r '.orgNum' <<< $distribution)
 
@@ -43,6 +58,7 @@ echo filename2: $filename2
 
 # filename=distri.json
 # filename2=org_device_distri.json
-namespace=recval
-chmod +rw $dir/start.sh
-bash $dir/start.sh $filename $filename2 $namespace
+
+# chmod +rw $dir/start.sh
+# bash $dir/start.sh $filename $filename2 $namespace
+

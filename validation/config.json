@@ -1,6 +1,10 @@
 {
     "blockchain": {
-        "consensus":""
+        "platform": "go-ethereum",
+        "consensus":"poa",
+        "miner":{
+            "num": 3
+        }
     },
     "distribution": {
         "orgNum": 3,
