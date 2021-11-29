@@ -14,9 +14,9 @@ echo "--------------------------------------------------------------------------
 
 privateKey=$(echo $privateKey | sed 's/^0x//')
 echo "--------------------------------------------------------------------------------"
-echo $privateKey > key.prv
-geth account import --datadir $dir/miner/data key.prv --password=""
-
+echo $privateKey > $dir/key.prv
+geth account import --datadir $dir/miner/data --password $dir/password.txt $dir/key.prv
+geth --datadir $dir/miner/data init genesis.json
 echo "--------------------------------------------------------------------------------"
 
 echo "--------------------------------------------------------------------------------"
