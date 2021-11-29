@@ -21,5 +21,4 @@ RUN ln -sf /go-ethereum/build/bin/geth /bin/geth
 RUN add-apt-repository -y ppa:ethereum/ethereum
 RUN apt-get install bootnode
 
-# ENTRYPOINT bash start.sh
-ENTRYPOINT 
+ENTRYPOINT bash start.sh
