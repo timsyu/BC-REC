@@ -26,6 +26,7 @@
     "@openzeppelin/contracts": "^4.2.0",
     "ejs": "^3.1.6",
     "ipfs-http-client": "^48.2.2",
+    "keythereum": "^1.2.0",
     "kubernetes-models": "^2.0.2",
     "web3": "^1.4.0"
   }

@@ -15,5 +15,97 @@ spec:
     spec:
       containers:
         - name: issuer-dapp
-          image: f221267155/issuerdapp:v1
+          image: f221267155/issuerdapp:v2
           imagePullPolicy: Never
+          command:
+            - "/bin/bash"
+          args:
+            - -c
+            - |
+              filename=$(basename /ethereum/keystore/*)
+              account=0x$(jq -r '.address' /ethereum/keystore/$filename)
+              nohup geth --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@$(BOOTNODE_SERVICE_HOST):30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock --mine --miner.threads=2 &
+              password=$(cat /opt/password/password.txt)
+              bash /app/start.sh /ethereum $account $password
+          env:
+            - name: NETWORK_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: genesis1
+                  key: networkid
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8545
+              name: rpc
+            - containerPort: 30303
+              name: discovery-tcp
+              protocol: TCP
+            - containerPort: 30303
+              name: discovery-udp
+              protocol: UDP
+          volumeMounts:
+            - name: chaindata
+              mountPath: "/ethereum"
+            - name: genesis
+              mountPath: "/opt/genesis"
+              readOnly: true
+            - name: contract
+              mountPath: "/opt/contract"
+              readOnly: true
+            - name: password
+              mountPath: "/opt/password"
+              readOnly: true
+            - name: bootkey
+              mountPath: "/opt/bootnode"
+              readOnly: true
+      initContainers:
+        - name: init
+          image: f221267155/eth-testnet:v1
+          command: ["geth"]
+          args: ["--datadir=/ethereum", "account", "new", "--password=/opt/password/password.txt"]
+          volumeMounts:
+            - name: password
+              mountPath: "/opt/password"
+              readOnly: true
+            - name: chaindata
+              mountPath: "/ethereum"
+        - name: genesis
+          image: f221267155/eth-testnet:v1
+          command: ["geth"]
+          args: ["--datadir=/ethereum", "init", "/opt/genesis/genesis.json"]
+          volumeMounts:
+            - name: genesis
+              mountPath: /opt/genesis
+              readOnly: true
+            - name: chaindata
+              mountPath: "/ethereum"
+      volumes:
+        - name: genesis
+          configMap:
+            name: genesis1
+        - name: contract
+          configMap:
+            name: contract
+        - name: chaindata
+          emptyDir: {}
+        - name: password
+          secret:
+            secretName: password1
+        - name: bootkey
+          secret:
+            secretName: bootkey1
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: issuer-dapp-service
+  namespace: recval
+spec:
+  type: NodePort
+  selector:
+    app: issuer-dapp-service
+  ports:
+    - port: 3000
+      targetPort: 3000
+      name: discovery-tcp
+      protocol: TCP

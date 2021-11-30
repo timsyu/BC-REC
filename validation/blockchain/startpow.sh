@@ -31,20 +31,20 @@ name=$content yq e -i --prettyPrint '
 kubectl apply -f $dir/genesis-config.yaml
 
 # miners
-for (( i=1; i<=$minerNum; i++))
-do
-    deploymentName=eth-testnet-miner$i
-    name=$deploymentName yq e -i '
-        .metadata.name = strenv(name)
-    ' $dir/pow/miner.yaml
-    namespace=$namespace yq e -i '
-        .metadata.namespace = strenv(namespace)
-    ' $dir/pow/miner.yaml
+# for (( i=1; i<=$minerNum; i++))
+# do
+#     deploymentName=eth-testnet-miner$i
+#     name=$deploymentName yq e -i '
+#         .metadata.name = strenv(name)
+#     ' $dir/pow/miner.yaml
+#     namespace=$namespace yq e -i '
+#         .metadata.namespace = strenv(namespace)
+#     ' $dir/pow/miner.yaml
 
-    name=$deploymentName yq e -i '
-        .spec.template.spec.containers[0].name = strenv(name)
-    ' $dir/pow/miner.yaml
-    # create pod
-    kubectl apply -f $dir/pow/miner.yaml
-done
+#     name=$deploymentName yq e -i '
+#         .spec.template.spec.containers[0].name = strenv(name)
+#     ' $dir/pow/miner.yaml
+#     # create pod
+#     kubectl apply -f $dir/pow/miner.yaml
+# done
 

@@ -1,5 +1,4 @@
 {
-    "url":"https://besu-allen-704319b4e1-node-2aae4c9e.baas.twcc.ai",
-    "twcc_besu":"https://besu-rectest-0b50fb7cee-node-29b86c87.baas.twcc.ai",
-    "ws_twcc_besu":"wss://besu-rectest-0b50fb7cee-node-29b86c87.baas.twcc.ai/json-rpc/ws"
+    "rpc":"https://besu-rectest-0b50fb7cee-node-29b86c87.baas.twcc.ai",
+    "ws_rpc":"wss://besu-rectest-0b50fb7cee-node-29b86c87.baas.twcc.ai/json-rpc/ws"
 }

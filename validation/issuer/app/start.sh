@@ -1,29 +1,24 @@
 #! /bin/bash
 dir=$(dirname "$0")
 
+datadir=$1
+account=$2
+password=$3
 echo "--------------------------------------------------------------------------------"
 echo "init wallet"
-wallet=( $(node $dir/main.js wallet --init) )
+wallet=( $(node $dir/main.js wallet --datadir $datadir --address $account --password $password) )
 account=${wallet[0]}
 privateKey=${wallet[1]}
-balance=${wallet[2]}
 echo account: $account
 echo privateKey: $privateKey
-echo balance: $balance ethers
 echo "--------------------------------------------------------------------------------"
 
-privateKey=$(echo $privateKey | sed 's/^0x//')
-echo "--------------------------------------------------------------------------------"
-echo $privateKey > $dir/key.prv
-geth account import --datadir $dir/miner/data --password $dir/password.txt $dir/key.prv
-geth --datadir $dir/miner/data init genesis.json
-echo "--------------------------------------------------------------------------------"
-
+false > $dir/out/verify.txt
 echo "--------------------------------------------------------------------------------"
 echo "verify start"
 echo "run in background"
 echo "write console to out/verify.txt"
-# nohup node main.js verify --account $account --privatekey $privateKey &> out/verify.txt &
+nohup node main.js verify --account $account --privatekey $privateKey &> $dir/out/verify.txt &
 echo "you can type 'tail -f out/verify.txt'"
 echo "--------------------------------------------------------------------------------"
 
@@ -34,4 +29,4 @@ echo "--------------------------------------------------------------------------
 # nohup node main.js validate --account $account --privatekey $privateKey &> out/validate.txt &
 # echo "you can type 'tail -f out/validate.txt'"
 # echo "--------------------------------------------------------------------------------"
-# tail -f normalStdout.txt
+tail -f normalStdout.txt

@@ -1,5 +1,3 @@
-const { resolveProperties } = require("@ethersproject/properties");
-
 class RecordTools {
     constructor(web3, account, privateKey, config) {
         this.web3 = web3;

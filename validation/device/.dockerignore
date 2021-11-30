@@ -1,3 +1,7 @@
 **/node_modules
 **/wallet_secrets.json
 **/out
+**/miner
+
+**/errStdErr.txt
+**/normalStdout.txt

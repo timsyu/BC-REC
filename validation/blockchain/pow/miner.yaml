@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: eth-testnet-miner3
+  name: eth-testnet-miner4
   namespace: recval
 spec:
   replicas: 1
@@ -14,7 +14,7 @@ spec:
         app: eth-testnet
     spec:
       containers:
-        - name: eth-testnet-miner3
+        - name: eth-testnet-miner4
           image: f221267155/eth-testnet:v1
           command:
             - "/bin/bash"
@@ -33,8 +33,6 @@ spec:
           ports:
             - containerPort: 8545
               name: rpc
-            - containerPort: 6060
-              name: metrics
             - containerPort: 30303
               name: discovery-tcp
               protocol: TCP

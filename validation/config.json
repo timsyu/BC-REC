@@ -3,7 +3,7 @@
         "platform": "go-ethereum",
         "consensus":"poa",
         "miner":{
-            "num": 4
+            "num": 3
         }
     },
     "distribution": {

@@ -1,11 +1,11 @@
 const Web3 = require("web3");
-const WalletTools = require("./walletTools");
+// const WalletTools = require("./walletTools");
 const DeviceVerificationTools = require("./deviceVerificationTools");
 const CertificateRequestTools = require("./certificateRequestTools");
 const ConfigTools = require("./configTools");
 const yargs = require('yargs');
 const schedule = require('node-schedule');
-
+const keythereum = require("keythereum");
 const { Console } = require("console");
 const fs = require("fs");
 const colors = require('colors/safe');
@@ -90,6 +90,18 @@ const argv = yargs
             description: 'init wallet and return account and privateKey',
             alias: 'i',
             type: 'boolean',
+        },
+        datadir: {
+            description: 'datadir',
+            type: 'string',
+        },
+        address: {
+            description: 'account address',
+            type: 'string',
+        },
+        password: {
+            description: 'account password',
+            type: 'string',
         }
     })
     .option('network', {
@@ -104,7 +116,7 @@ const argv = yargs
 main = async(argv) => {
     const config = new ConfigTools();
     if (argv.network) {
-        const web3 = new Web3(config.provider.twcc_besu);
+        const web3 = new Web3(config.provider.rpc);
         const network = await web3.eth.net.getNetworkType();
         console.log(network);
     }
@@ -112,42 +124,69 @@ main = async(argv) => {
         let account = argv.account;
         let privateKey = argv.privatekey;
         if (account && privateKey) {
-            const web3 = new Web3(config.provider.twcc_besu);
+            const web3 = new Web3(config.provider.rpc);
             let rule = new schedule.RecurrenceRule();
             rule.second = [0, 30]; // when sec is at 0, 10, 20, 30, 40 , 50,...
             let job = schedule.scheduleJob(rule, () => {
-                verify(web3, account, privateKey, config);
+                if(!web3.eth.isSyncing()) {
+                    verify(web3, account, privateKey, config);
+                } else {
+                    myLogger.log(new Date(), "validate", "Node is Syncing... ");
+                }
             });
         }
     } else if (argv._.includes('validate')) {
         let account = argv.account;
         let privateKey = argv.privatekey;
         if (account && privateKey) {
-            const web3 = new Web3(config.provider.twcc_besu);
+            const web3 = new Web3(config.provider.rpc);
             let rule = new schedule.RecurrenceRule();
             rule.second = [0, 30]; // when sec is at 0, 30,...
             let job = schedule.scheduleJob(rule, () => {
-                validate(web3, account, privateKey, config);
+                if(!web3.eth.isSyncing()) {
+                    validate(web3, account, privateKey, config);
+                } else {
+                    myLogger.log(new Date(), "validate", "Node is Syncing... ");
+                }
             });
         }
-    } else if (argv._.includes('wallet')) {
-        let init = argv.init;
-        if (init) {
-            // init wallet, account
-            const walletTools = new WalletTools();
-            const wallet = await walletTools.init();
-            const account = wallet.address;
-            const privateKey = wallet.privateKey;
-            console.log(account);
-            console.log(privateKey);
-            // get balance
-            const web3 = new Web3(config.provider.twcc_besu);
-            let balance = await web3.eth.getBalance(account);
-            balance = web3.utils.fromWei(balance, 'ether');
-            console.log(balance);
-            myLogger.log(new Date(), "account: ", account);
-            myLogger.log(new Date(), "privateKey: ", privateKey);
-            myLogger.log(new Date(), "balance: ", balance);
+    }
+    // else if (argv._.includes('wallet')) {
+    //     let init = argv.init;
+    //     if (init) {
+    //         // init wallet, account
+    //         const walletTools = new WalletTools();
+    //         const wallet = await walletTools.init();
+    //         const account = wallet.address;
+    //         const privateKey = wallet.privateKey;
+    //         console.log(account);
+    //         console.log(privateKey);
+    //         // get balance
+    //         const web3 = new Web3(config.provider.rpc);
+    //         let balance = await web3.eth.getBalance(account);
+    //         balance = web3.utils.fromWei(balance, 'ether');
+    //         console.log(balance);
+    //         myLogger.log(new Date(), "account: ", account);
+    //         myLogger.log(new Date(), "privateKey: ", privateKey);
+    //         myLogger.log(new Date(), "balance: ", balance);
+    //     }
+    // }
+    else if (argv._.includes('wallet')) {
+        let datadir = argv.datadir;
+        let address = argv.address;
+        let password = argv.password;
+        if (datadir && address && password) {
+            // generate account pvt
+            try {
+                let keyObject = keythereum.importFromFile(address, datadir);
+                let privateKey = keythereum.recover(password, keyObject);
+                console.log(address);
+                console.log('0x'+privateKey.toString('hex'));
+            } catch(err) {
+                myLogger.error(new Date(), err);
+            }
+
+            
         }
     }
 }

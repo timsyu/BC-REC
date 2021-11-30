@@ -1,14 +1,42 @@
 #! /bin/bash
 
+datadir=$1
+account=$2
+password=$3
 echo "--------------------------------------------------------------------------------"
 echo "init wallet"
-wallet=( $(node main.js wallet --init) )
+wallet=( $(node $dir/main.js wallet --datadir $datadir --address $account --password $password) )
 account=${wallet[0]}
 privateKey=${wallet[1]}
-balance=${wallet[2]}
 echo account: $account
 echo privateKey: $privateKey
-echo balance: $balance ethers
+echo "--------------------------------------------------------------------------------"
+
+echo "--------------------------------------------------------------------------------"
+echo "Ask issuer Pod orgManager, issuer, nht contract address"
+host_var=ISSUER_DAPP_SERVICE_SERVICE_HOST
+host="${!host_var}"
+port_var=ISSUER_DAPP_SERVICE_SERVICE_PORT_DISCOVERY_TCP
+port="${!port_var}"
+echo $host
+echo $port
+while true
+do
+    result=`curl -s http://$host:$port/ask/contract/address`
+    success=$(jq -r '.success' <<< $result)
+    echo success: $success
+    if [[ $success == true ]];
+    then
+        orgManager=$(jq -r '.orgManager' <<< $result)
+        issuer=$(jq -r '.issuer' <<< $result)
+        nft=$(jq -r '.nft' <<< $result)
+        echo orgManager address: $orgManager
+        echo issuer address: $issuer
+        echo nft address: $nft
+        break
+    fi
+    sleep 5
+done
 echo "--------------------------------------------------------------------------------"
 
 echo "--------------------------------------------------------------------------------"

@@ -26,35 +26,35 @@ filename=$1
 count=$(jq -r '.count' $filename)
 echo $count
 
-echo "create org Pod and Org Service"
-for (( i=0; i<$count; i++))
-do
-    data=$(jq -r .data["${i}"] $filename)
-    # echo $data
-    name=org$(jq -r '.name' <<< $data)
-    num=$(jq -r '.num' <<< $data)
-    echo $name
-    echo $num
-    bash "${dir}"/org/start.sh $name $num $namespace
-    # sleep 1.5
-done
-sleep 2
+# echo "create org Pod and Org Service"
+# for (( i=0; i<$count; i++))
+# do
+#     data=$(jq -r .data["${i}"] $filename)
+#     # echo $data
+#     name=org$(jq -r '.name' <<< $data)
+#     num=$(jq -r '.num' <<< $data)
+#     echo $name
+#     echo $num
+#     bash "${dir}"/org/start.sh $name $num $namespace
+#     # sleep 1.5
+# done
+# sleep 2
 
-filename2=$2
-count=$(jq -r '.count' $filename2)
-echo $count
-echo "create device Pod"
-for (( i=0; i<$count; i++))
-do
-    data=$(jq -r .data["${i}"] $filename2)
-    # echo $data
-    name=device$(jq -r '.name' <<< $data)
-    orgId=$(jq -r '.orgId' <<< $data)
-    echo $name
-    echo $orgId
-    bash "${dir}"/device/start.sh $name $orgId $namespace
-    # sleep 1.5
-done
+# filename2=$2
+# count=$(jq -r '.count' $filename2)
+# echo $count
+# echo "create device Pod"
+# for (( i=0; i<$count; i++))
+# do
+#     data=$(jq -r .data["${i}"] $filename2)
+#     # echo $data
+#     name=device$(jq -r '.name' <<< $data)
+#     orgId=$(jq -r '.orgId' <<< $data)
+#     echo $name
+#     echo $orgId
+#     bash "${dir}"/device/start.sh $name $orgId $namespace
+#     # sleep 1.5
+# done
 
 echo "create issuer Pod"
 bash "${dir}"/issuer/start.sh $namespace

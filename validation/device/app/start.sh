@@ -1,14 +1,15 @@
 #! /bin/bash
 
+datadir=$1
+account=$2
+password=$3
 echo "--------------------------------------------------------------------------------"
 echo "init wallet"
-wallet=( $(node main.js wallet --init) )
+wallet=( $(node $dir/main.js wallet --datadir $datadir --address $account --password $password) )
 account=${wallet[0]}
 privateKey=${wallet[1]}
-balance=${wallet[2]}
 echo account: $account
 echo privateKey: $privateKey
-echo balance: $balance ethers
 echo "--------------------------------------------------------------------------------"
 
 echo "--------------------------------------------------------------------------------"

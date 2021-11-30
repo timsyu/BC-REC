@@ -60,5 +60,5 @@ echo filename2: $filename2
 # filename2=org_device_distri.json
 
 # chmod +rw $dir/start.sh
-# bash $dir/start.sh $filename $filename2 $namespace
+bash $dir/start.sh $filename $filename2 $namespace
 
