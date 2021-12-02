@@ -57,6 +57,13 @@ spec:
         - name: org-node
           image: f221267155/eth-testnet:v1
           imagePullPolicy: Never
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "800m"
+            limits:
+              memory: "1024Mi"
+              cpu: "1.5"
           command:
             - "/bin/bash"
           args:
