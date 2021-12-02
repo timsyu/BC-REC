@@ -51,6 +51,16 @@ do
 done
 echo "--------------------------------------------------------------------------------"
 
+while true
+do
+    block=$(geth attach http://127.0.0.1:8545 -exec "eth.getBlock('2')");
+    if [[ $block != null ]];
+    then 
+        echo "maybe interact with blockchain";
+        break
+    fi
+done
+
 echo "--------------------------------------------------------------------------------"
 echo "create org"
 orgName=$ORG_NAME

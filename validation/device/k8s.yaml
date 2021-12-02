@@ -19,11 +19,11 @@ spec:
           imagePullPolicy: Never
           resources:
             requests:
+              cpu: "400m"
               memory: "512Mi"
-              cpu: "800m"
             limits:
+              cpu: "500m"
               memory: "1024Mi"
-              cpu: "1.5"
           env:
             - name: TARGET_ORG
               value: "3"
