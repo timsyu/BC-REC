@@ -1,8 +1,9 @@
 const Web3 = require("web3");
 // const WalletTools = require("./walletTools");
-const DeviceVerificationTools = require("./deviceVerificationTools");
-const CertificateRequestTools = require("./certificateRequestTools");
-const ConfigTools = require("./configTools");
+const DeviceVerificationTools = require(`${__dirname}/deviceVerificationTools`);
+const CertificateRequestTools = require(`${__dirname}/certificateRequestTools`);
+const DeployContractTools = require(`${__dirname}/deployContractTools`);
+const ConfigTools = require(`${__dirname}/configTools`);
 const yargs = require('yargs');
 const schedule = require('node-schedule');
 const keythereum = require("keythereum");
@@ -22,8 +23,8 @@ colors.setTheme({
 
 // make a new logger
 const myLogger = new Console({
-    stdout: fs.createWriteStream("normalStdout.txt"),
-    stderr: fs.createWriteStream("errStdErr.txt"),
+    stdout: fs.createWriteStream(`${__dirname}/out/normalStdout.txt`),
+    stderr: fs.createWriteStream(`${__dirname}/out/errStdErr.txt`),
 });
 
 // Approve all device verification
@@ -60,6 +61,23 @@ validate = async(web3, account, privateKey, config) => {
     }
 }
 
+// deploy orgManager, issuer(include nft) contract
+deploy = async(web3, account, privateKey, config) => {
+    // console.log("---deploy smart contracts---");
+    const deployContractTools = new DeployContractTools(web3, account, privateKey, config);
+    let {success, orgManagerAddress, issuerAddress, nftAddress} = await deployContractTools.deploy();
+    myLogger.log(new Date(), "deploy contracts", success);
+    if(success) {
+        myLogger.log(new Date(), "deploy orgManager contract:", orgManagerAddress);
+        myLogger.log(new Date(), "deploy issuer contract:", issuerAddress);
+        myLogger.log(new Date(), "deploy nft contract:", nftAddress);
+    }
+    console.log(success);
+    console.log(orgManagerAddress);
+    console.log(issuerAddress);
+    console.log(nftAddress);
+}
+
 const argv = yargs
     .command('verify', 'register device', {
         account: {
@@ -74,6 +92,18 @@ const argv = yargs
         }
     })
     .command('validate', 'record power', {
+        account: {
+            description: 'account address',
+            alias: 'a',
+            type: 'string',
+        },
+        privatekey: {
+            description: 'account private key',
+            alias: 'pvtkey',
+            type: 'string',
+        }
+    })
+    .command('deploy', 'deploy smart contract', {
         account: {
             description: 'account address',
             alias: 'a',
@@ -128,11 +158,7 @@ main = async(argv) => {
             let rule = new schedule.RecurrenceRule();
             rule.second = [0, 30]; // when sec is at 0, 10, 20, 30, 40 , 50,...
             let job = schedule.scheduleJob(rule, () => {
-                if(!web3.eth.isSyncing()) {
-                    verify(web3, account, privateKey, config);
-                } else {
-                    myLogger.log(new Date(), "validate", "Node is Syncing... ");
-                }
+                verify(web3, account, privateKey, config);
             });
         }
     } else if (argv._.includes('validate')) {
@@ -143,12 +169,15 @@ main = async(argv) => {
             let rule = new schedule.RecurrenceRule();
             rule.second = [0, 30]; // when sec is at 0, 30,...
             let job = schedule.scheduleJob(rule, () => {
-                if(!web3.eth.isSyncing()) {
-                    validate(web3, account, privateKey, config);
-                } else {
-                    myLogger.log(new Date(), "validate", "Node is Syncing... ");
-                }
+                validate(web3, account, privateKey, config);
             });
+        }
+    } else if (argv._.includes('deploy')) {
+        let account = argv.account;
+        let privateKey = argv.privatekey;
+        if (account && privateKey) {
+            const web3 = new Web3(config.provider.rpc);
+            deploy(web3, account, privateKey, config);
         }
     }
     // else if (argv._.includes('wallet')) {

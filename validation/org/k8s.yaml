@@ -15,7 +15,47 @@ spec:
     spec:
       containers:
         - name: org-dapp
-          image: f221267155/orgdapp:v1
+          image: f221267155/orgdapp:v2
+          imagePullPolicy: Never
+          command:
+            - "/bin/bash"
+          env:
+            - name: ORG_NAME
+              value: "org3-name"
+            - name: ORG_DESC
+              value: "org3-desc"
+            - name: PLANT_NUM
+              value: "2"
+          args:
+            - -c
+            - |
+              rpc=http://127.0.0.1:8545
+              ws_rpc=http://127.0.0.1:8546
+              v=$(jq ".rpc=\"$rpc\" | .ws_rpc=\"$ws_rpc\"" /app/resource/provider.json)
+              echo $v > /app/resource/provider.json
+              while true
+              do
+                isSyncing=$(geth attach http://127.0.0.1:8545 -exec "eth.syncing")
+                echo node isSyncing: $isSyncing
+                if [[ $isSyncing == false ]];
+                then
+                  echo node is fully synced with other nodes!!
+                  break
+                fi
+                sleep 5
+              done
+              datadir=/ethereum
+              filename=$(basename /ethereum/keystore/*)
+              account=0x$(jq -r '.address' /ethereum/keystore/$filename)
+              password=$(cat /opt/password/password.txt)
+              bash /app/start.sh $datadir $account $password
+          volumeMounts:
+            - name: chaindata
+              mountPath: "/ethereum"
+            - name: password
+              mountPath: "/opt/password"
+        - name: org-node
+          image: f221267155/eth-testnet:v1
           imagePullPolicy: Never
           command:
             - "/bin/bash"
@@ -24,16 +64,8 @@ spec:
             - |
               filename=$(basename /ethereum/keystore/*)
               account=0x$(jq -r '.address' /ethereum/keystore/$filename)
-              nohup geth --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@$(BOOTNODE_SERVICE_HOST):30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545  --http.api 'admin,eth,net,web3,personal,miner' --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins '*' --ws.api 'eth,net,web3' --nousb --allow-insecure-unlock --mine --miner.threads=2 &
-              password=$(cat /opt/password/password.txt)
-              bash /app/start.sh /ethereum $account $password
+              geth --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@$(BOOTNODE_SERVICE_HOST):30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545  --http.api 'admin,eth,net,web3,personal,miner' --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins '*' --ws.api 'eth,net,web3' --nousb --allow-insecure-unlock
           env:
-            - name: ORG_NAME
-              value: "org3-name"
-            - name: ORG_DESC
-              value: "org3-desc"
-            - name: PLANT_NUM
-              value: "2"
             - name: NETWORK_ID
               valueFrom:
                 configMapKeyRef:
@@ -56,8 +88,6 @@ spec:
             - name: genesis
               mountPath: "/opt/genesis"
               readOnly: true
-            - name: contract
-              mountPath: "/opt/contract"
               readOnly: true
             - name: password
               mountPath: "/opt/password"
@@ -90,9 +120,6 @@ spec:
         - name: genesis
           configMap:
             name: genesis1
-        - name: contract
-          configMap:
-            name: contract
         - name: chaindata
           emptyDir: {}
         - name: password

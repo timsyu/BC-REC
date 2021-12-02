@@ -27,11 +27,15 @@ app.get("/ask/contract/address", async function(req, res) {
     let issuer = '';
     let nft = '';
     try {
-        let data = await fs.readFileSync('./out/contractAddress.json', 'utf-8');
-        let contractAddress = JSON.parse(data);
-        orgManager = contractAddress.orgManager;
-        issuer = contractAddress.issuer;
-        nft = contractAddress.nft;
+        let orgManagerJson = await fs.readFileSync(`${__dirname}/resource/orgManager.json`, 'utf-8');
+        let issuerJson = await fs.readFileSync(`${__dirname}/resource/issuer.json`, 'utf-8');
+        let nftJson = await fs.readFileSync(`${__dirname}/resource/nft.json`, 'utf-8');
+        let orgManagerObj = JSON.parse(orgManagerJson);
+        let issuerObj = JSON.parse(issuerJson);
+        let nftObj = JSON.parse(nftJson);
+        orgManager = orgManagerObj.address;
+        issuer = issuerObj.address;
+        nft = nftObj.address;
         if (orgManager && issuer && nft) {
             result = true;
         } else {
@@ -40,7 +44,7 @@ app.get("/ask/contract/address", async function(req, res) {
             nft = '';
         }
     } catch (error) {
-        console.log("contractAddress.json is not exist!!");
+        console.log("json files are not exist!!");
     }
     // return result
     res.json({

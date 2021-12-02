@@ -1,8 +1,8 @@
 const Web3 = require("web3");
 // const WalletTools = require("./walletTools");
-const RecordTools = require("./recordTools");
-const RegisterTools = require("./registerTools");
-const ConfigTools = require("./configTools");
+const RecordTools = require(`${__dirname}/recordTools`);
+const RegisterTools = require(`${__dirname}/registerTools`);
+const ConfigTools = require(`${__dirname}/configTools`);
 const yargs = require('yargs');
 const schedule = require('node-schedule');
 const keythereum = require("keythereum");
@@ -22,8 +22,8 @@ colors.setTheme({
 
 // make a new logger
 const myLogger = new Console({
-    stdout: fs.createWriteStream("normalStdout.txt"),
-    stderr: fs.createWriteStream("errStdErr.txt"),
+    stdout: fs.createWriteStream(`${__dirname}/out/normalStdout.txt`),
+    stderr: fs.createWriteStream(`${__dirname}/out/errStdErr.txt`),
 });
 
 register = async(web3, account, privateKey, config, orgAddress, plantAddress) => {
@@ -171,11 +171,7 @@ main = async(argv) => {
         let orgAddress = argv.org;
         let plantAddress = argv.plant;
         if (account && privateKey && orgAddress && plantAddress) {
-            if(!web3.eth.isSyncing()) {
-                register(web3, account, privateKey, config, orgAddress, plantAddress);
-            } else {
-                myLogger.log(new Date(), "validate", "Node is Syncing... ");
-            }
+            register(web3, account, privateKey, config, orgAddress, plantAddress);
         }
     } else if (argv._.includes('record')) {
         let account = argv.account;
@@ -188,11 +184,7 @@ main = async(argv) => {
             rule.second = [0, 30]; // when sec is at 0, 30,...
             let job = schedule.scheduleJob(rule, () => {
                 // console.log(new Date());
-                if(!web3.eth.isSyncing()) {
-                    record(web3, account, privateKey, config, plantAddress, value);
-                } else {
-                    myLogger.log(new Date(), "validate", "Node is Syncing... ");
-                }
+                record(web3, account, privateKey, config, plantAddress, value);
             });
         }
     }

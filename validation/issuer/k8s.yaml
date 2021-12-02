@@ -7,11 +7,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: issuer-dapp
+      app: issuer-dapp-service
   template:
     metadata:
       labels:
-        app: issuer-dapp
+        app: issuer-dapp-service
     spec:
       containers:
         - name: issuer-dapp
@@ -22,11 +22,42 @@ spec:
           args:
             - -c
             - |
+              rpc=http://127.0.0.1:8545
+              v=$(jq ".rpc=\"$rpc\"" /app/resource/provider.json)
+              echo $v > /app/resource/provider.json
+              while true
+              do
+                isSyncing=$(geth attach http://127.0.0.1:8545 -exec "eth.syncing")
+                echo node isSyncing: $isSyncing
+                if [[ $isSyncing == false ]];
+                then
+                  echo node is fully synced with other nodes!!
+                  break
+                fi
+                sleep 5
+              done
+              datadir=/ethereum
               filename=$(basename /ethereum/keystore/*)
               account=0x$(jq -r '.address' /ethereum/keystore/$filename)
-              nohup geth --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@$(BOOTNODE_SERVICE_HOST):30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock --mine --miner.threads=2 &
               password=$(cat /opt/password/password.txt)
-              bash /app/start.sh /ethereum $account $password
+              bash /app/start.sh $datadir $account $password
+          volumeMounts:
+            - name: chaindata
+              mountPath: "/ethereum"
+            - name: password
+              mountPath: "/opt/password"
+        - name: issuer-node
+          image: f221267155/eth-testnet:v1
+          imagePullPolicy: Never
+          command:
+            - "/bin/bash"
+          args:
+            - -c
+            - |
+              filename=$(basename /ethereum/keystore/*)
+              account=0x$(jq -r '.address' /ethereum/keystore/$filename)
+
+              geth --mine --miner.threads=1 --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@$(BOOTNODE_SERVICE_HOST):30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock
           env:
             - name: NETWORK_ID
               valueFrom:
@@ -48,9 +79,6 @@ spec:
               mountPath: "/ethereum"
             - name: genesis
               mountPath: "/opt/genesis"
-              readOnly: true
-            - name: contract
-              mountPath: "/opt/contract"
               readOnly: true
             - name: password
               mountPath: "/opt/password"
@@ -83,9 +111,6 @@ spec:
         - name: genesis
           configMap:
             name: genesis1
-        - name: contract
-          configMap:
-            name: contract
         - name: chaindata
           emptyDir: {}
         - name: password

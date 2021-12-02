@@ -1,6 +1,6 @@
-const Provider = require('./resource/provider.json');
-const Org = require('./resource/org.json');
-const Plant = require('./resource/plant.json');
+const Provider = require(`${__dirname}/resource/provider.json`);
+const Org = require(`${__dirname}/resource/org.json`);
+const Plant = require(`${__dirname}/resource/plant.json`);
 
 class ConfigTools {
     constructor() {

@@ -26,10 +26,10 @@ app.get("/ask/register/address", async function(req, res) {
     let orgAddress = '';
     let plantAddress = '';
     try {
-        let odata = await fs.readFileSync('./out/org.txt', 'utf-8')
+        let odata = await fs.readFileSync(`${__dirname}/out/org.txt`, 'utf-8')
                             .split('\n');
         orgAddress = odata[0];
-        let pdatas = await fs.readFileSync('./out/plants.txt', 'utf-8')
+        let pdatas = await fs.readFileSync(`${__dirname}/out/plants.txt`, 'utf-8')
                             .split('\n')
                             .filter(Boolean);
         plantAddress = pdatas[Math.floor(Math.random() * pdatas.length)];

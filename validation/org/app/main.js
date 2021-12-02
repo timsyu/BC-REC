@@ -1,8 +1,8 @@
 const Web3 = require("web3");
 // const WalletTools = require("./walletTools");
-const OrgTools = require("./orgTools");
-const ConfigTools = require("./configTools");
-const CertificateTools = require("./certificateTools")
+const OrgTools = require(`${__dirname}/orgTools`);
+const ConfigTools = require(`${__dirname}/configTools`);
+const CertificateTools = require(`${__dirname}/certificateTools`);
 const yargs = require('yargs');
 const schedule = require('node-schedule');
 const keythereum = require("keythereum");
@@ -22,8 +22,8 @@ colors.setTheme({
 
 // make a new logger
 const myLogger = new Console({
-    stdout: fs.createWriteStream("normalStdout.txt"),
-    stderr: fs.createWriteStream("errStdErr.txt"),
+    stdout: fs.createWriteStream(`${__dirname}/out/normalStdout.txt`),
+    stderr: fs.createWriteStream(`${__dirname}/out/errStdErr.txt`),
 });
 
 createOrg = async(web3, account, privateKey, config, orgName, orgDescriptsion) => {
@@ -312,11 +312,7 @@ main = async(argv) => {
         let orgDescriptsion = argv.desc;
         if (account && privateKey && orgName && orgDescriptsion) {
             const web3 = new Web3(config.provider.rpc);
-            if(!web3.eth.isSyncing()) {
-                createOrg(web3, account, privateKey, config, orgName, orgDescriptsion);
-            } else {
-                myLogger.log(new Date(), "validate", "Node is Syncing... ");
-            }
+            createOrg(web3, account, privateKey, config, orgName, orgDescriptsion);
         }
     } else if (argv._.includes('createplant')) { // createPlant
         let account = argv.account;
@@ -326,11 +322,7 @@ main = async(argv) => {
         let plantDescriptsion = argv.desc;
         if (account && privateKey && orgAddress && plantName && plantDescriptsion) {
             const web3 = new Web3(config.provider.rpc);
-            if(!web3.eth.isSyncing()) {
-                createPlant(web3, account, privateKey, config, orgAddress, plantName, plantDescriptsion);
-            } else {
-                myLogger.log(new Date(), "validate", "Node is Syncing... ");
-            }
+            createPlant(web3, account, privateKey, config, orgAddress, plantName, plantDescriptsion);
         }
     } else if (argv._.includes('autoapprove')) { // approveDeviceRegister
         let account = argv.account;
@@ -342,11 +334,7 @@ main = async(argv) => {
             rule.second = [0, 30]; // when sec is at 0, 30,...
             let job = schedule.scheduleJob(rule, () => {
                 console.log(new Date(),"autoapprove");
-                if(!web3.eth.isSyncing()) {
-                    approveDeviceRegister(web3, account, privateKey, config, orgAddress);
-                } else {
-                    myLogger.log(new Date(), "validate", "Node is Syncing... ");
-                }
+                approveDeviceRegister(web3, account, privateKey, config, orgAddress);
             });
         }
     } else if (argv._.includes('autoreqdevice')) { // requestDeviceVerification
@@ -359,11 +347,7 @@ main = async(argv) => {
             rule.second = [0, 10, 20 ,30, 40, 50]; // when sec is at 0, 30,...
             let job = schedule.scheduleJob(rule, () => {
                 console.log(new Date(),"autoreqdevice");
-                if(!web3.eth.isSyncing()) {
-                    requestDeviceVerification(web3, account, privateKey, config, orgAddress);
-                } else {
-                    myLogger.log(new Date(), "validate", "Node is Syncing... ");
-                }
+                requestDeviceVerification(web3, account, privateKey, config, orgAddress);
             });
         }
     } else if (argv._.includes('autoreqcert')) { // requestCertificate
@@ -378,11 +362,7 @@ main = async(argv) => {
             let job = schedule.scheduleJob(rule, () => {
                 // console.log(new Date());
                 let metadataUri = "metadataUri";
-                if(!web3.eth.isSyncing()) {
-                    requestCertificate(web3, account, privateKey, config, orgAddress, metadataUri);
-                } else {
-                    myLogger.log(new Date(), "validate", "Node is Syncing... ");
-                }
+                requestCertificate(web3, account, privateKey, config, orgAddress, metadataUri);
             });
         }
     } else if (argv._.includes('autoreducepower')) { // reducePower
@@ -396,11 +376,7 @@ main = async(argv) => {
             // rule.second = [50]; // when sec is at 50,...
             // let job = schedule.scheduleJob(rule, () => {
                 // console.log(new Date());
-                if(!web3.eth.isSyncing()) {
-                    reducePower(web3, account, privateKey, config, orgAddress);
-                } else {
-                    myLogger.log(new Date(), "validate", "Node is Syncing... ");
-                }
+                reducePower(web3, account, privateKey, config, orgAddress);
             // });
         }
     }

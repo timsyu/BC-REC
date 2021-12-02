@@ -25,7 +25,7 @@ class OrgTools {
             value: `0x0`,
             to: orgManager.address,
             data: dataAbi,
-            gasLimit: `0x${new BN("5000000").toString(16)}`,
+            gasLimit: `0x${new BN("4700000").toString(16)}`,
             gasPrice: `0x${new BN(gasPrice).toString(16)}`
         }, this.privateKey);
 
@@ -52,7 +52,7 @@ class OrgTools {
             value: `0x0`,
             to: orgAddress,
             data: dataAbi,
-            gasLimit: `0x${new BN("5000000").toString(16)}`,
+            gasLimit: `0x${new BN("4700000").toString(16)}`,
             gasPrice: `0x${new BN(gasPrice).toString(16)}`
         }, this.privateKey);
 
@@ -90,7 +90,7 @@ class OrgTools {
             value: `0x0`,
             to: orgAddress,
             data: dataAbi,
-            gasLimit: `0x${new BN("5000000").toString(16)}`,
+            gasLimit: `0x${new BN("4700000").toString(16)}`,
             gasPrice: `0x${new BN(gasPrice).toString(16)}`
         }, this.privateKey);
 
@@ -208,7 +208,7 @@ class OrgTools {
             value: `0x0`,
             to: orgAddress,
             data: dataAbi,
-            gasLimit: `0x${new BN("5000000").toString(16)}`,
+            gasLimit: `0x${new BN("4700000").toString(16)}`,
             gasPrice: `0x${new BN(gasPrice).toString(16)}`
         }, this.privateKey);
 
@@ -233,7 +233,7 @@ class OrgTools {
             value: `0x0`,
             to: orgAddress,
             data: dataAbi,
-            gasLimit: `0x${new BN("5000000").toString(16)}`,
+            gasLimit: `0x${new BN("4700000").toString(16)}`,
             gasPrice: `0x${new BN(gasPrice).toString(16)}`
         }, this.privateKey);
 
@@ -258,7 +258,7 @@ class OrgTools {
             value: `0x0`,
             to: orgAddress,
             data: dataAbi,
-            gasLimit: `0x${new BN("5000000").toString(16)}`,
+            gasLimit: `0x${new BN("4700000").toString(16)}`,
             gasPrice: `0x${new BN(gasPrice).toString(16)}`
         }, this.privateKey);
 
@@ -299,7 +299,7 @@ class OrgTools {
             value: `0x0`,
             to: orgAddress,
             data: dataAbi,
-            gasLimit: `0x${new BN("5000000").toString(16)}`,
+            gasLimit: `0x${new BN("4700000").toString(16)}`,
             gasPrice: `0x${new BN(gasPrice).toString(16)}`
         }, this.privateKey);
 

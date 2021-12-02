@@ -1,8 +1,10 @@
 #! /bin/bash
+dir=$(dirname "$0")
 
 datadir=$1
 account=$2
 password=$3
+false > $dir/out/normalStdout.txt
 echo "--------------------------------------------------------------------------------"
 echo "init wallet"
 wallet=( $(node $dir/main.js wallet --datadir $datadir --address $account --password $password) )
@@ -39,7 +41,7 @@ echo "--------------------------------------------------------------------------
 
 echo "--------------------------------------------------------------------------------"
 echo "device register"
-result=( $(node main.js register --account $account --privatekey $privateKey --org $orgAddress --plant $plantAddress) )
+result=( $(node $dir/main.js register --account $account --privatekey $privateKey --org $orgAddress --plant $plantAddress) )
 isRegistered=${result[0]}
 txHash=${result[1]}
 echo isRegistered: $isRegistered
@@ -49,8 +51,9 @@ echo "--------------------------------------------------------------------------
 echo "--------------------------------------------------------------------------------"
 echo "device record"
 echo "run in the background"
-echo "write console to out/record.txt"
-nohup node main.js record --account $account --privatekey $privateKey --plant $plantAddress &> out/record.txt &
-echo "you can type 'tail -f out/record.txt'"
+echo "write console to $dir/out/record.txt"
+nohup node $dir/main.js record --account $account --privatekey $privateKey --plant $plantAddress &> $dir/out/record.txt &
+echo "you can type 'tail -f $dir/out/record.txt'"
 echo "--------------------------------------------------------------------------------"
-tail -f normalStdout.txt
+echo "'tail -f $dir/out/normalStdout.txt'"
+tail -f $dir/out/normalStdout.txt

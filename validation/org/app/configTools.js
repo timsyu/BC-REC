@@ -1,9 +1,9 @@
-const Provider = require('./resource/provider.json');
-const OrgManager = require('./resource/orgManager.json');
-const Org = require('./resource/org.json');
-const Plant = require('./resource/plant.json');
-const Issuer = require('./resource/issuer.json');
-const Token = require('./resource/token.json');
+const Provider = require(`${__dirname}/resource/provider.json`);
+const OrgManager = require(`${__dirname}/resource/orgManager.json`);
+const Org = require(`${__dirname}/resource/org.json`);
+const Plant = require(`${__dirname}/resource/plant.json`);
+const Issuer = require(`${__dirname}/resource/issuer.json`);
+const Token = require(`${__dirname}/resource/token.json`);
 
 class ConfigTools {
     constructor() {
