@@ -64,13 +64,17 @@ spec:
             - |
               filename=$(basename /ethereum/keystore/*)
               account=0x$(jq -r '.address' /ethereum/keystore/$filename)
-              geth --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@$(BOOTNODE_SERVICE_HOST):30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545  --http.api 'admin,eth,net,web3,personal,miner' --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins '*' --ws.api 'eth,net,web3' --nousb --allow-insecure-unlock
+              geth --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@$(BOOTNODE_SERVICE_HOST):30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr $MY_POD_IP --http.port 8545  --http.api 'admin,eth,net,web3,personal,miner' --ws --ws.addr $MY_POD_IP --ws.port 8546 --ws.origins '*' --ws.api 'eth,net,web3' --nousb --allow-insecure-unlock
           env:
             - name: NETWORK_ID
               valueFrom:
                 configMapKeyRef:
                   name: genesis1
                   key: networkid
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           ports:
             - containerPort: 8545
               name: rpc
