@@ -17,10 +17,6 @@ spec:
         - name: device-node
           image: f221267155/eth-testnet:v1
           imagePullPolicy: Never
-          resources:
-            limits:
-              cpu: "500m"
-              memory: "1024Mi"
           env:
             - name: TARGET_ORG
               value: "3"
