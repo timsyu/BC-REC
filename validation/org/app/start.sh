@@ -21,7 +21,7 @@ echo "--------------------------------------------------------------------------
 echo "Ask issuer Pod orgManager, issuer, nht contract address"
 host_var=ISSUER_DAPP_SERVICE_SERVICE_HOST
 host="${!host_var}"
-port_var=ISSUER_DAPP_SERVICE_SERVICE_PORT_DISCOVERY_TCP
+port_var=ISSUER_DAPP_SERVICE_SERVICE_PORT_MY_SERVER_TCP
 port="${!port_var}"
 echo $host
 echo $port
