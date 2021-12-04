@@ -18,7 +18,7 @@ echo "--------------------------------------------------------------------------
 echo "Ask org address and plant address"
 host_var=ORG${TARGET_ORG}_DAPP_SERVICE_SERVICE_HOST
 host="${!host_var}"
-port_var=ORG${TARGET_ORG}_DAPP_SERVICE_SERVICE_PORT_DISCOVERY_TCP
+port_var=ORG${TARGET_ORG}_DAPP_SERVICE_SERVICE_PORT_MY_SERVER_TCP
 port="${!port_var}"
 echo $host
 echo $port

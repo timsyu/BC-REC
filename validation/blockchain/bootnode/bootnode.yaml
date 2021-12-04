@@ -22,7 +22,7 @@ spec:
         - "/bin/bash"
         - -c
         - |
-          bootnode --nodekey=/opt/bootnode/boot.key
+          bootnode --verbosity 9 --nodekey=/opt/bootnode/boot.key
         imagePullPolicy: Never
         ports: 
         - containerPort: 30303
@@ -49,6 +49,7 @@ metadata:
   name: bootnode
   namespace: recval
 spec:
+  type: ClusterIP
   selector:
     component: bootnode
   ports:

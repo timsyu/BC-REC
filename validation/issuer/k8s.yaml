@@ -41,6 +41,9 @@ spec:
               account=0x$(jq -r '.address' /ethereum/keystore/$filename)
               password=$(cat /opt/password/password.txt)
               bash /app/start.sh $datadir $account $password
+          ports:
+            - containerPort: 3000
+              name: my-server-tcp
           volumeMounts:
             - name: chaindata
               mountPath: "/ethereum"
@@ -56,8 +59,7 @@ spec:
             - |
               filename=$(basename /ethereum/keystore/*)
               account=0x$(jq -r '.address' /ethereum/keystore/$filename)
-
-              geth --mine --miner.threads=1 --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@$(BOOTNODE_SERVICE_HOST):30301 --nodiscover --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock
+              geth --mine --miner.threads=1 --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@172.17.0.5:30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock
           env:
             - name: NETWORK_ID
               valueFrom:
@@ -126,11 +128,19 @@ metadata:
   name: issuer-dapp-service
   namespace: recval
 spec:
-  type: NodePort
+  # type: NodePort
   selector:
     app: issuer-dapp-service
   ports:
     - port: 3000
       targetPort: 3000
+      name: my-server-tcp
+      protocol: TCP
+    - port: 30303
+      targetPort: 30303
       name: discovery-tcp
       protocol: TCP
+    - port: 30303
+      targetPort: 30303
+      name: discovery-udp
+      protocol: UDP
