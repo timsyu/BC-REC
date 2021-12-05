@@ -59,7 +59,7 @@ spec:
             - |
               filename=$(basename /ethereum/keystore/*)
               account=0x$(jq -r '.address' /ethereum/keystore/$filename)
-              geth --mine --miner.threads=1 --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@172.17.0.5:30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock
+              geth --mine --miner.threads=1 --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@172.17.0.7:30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock
           env:
             - name: NETWORK_ID
               valueFrom:

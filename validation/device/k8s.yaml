@@ -14,49 +14,12 @@ spec:
         app: device5-dapp
     spec:
       containers:
-        - name: device-node
-          image: f221267155/eth-testnet:v1
+        - name: device-dapp
+          image: f221267155/devicedapp:v2
           imagePullPolicy: Never
           env:
             - name: TARGET_ORG
               value: "3"
-            - name: NETWORK_ID
-              valueFrom:
-                configMapKeyRef:
-                  name: genesis1
-                  key: networkid
-          command:
-            - "/bin/bash"
-          args:
-            - -c
-            - |
-              filename=$(basename /ethereum/keystore/*)
-              account=0x$(jq -r '.address' /ethereum/keystore/$filename)
-              geth --miner.gasprice=0 --syncmode "light" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@172.17.0.5:30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock
-          ports:
-            - containerPort: 8545
-              name: rpc
-            - containerPort: 30303
-              name: discovery-tcp
-              protocol: TCP
-            - containerPort: 30303
-              name: discovery-udp
-              protocol: UDP
-          volumeMounts:
-            - name: chaindata
-              mountPath: "/ethereum"
-            - name: genesis
-              mountPath: "/opt/genesis"
-              readOnly: true
-            - name: password
-              mountPath: "/opt/password"
-              readOnly: true
-            - name: bootkey
-              mountPath: "/opt/bootnode"
-              readOnly: true
-        - name: device-dapp
-          image: f221267155/devicedapp:v2
-          imagePullPolicy: Never
           command:
             - "/bin/bash"
           args:
@@ -87,6 +50,44 @@ spec:
               mountPath: "/ethereum"
             - name: password
               mountPath: "/opt/password"
+        - name: device-node
+          image: f221267155/eth-testnet:v1
+          imagePullPolicy: Never
+          env:
+            - name: NETWORK_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: genesis1
+                  key: networkid
+          command:
+            - "/bin/bash"
+          args:
+            - -c
+            - |
+              filename=$(basename /ethereum/keystore/*)
+              account=0x$(jq -r '.address' /ethereum/keystore/$filename)
+              geth --miner.gasprice=0 --syncmode "snap" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@172.17.0.7:30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock
+          ports:
+            - containerPort: 8545
+              name: rpc
+            - containerPort: 30303
+              name: discovery-tcp
+              protocol: TCP
+            - containerPort: 30303
+              name: discovery-udp
+              protocol: UDP
+          volumeMounts:
+            - name: chaindata
+              mountPath: "/ethereum"
+            - name: genesis
+              mountPath: "/opt/genesis"
+              readOnly: true
+            - name: password
+              mountPath: "/opt/password"
+              readOnly: true
+            - name: bootkey
+              mountPath: "/opt/bootnode"
+              readOnly: true
       initContainers:
         - name: init
           image: f221267155/eth-testnet:v1

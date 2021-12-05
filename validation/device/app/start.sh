@@ -4,6 +4,9 @@ dir=$(dirname "$0")
 datadir=$1
 account=$2
 password=$3
+echo $datadir
+echo $account
+echo $password
 false > $dir/out/normalStdout.txt
 echo "--------------------------------------------------------------------------------"
 echo "init wallet"
