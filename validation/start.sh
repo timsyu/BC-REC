@@ -2,6 +2,7 @@
 
 dir=$(dirname "$0")
 namespace=$3
+orgIsMiner=$4
 
 # create org device file and permissions
 # create files
@@ -38,7 +39,7 @@ do
     num=$(jq -r '.num' <<< $data)
     echo $name
     echo $num
-    bash "${dir}"/org/start.sh $name $num $namespace
+    bash "${dir}"/org/start.sh $name $num $namespace $orgIsMiner
     # sleep 1.5
 done
 sleep 2

@@ -12,11 +12,20 @@ configPath=$dir/config.json
 blockchain=$(jq -r '.blockchain' $configPath)
 platform=$(jq -r '.platform' <<< $blockchain)
 consensus=$(jq -r '.consensus' <<< $blockchain)
+orgIsMiner=$(jq -r '.orgIsMiner' <<< $blockchain)
 miner=$(jq -r '.miner' <<< $blockchain)
 minerNum=$(jq -r '.num' <<< $miner)
-
-chmod +rw $dir/blockchain/startpow.sh
-bash $dir/blockchain/startpow.sh $minerNum $namespace
+echo consensus: $consensus
+echo orgIsMiner: $orgIsMiner
+if [[ $consensus == "pow" ]];
+then
+    chmod +rw $dir/blockchain/startpow.sh
+    bash $dir/blockchain/startpow.sh $minerNum $namespace
+elif [[ $consensus == "poa" ]];
+then
+    chmod +rw $dir/blockchain/startpoa.sh
+    bash $dir/blockchain/startpoa.sh $minerNum $namespace
+fi
 
 # ------------------------------------
 
@@ -60,5 +69,5 @@ echo filename2: $filename2
 # filename2=org_device_distri.json
 
 # chmod +rw $dir/start.sh
-bash $dir/start.sh $filename $filename2 $namespace
+bash $dir/start.sh $filename $filename2 $namespace $orgIsMiner
 

@@ -1,13 +1,14 @@
 {
     "blockchain": {
         "platform": "go-ethereum",
-        "consensus":"poa",
+        "consensus":"pow",
+        "orgIsMiner": false,
         "miner":{
-            "num": 3
+            "num": 1
         }
     },
     "distribution": {
-        "orgNum": 3,
+        "orgNum": 10,
         "org2plant":{
             "methods": "normal",
             "meau": 2,

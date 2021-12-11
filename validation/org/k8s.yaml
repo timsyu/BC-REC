@@ -26,6 +26,8 @@ spec:
               value: "org3-desc"
             - name: PLANT_NUM
               value: "2"
+            - name: ORG_IS_MINER
+              value: "false"
           args:
             - -c
             - |
@@ -44,6 +46,12 @@ spec:
                 fi
                 sleep 5
               done
+
+              if [[ $ORG_IS_MINER == "true" ]];
+              then
+                geth attach http://127.0.0.1:8545 -exec "miner.start(1)"
+              fi
+
               datadir=/ethereum
               filename=$(basename /ethereum/keystore/*)
               account=0x$(jq -r '.address' /ethereum/keystore/$filename)
@@ -67,7 +75,7 @@ spec:
             - |
               filename=$(basename /ethereum/keystore/*)
               account=0x$(jq -r '.address' /ethereum/keystore/$filename)
-              geth --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@172.17.0.7:30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*' --http.api 'admin,eth,net,web3,personal,miner' --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins '*' --ws.api 'eth,net,web3' --nousb --allow-insecure-unlock
+              geth --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@172.17.0.13:30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*' --http.api 'admin,eth,net,web3,personal,miner' --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins '*' --ws.api 'eth,net,web3' --nousb --allow-insecure-unlock
           env:
             - name: NETWORK_ID
               valueFrom:
@@ -101,6 +109,7 @@ spec:
       initContainers:
         - name: init
           image: f221267155/eth-testnet:v1
+          imagePullPolicy: Never
           command: ["geth"]
           args: ["--datadir=/ethereum", "account", "new", "--password=/opt/password/password.txt"]
           volumeMounts:
@@ -111,6 +120,7 @@ spec:
               mountPath: "/ethereum"
         - name: genesis
           image: f221267155/eth-testnet:v1
+          imagePullPolicy: Never
           command: ["geth"]
           args: ["--datadir=/ethereum", "init", "/opt/genesis/genesis.json"]
           volumeMounts:

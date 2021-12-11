@@ -4,6 +4,8 @@ dir=$(dirname "$0")
 orgName=$1
 plantNum=$2
 namespace=$3
+orgIsMiner=$4
+
 # Deployment
 deploymentName=$orgName-dapp-deployname
 serviceName=$orgName-dapp-service
@@ -38,7 +40,11 @@ value=$plantNum yq e -i '
     .spec.template.spec.containers[0].env[2].value = strenv(value)
 ' "${dir}"/k8s.yaml
 
-
+# set ORG_IS_MINER
+value=$orgIsMiner yq e -i '
+    . | select(.kind == "Deployment") |=
+    .spec.template.spec.containers[0].env[3].value = strenv(value)
+' "${dir}"/k8s.yaml
 
 # Service
 name=$serviceName yq e -i '

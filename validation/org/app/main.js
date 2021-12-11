@@ -331,7 +331,7 @@ main = async(argv) => {
         if (account && privateKey && orgAddress) {
             const web3 = new Web3(config.provider.rpc);
             let rule = new schedule.RecurrenceRule();
-            rule.second = [0, 30]; // when sec is at 0, 30,...
+            rule.second = [0, 10, 20 ,30, 40, 50]; // when sec is at 0, 30,...
             let job = schedule.scheduleJob(rule, () => {
                 console.log(new Date(),"autoapprove");
                 approveDeviceRegister(web3, account, privateKey, config, orgAddress);

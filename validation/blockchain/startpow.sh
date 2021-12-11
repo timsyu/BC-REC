@@ -31,20 +31,49 @@ name=$content yq e -i --prettyPrint '
 kubectl apply -f $dir/genesis-config.yaml
 
 # miners
-# for (( i=1; i<=$minerNum; i++))
-# do
-#     deploymentName=eth-testnet-miner$i
-#     name=$deploymentName yq e -i '
-#         .metadata.name = strenv(name)
-#     ' $dir/pow/miner.yaml
-#     namespace=$namespace yq e -i '
-#         .metadata.namespace = strenv(namespace)
-#     ' $dir/pow/miner.yaml
+for (( i=1; i<=$minerNum; i++))
+do
+    deploymentName=eth-testnet-miner$i
+    serviceName=miner$i-service
+    # Deployment
+    name=$deploymentName yq e -i '
+        . | select(.kind == "Deployment") |=
+        .metadata.name = strenv(name)
+    ' $dir/pow/node.yaml
+    namespace=$namespace yq e -i '
+        . | select(.kind == "Deployment") |=
+        .metadata.namespace = strenv(namespace)
+    ' $dir/pow/node.yaml
 
-#     name=$deploymentName yq e -i '
-#         .spec.template.spec.containers[0].name = strenv(name)
-#     ' $dir/pow/miner.yaml
-#     # create pod
-#     kubectl apply -f $dir/pow/miner.yaml
-# done
+    name=$deploymentName yq e -i '
+        . | select(.kind == "Deployment") |=
+        .spec.template.spec.containers[0].name = strenv(name)
+    ' $dir/pow/node.yaml
+
+    name=$serviceName yq e -i '
+        . | select(.kind == "Deployment") |=
+        .spec.selector.matchLabels.app = strenv(name)
+    ' $dir/pow/node.yaml
+
+    name=$serviceName yq e -i '
+        . | select(.kind == "Deployment") |=
+        .spec.template.metadata.labels.app = strenv(name)
+    ' $dir/pow/node.yaml
+
+    # Service
+    name=$serviceName yq e -i '
+        . | select(.kind == "Service") |=
+        .metadata.name = strenv(name)
+    ' $dir/pow/node.yaml
+    namespace=$namespace yq e -i '
+        . | select(.kind == "Service") |=
+        .metadata.namespace = strenv(namespace)
+    ' $dir/pow/node.yaml
+    name=$serviceName yq e -i '
+        . | select(.kind == "Service") |=
+        .spec.selector.app = strenv(name)
+    ' $dir/pow/node.yaml
+    # create pod
+    kubectl apply -f $dir/pow/node.yaml
+done
 

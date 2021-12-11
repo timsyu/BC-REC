@@ -66,7 +66,7 @@ spec:
             - |
               filename=$(basename /ethereum/keystore/*)
               account=0x$(jq -r '.address' /ethereum/keystore/$filename)
-              geth --miner.gasprice=0 --syncmode "snap" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@172.17.0.7:30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock
+              geth --miner.gasprice=0 --syncmode "snap" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@172.17.0.13:30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock
           ports:
             - containerPort: 8545
               name: rpc

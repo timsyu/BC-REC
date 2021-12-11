@@ -1,55 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: issuer-dapp-deployname
-  namespace: "recval"
+  name: eth-testnet-miner3
+  namespace: recval
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: issuer-dapp-service
+      app: miner3-service
   template:
     metadata:
       labels:
-        app: issuer-dapp-service
+        app: miner3-service
     spec:
       containers:
-        - name: issuer-dapp
-          image: f221267155/issuerdapp:v2
-          imagePullPolicy: Never
-          command:
-            - "/bin/bash"
-          args:
-            - -c
-            - |
-              rpc=http://127.0.0.1:8545
-              v=$(jq ".rpc=\"$rpc\"" /app/resource/provider.json)
-              echo $v > /app/resource/provider.json
-              while true
-              do
-                isSyncing=$(geth attach http://127.0.0.1:8545 -exec "eth.syncing")
-                echo node isSyncing: $isSyncing
-                if [[ $isSyncing == false ]];
-                then
-                  echo node is fully synced with other nodes!!
-                  break
-                fi
-                sleep 5
-              done
-              datadir=/ethereum
-              filename=$(basename /ethereum/keystore/*)
-              account=0x$(jq -r '.address' /ethereum/keystore/$filename)
-              password=$(cat /opt/password/password.txt)
-              bash /app/start.sh $datadir $account $password
-          ports:
-            - containerPort: 3000
-              name: my-server-tcp
-          volumeMounts:
-            - name: chaindata
-              mountPath: "/ethereum"
-            - name: password
-              mountPath: "/opt/password"
-        - name: issuer-node
+        - name: eth-testnet-miner3
           image: f221267155/eth-testnet:v1
           imagePullPolicy: Never
           command:
@@ -59,7 +24,7 @@ spec:
             - |
               filename=$(basename /ethereum/keystore/*)
               account=0x$(jq -r '.address' /ethereum/keystore/$filename)
-              geth --mine --miner.threads=1 --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@172.17.0.13:30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock
+              geth --metrics --pprof --mine --miner.threads=1 --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@172.17.0.13:30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock
           env:
             - name: NETWORK_ID
               valueFrom:
@@ -68,6 +33,8 @@ spec:
                   key: networkid
           imagePullPolicy: Never
           ports:
+            - containerPort: 6060
+              name: metric-tcp
             - containerPort: 8545
               name: rpc
             - containerPort: 30303
@@ -127,16 +94,16 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: issuer-dapp-service
-  namespace: "recval"
+  name: miner3-service
+  namespace: recval
 spec:
   # type: NodePort
   selector:
-    app: issuer-dapp-service
+    app: miner3-service
   ports:
-    - port: 3000
-      targetPort: 3000
-      name: my-server-tcp
+    - port: 6060
+      targetPort: 6060
+      name: metric-tcp
       protocol: TCP
     - port: 30303
       targetPort: 30303
