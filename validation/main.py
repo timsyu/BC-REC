@@ -13,7 +13,7 @@ parser.add_argument('--mode', type=str,
                     help='device or plant', required=True)
 parser.add_argument('--seed', type=int,
                     help='seed for random')
-parser.add_argument('--mean', type=int,
+parser.add_argument('--mean', type=float,
                     help='mean, mu', required=True)
 parser.add_argument('--sigma', type=int,
                     help='sigma', required=True)
@@ -39,10 +39,9 @@ def generateOutput(mode, filename, seed, mean, sigma, size, imageName):
                     count += 1
                     info = {'name': count,'orgId': orgCount}
                     data.append(info)
-        print('total org number', orgCount)
-        print('total device number', count)
+        print(orgCount)
+        print(count)
     elif mode == "plant" :
-        count = 0
         plantCount = 0
         for i in range(len(vals)):
             num = counts[i]
@@ -51,8 +50,8 @@ def generateOutput(mode, filename, seed, mean, sigma, size, imageName):
                 plantCount += counts[i]
                 info = {'name': count ,'num': counts[i]}
                 data.append(info)
-        print('total org number', count)
-        print('total plant number', plantCount)
+        print(count)
+        print(plantCount)
     out = {'data': data, 'count': count}
     # print(out)
     with open(filename, 'w', encoding='utf-8') as f:
@@ -62,6 +61,5 @@ def generateOutput(mode, filename, seed, mean, sigma, size, imageName):
 if __name__ == '__main__':
     args = parser.parse_args()
     print(args.filename)
-    print(args.mode)
     if(args.mode == "device" or args.mode == "plant"):
         generateOutput(args.mode, args.filename, args.seed, args.mean, args.sigma, args.size, args.imagename)

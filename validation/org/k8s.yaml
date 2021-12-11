@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: org3-dapp-deployname
-  namespace: recval
+  name: org5-dapp-deployname
+  namespace: "recval"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: org3-dapp-service
+      app: org5-dapp-service
   template:
     metadata:
       labels:
-        app: org3-dapp-service
+        app: org5-dapp-service
     spec:
       containers:
         - name: org-dapp
@@ -21,9 +21,9 @@ spec:
             - "/bin/bash"
           env:
             - name: ORG_NAME
-              value: "org3-name"
+              value: "org5-name"
             - name: ORG_DESC
-              value: "org3-desc"
+              value: "org5-desc"
             - name: PLANT_NUM
               value: "2"
             - name: ORG_IS_MINER
@@ -145,12 +145,12 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: org3-dapp-service
-  namespace: recval
+  name: org5-dapp-service
+  namespace: "recval"
 spec:
   # type: NodePort
   selector:
-    app: org3-dapp-service
+    app: org5-dapp-service
   ports:
     - port: 3000
       targetPort: 3000

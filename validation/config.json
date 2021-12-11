@@ -4,20 +4,22 @@
         "consensus":"pow",
         "orgIsMiner": false,
         "miner":{
-            "num": 1
+            "num": 0
         }
     },
     "distribution": {
-        "orgNum": 10,
+        "orgNum": 5,
         "org2plant":{
             "methods": "normal",
-            "meau": 2,
-            "sigma": 1
+            "meau": 8,
+            "sigma": 4,
+            "seed": 9
         },
         "org2device":{
             "methods": "normal",
-            "meau": 2,
-            "sigma": 1
+            "meau": 5.5,
+            "sigma": 1,
+            "seed": 9
         }
     }
 }
