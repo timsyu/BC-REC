@@ -9,6 +9,7 @@ const keythereum = require("keythereum");
 const { Console } = require("console");
 const fs = require("fs");
 const colors = require('colors/safe');
+const process = require('process');
 
 // set theme
 colors.setTheme({
@@ -25,6 +26,8 @@ const myLogger = new Console({
     stdout: fs.createWriteStream(`${__dirname}/out/normalStdout.txt`),
     stderr: fs.createWriteStream(`${__dirname}/out/errStdErr.txt`),
 });
+
+const myRecordTimeLogger = fs.createWriteStream(`${__dirname}/out/time.txt`);
 
 register = async(web3, account, privateKey, config, orgAddress, plantAddress) => {
     try {
@@ -63,7 +66,11 @@ record = async(web3, account, privateKey, config, plantAddress, value) => {
             console.log("---device record & bind power start---");
             let dateTime = new Date().getTime();
             const date = Math.floor(dateTime / 1000);
+            const start = process.hrtime.bigint();
             const { recordResult, powerId, recordTxHash , bindTxHash} = await recordTools.record(plantAddress, date, value);
+            const end = process.hrtime.bigint();
+            const t = (Number(end - start)/ Math.pow(10,9)).toString()
+            myRecordTimeLogger.write(`${t}\n`);
             console.log("recordResult: ", recordResult);
             console.log("powerId: ", powerId);
             console.log("recordTxHash: ", recordTxHash);
