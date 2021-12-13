@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: issuer-dapp-deployname
-  namespace: "recval"
+  namespace: ""
 spec:
   replicas: 1
   selector:
@@ -128,7 +128,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: issuer-dapp-service
-  namespace: "recval"
+  namespace: ""
 spec:
   # type: NodePort
   selector:
