@@ -21,7 +21,7 @@ spec:
           args:
             - -c
             - >
-              geth --mine --miner.threads=4 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@$(BOOTNODE_SERVICE_HOST):30301 --datadir /ethereum  --unlock ${ACCOUNT} --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner,clique' --nousb --allow-insecure-unlock;
+              geth --mine --miner.threads=4 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@$(NODE_IP):32121 --datadir /ethereum  --unlock ${ACCOUNT} --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner,clique' --nousb --allow-insecure-unlock;
 
           env:
             - name: NETWORK_ID
@@ -34,6 +34,10 @@ spec:
                 secretKeyRef:
                   name: keystore3
                   key: account
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           imagePullPolicy: Never
           ports:
             - containerPort: 8545
