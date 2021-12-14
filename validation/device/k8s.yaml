@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: device25-dapp
+  name: device1-dapp
   namespace: recval
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: device25-dapp
+      app: device1-dapp
   template:
     metadata:
       labels:
-        app: device25-dapp
+        app: device1-dapp
     spec:
       containers:
         - name: device-dapp
@@ -19,7 +19,7 @@ spec:
           imagePullPolicy: Never
           env:
             - name: TARGET_ORG
-              value: "5"
+              value: "1"
           command:
             - "/bin/bash"
           args:

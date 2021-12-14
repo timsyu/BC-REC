@@ -26,6 +26,8 @@ const myLogger = new Console({
     stderr: fs.createWriteStream(`${__dirname}/out/errStdErr.txt`),
 });
 
+const myRequestCertTimeLogger = fs.createWriteStream(`${__dirname}/out/time.txt`);
+
 createOrg = async(web3, account, privateKey, config, orgName, orgDescriptsion) => {
     try {
         // init org tools
@@ -129,7 +131,11 @@ requestCertificate = async(web3, account, privateKey, config, orgAddress, metada
                 console.log("powerIds", powerIds);
                 console.log("values", values);
                 myLogger.log(new Date(), colors.action("requestCertificate "),"certNum: ", colors.text(certNum),"powerIds: ", colors.text(powerIds), "values: ", colors.text(values));
+                const start = process.hrtime.bigint();
                 let {txHash, requestId, tokenIds} = await orgTools.requestCertificate(orgAddress, certNum, plantId, powerIds, values, metadataUri);
+                const end = process.hrtime.bigint();
+                const t = (Number(end - start)/ Math.pow(10,9)).toString()
+                myRequestCertTimeLogger.write(`${t}\n`);
                 console.log("txHash", txHash);
                 console.log("requestId", requestId);
                 console.log("tokenIds", tokenIds);

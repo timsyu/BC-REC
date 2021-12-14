@@ -8,16 +8,16 @@
         }
     },
     "distribution": {
-        "orgNum": 5,
+        "orgNum": 1,
         "org2plant":{
             "methods": "normal",
-            "meau": 8,
+            "meau": 1,
             "sigma": 4,
             "seed": 9
         },
         "org2device":{
             "methods": "normal",
-            "meau": 5.5,
+            "meau": 1,
             "sigma": 1,
             "seed": 9
         }
