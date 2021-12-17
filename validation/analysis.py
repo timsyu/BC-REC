@@ -66,4 +66,5 @@ class Analysis:
 
 if __name__ == '__main__':
     a = Analysis()
+    a.draw(targetfile='a.txt', toInt=True, draw=True, filename='a.png')
     a.combine(targetfiles=['a.txt', 'b.txt', 'c.txt'], toInt=True, draw=True, filename='total.png')

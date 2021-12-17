@@ -18,6 +18,11 @@ echo privateKey: $privateKey
 echo "--------------------------------------------------------------------------------"
 
 echo "--------------------------------------------------------------------------------"
+echo "start service"
+nohup node $dir/server.js &> $dir/out/server.txt &
+echo "--------------------------------------------------------------------------------"
+
+echo "--------------------------------------------------------------------------------"
 echo "Ask org address and plant address"
 host_var=ORG${TARGET_ORG}_DAPP_SERVICE_SERVICE_HOST
 host="${!host_var}"
