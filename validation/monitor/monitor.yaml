@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitor-deployname
+  namespace: recval
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monitor-service
+  template:
+    metadata:
+      labels:
+        app: monitor-service
+    spec:
+      containers:
+        - name: monitor-node
+          image: f221267155/monitor:v1
+          imagePullPolicy: Never
+          command:
+            - "/bin/bash"
+          args:
+            - -c
+            - |
+              python server.py
+          env:
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          ports:
+            - containerPort: 3000
+              name: my-server-tcp
+          volumeMounts:
+            - name: distribution
+              mountPath: "/opt/distribution"
+              readOnly: true
+      volumes:
+        - name: distribution
+          configMap:
+            name: distribution
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: monitor-service
+  namespace: recval
+spec:
+  type: NodePort
+  selector:
+    app: monitor-service
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 32122
+      name: my-server-tcp
+      protocol: TCP
