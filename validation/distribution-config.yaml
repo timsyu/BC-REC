@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: distribution
+  namespace: recval
+data:
+  org_device_distribution.json: |-
+    {
+      "data": [
+        {
+          "name": 1,
+          "orgId": 1
+        },
+        {
+          "name": 2,
+          "orgId": 1
+        },
+        {
+          "name": 3,
+          "orgId": 2
+        },
+        {
+          "name": 4,
+          "orgId": 2
+        }
+      ],
+      "count": 4
+    }
+  org_plant_distribution.json: |-
+    {
+      "data": [
+        {
+          "name": 1,
+          "num": 1
+        },
+        {
+          "name": 2,
+          "num": 1
+        }
+      ],
+      "count": 2
+    }

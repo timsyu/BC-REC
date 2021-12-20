@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: device1-dapp
+  name: device4-dapp-deployment
   namespace: recval
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: device1-dapp-service
+      app: device4-dapp-service
   template:
     metadata:
       labels:
-        app: device1-dapp-service
+        app: device4-dapp-service
     spec:
       containers:
         - name: device-dapp
@@ -19,7 +19,7 @@ spec:
           imagePullPolicy: Never
           env:
             - name: TARGET_ORG
-              value: "1"
+              value: "2"
           command:
             - "/bin/bash"
           args:
@@ -70,7 +70,7 @@ spec:
             - |
               filename=$(basename /ethereum/keystore/*)
               account=0x$(jq -r '.address' /ethereum/keystore/$filename)
-              geth --miner.gasprice=0 --syncmode "snap" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@$(NODE_IP):32121 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock
+              geth --miner.gasprice=0 --syncmode "snap" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@172.17.0.2:30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*'  --http.api 'admin,eth,net,web3,personal,miner' --nousb --allow-insecure-unlock
           ports:
             - containerPort: 8545
               name: rpc
@@ -129,12 +129,12 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: device1-dapp-service
+  name: device4-dapp-service
   namespace: recval
 spec:
   # type: NodePort
   selector:
-    app: device1-dapp-service
+    app: device4-dapp-service
   ports:
     - port: 3000
       targetPort: 3000

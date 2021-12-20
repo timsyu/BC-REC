@@ -22,40 +22,68 @@ chmod +x $dir/device/start.sh
 true > $dir/org/orglist.txt
 true > $dir/org/servicelist.txt
 true > $dir/device/devicelist.txt
-
-echo "create issuer Pod"
+# ------------------------------
+echo "create 1 issuer Pod"
 bash "${dir}"/issuer/start.sh $namespace
-
+# ------------------------------
 filename=$1
 count=$(jq -r '.count' $filename)
 echo $count
-
-echo "create org Pod and Org Service"
+echo "create $count org Pods and Org Services"
 for (( i=0; i<$count; i++))
 do
     data=$(jq -r .data["${i}"] $filename)
     # echo $data
     name=org$(jq -r '.name' <<< $data)
     num=$(jq -r '.num' <<< $data)
-    echo $name
-    echo $num
+    # echo $name
+    # echo $num
     bash "${dir}"/org/start.sh $name $num $namespace $orgIsMiner
     # sleep 1.5
 done
 sleep 2
 
+# ------------------------------
 filename2=$2
 count=$(jq -r '.count' $filename2)
 echo $count
-echo "create device Pod"
+echo "create $count device Pods"
 for (( i=0; i<$count; i++))
 do
     data=$(jq -r .data["${i}"] $filename2)
     # echo $data
     name=device$(jq -r '.name' <<< $data)
     orgId=$(jq -r '.orgId' <<< $data)
-    echo $name
-    echo $orgId
+    # echo $name
+    # echo $orgId
     bash "${dir}"/device/start.sh $name $orgId $namespace
     # sleep 1.5
 done
+
+# ------------------------------
+echo "create 1 monitor Pod"
+
+# set distri config
+chmod +rw $dir/distribution-config.yaml
+orgDeviceFile=$filename2
+orgPlantFile=$filename
+chmod +r $orgDeviceFile
+chmod +r $orgPlantFile
+orgDeviceContent=$(jq '.' $orgDeviceFile)
+orgPlantContent=$(jq '.' $orgPlantFile)
+
+namespace=$namespace yq e -i '
+        .metadata."namespace" = strenv(namespace)
+' $dir/distribution-config.yaml
+content=$orgDeviceContent yq e -i --prettyPrint '
+        .data."org_device_distribution.json" = strenv(content)
+' $dir/distribution-config.yaml
+content=$orgPlantContent yq e -i --prettyPrint '
+        .data."org_plant_distribution.json" = strenv(content)
+' $dir/distribution-config.yaml
+
+# build distri config
+kubectl apply -f "${dir}"/distribution-config.yaml
+
+# build monitor Pod
+bash "${dir}"/monitor/start.sh $namespace

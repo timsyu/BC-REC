@@ -22,8 +22,8 @@ def hello_world():
 def home():
     return render_template('home.html')
 
-def getRecordTimeInfo(url, number):
-    r = requests.get(url, number)
+def getRecordTimeInfo(url):
+    r = requests.get(url)
     content = ''
     if r.status_code == requests.codes.ok:
         result = r.json()
@@ -47,14 +47,18 @@ def distribution():
         pass
     return jsonify(data)
 
-@app.route('/img/recordtime.png')
+@app.route('/img/recordtime.png', methods=['POST'])
 def out():
-    servicename = request.args.get('servicename')
     number = request.args.get('num')
-    content = getRecordTimeInfo("http://" + servicename + ":3000/out/recordtime", number)
-    data = content.split(',')
+    json_data = json.loads(request.form.get('data'))
+    target = json_data['target']
+    array = []
+    for servicename in target:
+        content = getRecordTimeInfo("http://" + servicename + ":3000/out/recordtime?number=" + number)
+        data = content.split(',')
+        array += data
     a = Analysis()
-    plt = a.draw(data=data, toInt=True, draw=True)
+    plt = a.draw(data=array, toInt=True, draw=True)
     output = io.BytesIO()
     canvas = FigureCanvas(plt.gcf())
     png_output = io.BytesIO()

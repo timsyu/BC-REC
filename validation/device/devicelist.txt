@@ -1,1 +1,4 @@
-device1-dapp
+device1-dapp-deployment
+device2-dapp-deployment
+device3-dapp-deployment
+device4-dapp-deployment

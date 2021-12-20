@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: org1-dapp-deployname
+  name: org2-dapp-deployname
   namespace: "recval"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: org1-dapp-service
+      app: org2-dapp-service
   template:
     metadata:
       labels:
-        app: org1-dapp-service
+        app: org2-dapp-service
     spec:
       containers:
         - name: org-dapp
@@ -21,9 +21,9 @@ spec:
             - "/bin/bash"
           env:
             - name: ORG_NAME
-              value: "org1-name"
+              value: "org2-name"
             - name: ORG_DESC
-              value: "org1-desc"
+              value: "org2-desc"
             - name: PLANT_NUM
               value: "1"
             - name: ORG_IS_MINER
@@ -75,7 +75,7 @@ spec:
             - |
               filename=$(basename /ethereum/keystore/*)
               account=0x$(jq -r '.address' /ethereum/keystore/$filename)
-              geth --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@$(NODE_IP):32121 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*' --http.api 'admin,eth,net,web3,personal,miner' --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins '*' --ws.api 'eth,net,web3' --nousb --allow-insecure-unlock
+              geth --miner.gasprice=0 --syncmode "full" --networkid ${NETWORK_ID} --bootnodes enode://`bootnode -writeaddress --nodekey=/opt/bootnode/boot.key`@172.17.0.2:30301 --datadir /ethereum  --unlock $account --password /opt/password/password.txt  --http --http.addr 0.0.0.0 --http.port 8545 --http.corsdomain '*' --http.api 'admin,eth,net,web3,personal,miner' --ws --ws.addr 0.0.0.0 --ws.port 8546 --ws.origins '*' --ws.api 'eth,net,web3' --nousb --allow-insecure-unlock
           env:
             - name: NETWORK_ID
               valueFrom:
@@ -149,12 +149,12 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: org1-dapp-service
+  name: org2-dapp-service
   namespace: "recval"
 spec:
   # type: NodePort
   selector:
-    app: org1-dapp-service
+    app: org2-dapp-service
   ports:
     - port: 3000
       targetPort: 3000
